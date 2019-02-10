@@ -30,9 +30,7 @@
      var osc = context.createOscillator();
      osc.connect(context.destination);
      freq = document.querySelector("#note").value
-     if(step === 1){
-       osc.frequency.value = freq;
-     }
+     osc.frequency.value = freq;
      osc.start(time);
      osc.stop(time + 0.2);
      setTimeout(function(){
