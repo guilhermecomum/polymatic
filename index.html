@@ -2,30 +2,89 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>title</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Polymatic</title>
     <script src="beet.min.js"></script>
     <script src="ractive.js"></script>
+    <style type="text/css">
+     .stage {
+       padding: 20px;
+       display: flex;
+       flex-wrap: wrap
+     }
+     .input {
+       font-size: 30px;
+       width: 100%;
+       border: 1px solid black;
+       padding: 5px;
+       box-sizing : border-box;
+       margin-bottom: 10px;
+     }
+     label {
+       font-size: 25px;
+       padding-bottom: 5px;
+       display: block;
+     }
+     button {
+       background: white;
+       border: 1px solid black;
+       padding: 16px;
+     }
+     .add {
+       width: 100%;
+       font-size: 20px;
+     }
+     .remove {
+       color: red;
+       font-size: 20px;
+       text-decoration: none;
+     }
+     .control {
+       width: 49%;
+       font-size: 20px;
+     }
+     .controls {
+       margin-right: 100px;
+     }
+
+     li {
+       font-size: 25px;
+     }
+
+     @media (max-width: 540px) {
+       .controls {
+         margin-right: 0;
+       }
+     }
+    </style>
   </head>
   <body>
     <div id="target"></div>
 
     <script id="template" type="text/ractive">
-      <label>Sequência</label>
-      <input id="sequence" type="text" value="1000101010" />
-      <label>Frequência</label>
-      <input id="note" type="text" value="440" />
-      <label>Tempo</label>
-      <input id="tempo" type="text" value="120" />
-      <button on-click="['addLayer', layers]">Tocar</button>
-      <button on-click="@global.beet.stop()">Stop</button>
-      <button on-click="@global.beet.start()">Start</button>
-      <div>
-        <h2>Layers</h2>
-        <ul>
-          {{#each layers}}
-          <li>{{sequence}} - {{tempo}}bpm - {{note}}Hz</li>
-          {{/each}}
-        </ul>
+      <div class="stage">
+        <div class="controls">
+          <label>Sequência</label>
+          <input class="input" id="sequence" type="text" value="1000101010" /><br /><br />
+          <label>Tempo</label>
+          <input class="input" id="tempo" type="text" value="120" /><br /><br />
+          <label>Note</label>
+          <input class="input" id="note" type="text" value="440" /><br /><br />
+          <button class="add" on-click="['addLayer', layers]">Adicionar</button><br /><Br />
+          <button class="control" on-click="@global.beet.stop()">Stop</button>
+          <button class="control" on-click="@global.beet.start()">Start</button>
+        </div>
+        <div class="layers">
+          <h2>Padrões</h2>
+          <ul>
+            {{#each layers: num}}
+            <li>
+              layer{{index + 1}} - {{sequence}} - {{tempo}}bpm
+              <a href="#" class="remove" on-click="['removeLayer', num, layer]"> - remover</a>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
       </div>
     </script>
   </body>
@@ -35,7 +94,7 @@
      target: '#target',
      template: '#template',
      data: {
-       layers: []
+       layers: [],
      }
    });
 
@@ -50,25 +109,27 @@
        addLayer: function(ctx, layers) {
          sequence = document.querySelector("#sequence").value
          tempo = document.querySelector("#tempo").value
-         freq = document.querySelector("#note").value
          var pattern = beet.pattern(sequence);
          var layer = beet.layer(pattern, callbackOn);
          layer.tempo = tempo
          beet.add(layer).start();
-         ractive.push('layers', {sequence: sequence, tempo: tempo, note: freq })
+         ractive.push('layers', {index: (layers.length), sequence: sequence, tempo: tempo, layer: layer })
+       },
+       removeLayer: function(ctx, num, layer) {
+         ractive.pop('layers', num)
+         beet.remove(layer)
        }
      }
    )
 
    function callbackOn (time, step, timeFromScheduled) {
+     note = document.querySelector("#note").value
      var osc = context.createOscillator();
      osc.connect(context.destination);
-     freq = document.querySelector("#note").value
-     osc.frequency.value = freq;
+     osc.frequency.value = note;
      osc.start(time);
      osc.stop(time + 0.2);
    }
-
 
   </script>
 </html>
