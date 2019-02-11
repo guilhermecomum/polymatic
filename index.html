@@ -4,27 +4,61 @@
     <meta charset="UTF-8">
     <title>title</title>
     <script src="beet.min.js"></script>
+    <script src="ractive.js"></script>
   </head>
   <body>
-    <label>Sequência</label>
-    <input id="sequence" type="text" value="1000101010" />
-    <label>Frequência</label>
-    <input id="note" type="text" value="440" />
-    <button onClick="Reload()">Tocar</button>
-    <button onClick="beet.stop()">Stop</button>
-    <button onClick="beet.start()">Start</button>
+    <div id="target"></div>
+
+    <script id="template" type="text/ractive">
+      <label>Sequência</label>
+      <input id="sequence" type="text" value="1000101010" />
+      <label>Frequência</label>
+      <input id="note" type="text" value="440" />
+      <label>Tempo</label>
+      <input id="tempo" type="text" value="120" />
+      <button on-click="['addLayer', layers]">Tocar</button>
+      <button on-click="@global.beet.stop()">Stop</button>
+      <button on-click="@global.beet.start()">Start</button>
+      <div>
+        <h2>Layers</h2>
+        <ul>
+          {{#each layers}}
+          <li>{{sequence}} - {{tempo}}bpm - {{note}}Hz</li>
+          {{/each}}
+        </ul>
+      </div>
+    </script>
   </body>
 
   <script type="text/javascript">
-   function Layers() {
-     console.log(beet.layer())
-   }
-   function Reload() {
-     value = document.querySelector("#sequence").value
-     var pattern = beet.pattern(value);
-     var layer = beet.layer(pattern, callbackOn);
-     beet.add(layer).start();
-   }
+   var ractive = new Ractive({
+     target: '#target',
+     template: '#template',
+     data: {
+       layers: []
+     }
+   });
+
+   window.AudioContext = window.AudioContext || window.webkitAudioContext;
+   var context = new AudioContext();
+   var beet = new Beet({
+     context: context
+   });
+
+   ractive.on(
+     {
+       addLayer: function(ctx, layers) {
+         sequence = document.querySelector("#sequence").value
+         tempo = document.querySelector("#tempo").value
+         freq = document.querySelector("#note").value
+         var pattern = beet.pattern(sequence);
+         var layer = beet.layer(pattern, callbackOn);
+         layer.tempo = tempo
+         beet.add(layer).start();
+         ractive.push('layers', {sequence: sequence, tempo: tempo, note: freq })
+       }
+     }
+   )
 
    function callbackOn (time, step, timeFromScheduled) {
      var osc = context.createOscillator();
@@ -33,14 +67,8 @@
      osc.frequency.value = freq;
      osc.start(time);
      osc.stop(time + 0.2);
-     setTimeout(function(){
-       // trigger some js event such as animation - will be synced to the audio
-     }, timeFromScheduled * 1000);
    }
-   window.AudioContext = window.AudioContext || window.webkitAudioContext;
-   var context = new AudioContext();
-   var beet = new Beet({
-     context: context
-   });
+
+
   </script>
 </html>
