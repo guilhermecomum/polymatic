@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Polymatic</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Polymatic</title>
-    <script src="beet.min.js"></script>
-    <script src="ractive.js"></script>
-    <script src="tone.js"></script>
+    <link rel="icon" href="./images/icons/homescreen144.png">
     <style type="text/css">
+     .header {
+       padding-left: 20px;
+     }
+     h1 small {
+       font-size: 13px;
+     }
      .stage {
        padding: 20px;
        display: flex;
@@ -72,6 +76,9 @@
     <div id="target"></div>
 
     <script id="template" type="text/ractive">
+      <div class="header">
+        <h1>Polymatic <small>v1.2</small></h1>
+      </div>
       <div class="stage">
         <div class="controls">
           <label>Sequência</label>
@@ -84,7 +91,7 @@
             <option type="text" value="1">E4</option>
             <option type="text" value="2">A4</option>
           </select>
-     <br /><br />
+          <br /><br />
           <button class="add" on-click="['addLayer', layers]">Adicionar</button><br /><Br />
           <button class="control" on-click="@global.beet.stop()">Stop</button>
           <button class="control" on-click="@global.beet.start()">Start</button>
@@ -102,95 +109,102 @@
         </div>
       </div>
     </script>
-  </body>
-
-  <script type="text/javascript">
-   var ractive = new Ractive({
-     target: '#target',
-     template: '#template',
-     data: {
-       layers: [],
-     }
-   });
-
-   window.AudioContext = window.AudioContext || window.webkitAudioContext;
-   var context = new AudioContext();
-   var beet = new Beet({
-     context: context
-   });
-
-   var callbacks = {
-     0: synth1,
-     1: synth2,
-     2: synth3,
-   }
-
-   ractive.on(
-     {
-       addLayer: function(ctx, layers) {
-         sequence = document.querySelector("#sequence").value
-         tempo = document.querySelector("#tempo").value
-         note = document.querySelector("#note").value
-         var pattern = beet.pattern(sequence);
-         var layer = beet.layer(pattern, callbacks[note]);
-         layer.tempo = tempo
-         beet.add(layer).start();
-         ractive.push('layers', {index: (layers.length), sequence: sequence, tempo: tempo, layer: layer })
-       },
-       removeLayer: function(ctx, num, layer) {
-         ractive.pop('layers', num)
-         beet.remove(layer)
+    <script src="beet.min.js"></script>
+    <script src="ractive.js"></script>
+    <script src="tone.js"></script>
+    <script type="text/javascript">
+     var ractive = new Ractive({
+       target: '#target',
+       template: '#template',
+       data: {
+         layers: [],
        }
+     });
+
+     document.addEventListener('DOMContentLoaded', function() {
+       window.AudioContext = window.AudioContext || window.webkitAudioContext;
+       context = new AudioContext();
+       beet = new Beet({
+         context: context
+       });
+
+     }, false);
+
+     var callbacks = {
+       0: synth1,
+       1: synth2,
+       2: synth3,
      }
-   )
 
-   function synth1() {
-     callSynth("F3")
-   }
-   function synth2() {
-     callSynth("E4")
-   }
-   function synth3() {
-     callSynth("A4")
-   }
+     ractive.on(
+       {
+         addLayer: function(ctx, layers) {
+           context.resume().then(() => {
+             sequence = document.querySelector("#sequence").value
+             tempo = document.querySelector("#tempo").value
+             note = document.querySelector("#note").value
+             var pattern = beet.pattern(sequence);
+             var layer = beet.layer(pattern, callbacks[note]);
+             layer.tempo = tempo
+             beet.add(layer).start();
+             ractive.push('layers', {index: (layers.length), sequence: sequence, tempo: tempo, layer: layer })
+           });
+         },
+         removeLayer: function(ctx, num, layer) {
+           ractive.pop('layers', num)
+           beet.remove(layer)
+         }
+       }
+     )
 
-   function callSynth(note) {
-     var synth = new Tone.Synth({
-       "oscillator" : {
-         "type" : "sine",
-         "harmonicity" : 0.5,
-         "modulationType" : "basic"
-       },
-       "envelope" : {
-         "attackCurve" : "linear",
-         "attack" : 0.01,
-         "decay" : 0.10,
-         "sustain" : 0.10,
-         "release" : 1.2,
-       },
-       "portamento" : 0.0
-     }).toMaster();
-     synth.triggerAttackRelease(note, 0.1)
-   }
+     function synth1() {
+       callSynth("F3")
+     }
+     function synth2() {
+       callSynth("E4")
+     }
+     function synth3() {
+       callSynth("A4")
+     }
 
-   function callSynth1() {
-     var synth = new Tone.Synth({
-       "oscillator" : {
-         "type" : "sine",
-         "harmonicity" : 0.5,
-         "modulationType" : "basic"
-       },
-       "envelope" : {
-         "attackCurve" : "linear",
-         "attack" : 0.01,
-         "decay" : 0.10,
-         "sustain" : 0.10,
-         "release" : 1.2,
-       },
-       "portamento" : 0.0
-     }).toMaster();
-     synth.triggerAttackRelease("C4", 0.1)
-   }
+     function callSynth(note) {
+       var synth = new Tone.Synth({
+         "oscillator" : {
+           "type" : "sine",
+           "harmonicity" : 0.5,
+           "modulationType" : "basic"
+         },
+         "envelope" : {
+           "attackCurve" : "linear",
+           "attack" : 0.01,
+           "decay" : 0.10,
+           "sustain" : 0.10,
+           "release" : 1.2,
+         },
+         "portamento" : 0.0
+       }).toMaster();
+       synth.triggerAttackRelease(note, 0.1)
+     }
 
-  </script>
+     function callSynth1() {
+       var synth = new Tone.Synth({
+         "oscillator" : {
+           "type" : "sine",
+           "harmonicity" : 0.5,
+           "modulationType" : "basic"
+         },
+         "envelope" : {
+           "attackCurve" : "linear",
+           "attack" : 0.01,
+           "decay" : 0.10,
+           "sustain" : 0.10,
+           "release" : 1.2,
+         },
+         "portamento" : 0.0
+       }).toMaster();
+       synth.triggerAttackRelease("C4", 0.1)
+     }
+    </script>
+
+  </body>
 </html>
