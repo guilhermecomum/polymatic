@@ -6,6 +6,7 @@
     <title>Polymatic</title>
     <script src="beet.min.js"></script>
     <script src="ractive.js"></script>
+    <script src="tone.js"></script>
     <style type="text/css">
      .stage {
        padding: 20px;
@@ -19,6 +20,15 @@
        padding: 5px;
        box-sizing : border-box;
        margin-bottom: 10px;
+     }
+     .select {
+       font-size: 30px;
+       width: 100%;
+       border: 1px solid black;
+       padding: 5px;
+       box-sizing : border-box;
+       margin-bottom: 10px;
+       background: none;
      }
      label {
        font-size: 25px;
@@ -69,7 +79,12 @@
           <label>Tempo</label>
           <input class="input" id="tempo" type="text" value="120" /><br /><br />
           <label>Note</label>
-          <input class="input" id="note" type="text" value="440" /><br /><br />
+          <select class="select" id="note">
+            <option type="text" value="0">F3</option>
+            <option type="text" value="1">E4</option>
+            <option type="text" value="2">A4</option>
+          </select>
+     <br /><br />
           <button class="add" on-click="['addLayer', layers]">Adicionar</button><br /><Br />
           <button class="control" on-click="@global.beet.stop()">Stop</button>
           <button class="control" on-click="@global.beet.start()">Start</button>
@@ -104,13 +119,20 @@
      context: context
    });
 
+   var callbacks = {
+     0: synth1,
+     1: synth2,
+     2: synth3,
+   }
+
    ractive.on(
      {
        addLayer: function(ctx, layers) {
          sequence = document.querySelector("#sequence").value
          tempo = document.querySelector("#tempo").value
+         note = document.querySelector("#note").value
          var pattern = beet.pattern(sequence);
-         var layer = beet.layer(pattern, callbackOn);
+         var layer = beet.layer(pattern, callbacks[note]);
          layer.tempo = tempo
          beet.add(layer).start();
          ractive.push('layers', {index: (layers.length), sequence: sequence, tempo: tempo, layer: layer })
@@ -122,13 +144,52 @@
      }
    )
 
-   function callbackOn (time, step, timeFromScheduled) {
-     note = document.querySelector("#note").value
-     var osc = context.createOscillator();
-     osc.connect(context.destination);
-     osc.frequency.value = note;
-     osc.start(time);
-     osc.stop(time + 0.2);
+   function synth1() {
+     callSynth("F3")
+   }
+   function synth2() {
+     callSynth("E4")
+   }
+   function synth3() {
+     callSynth("A4")
+   }
+
+   function callSynth(note) {
+     var synth = new Tone.Synth({
+       "oscillator" : {
+         "type" : "sine",
+         "harmonicity" : 0.5,
+         "modulationType" : "basic"
+       },
+       "envelope" : {
+         "attackCurve" : "linear",
+         "attack" : 0.01,
+         "decay" : 0.10,
+         "sustain" : 0.10,
+         "release" : 1.2,
+       },
+       "portamento" : 0.0
+     }).toMaster();
+     synth.triggerAttackRelease(note, 0.1)
+   }
+
+   function callSynth1() {
+     var synth = new Tone.Synth({
+       "oscillator" : {
+         "type" : "sine",
+         "harmonicity" : 0.5,
+         "modulationType" : "basic"
+       },
+       "envelope" : {
+         "attackCurve" : "linear",
+         "attack" : 0.01,
+         "decay" : 0.10,
+         "sustain" : 0.10,
+         "release" : 1.2,
+       },
+       "portamento" : 0.0
+     }).toMaster();
+     synth.triggerAttackRelease("C4", 0.1)
    }
 
   </script>
