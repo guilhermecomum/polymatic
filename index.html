@@ -77,7 +77,7 @@
 
     <script id="template" type="text/ractive">
       <div class="header">
-        <h1>Polymatic <small>v1.2</small></h1>
+        <h1>Polymatic <small>v1.3</small></h1>
       </div>
       <div class="stage">
         <div class="controls">
@@ -101,8 +101,10 @@
           <ul>
             {{#each layers: num}}
             <li>
-              layer{{index + 1}} - {{sequence}} - {{tempo}}bpm
+              {{note}} - {{sequence}} - {{tempo}}bpm
               <a href="#" class="remove" on-click="['removeLayer', num, layer]"> - remover</a>
+              <a href="#" class="play" on-click="['playLayer', layer]"> - play</a>
+              <a href="#" class="pause" on-click="['pauseLayer', layer]"> - pause</a>
             </li>
             {{/each}}
           </ul>
@@ -136,6 +138,7 @@
        2: synth3,
      }
 
+
      ractive.on(
        {
          addLayer: function(ctx, layers) {
@@ -143,17 +146,28 @@
              sequence = document.querySelector("#sequence").value
              tempo = document.querySelector("#tempo").value
              note = document.querySelector("#note").value
+             noteName = document.querySelector("#note").options[note].text
              var pattern = beet.pattern(sequence);
              var layer = beet.layer(pattern, callbacks[note]);
              layer.tempo = tempo
              beet.add(layer).start();
-             ractive.push('layers', {index: (layers.length), sequence: sequence, tempo: tempo, layer: layer })
+             ractive.push('layers', { index: (layers.length), sequence: sequence, tempo: tempo, layer: layer, note: noteName })
+             console.log("reactive.data: ", layers)
            });
          },
          removeLayer: function(ctx, num, layer) {
            ractive.pop('layers', num)
            beet.remove(layer)
+         },
+         playLayer: function(ctx, layer) {
+           console.log("play", layer)
+           layer.start()
+         },
+         pauseLayer: function(ctx, layer) {
+           console.log("pause", layer)
+           layer.stop()
          }
+
        }
      )
 
@@ -168,7 +182,7 @@
      }
 
      function callSynth(note) {
-       var synth = new Tone.Synth({
+       synth = new Tone.Synth({
          "oscillator" : {
            "type" : "sine",
            "harmonicity" : 0.5,
