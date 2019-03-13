@@ -77,7 +77,7 @@
 
     <script id="template" type="text/ractive">
       <div class="header">
-        <h1>Polymatic <small>v1.3</small></h1>
+        <h1>Polymatic <small>v1.4</small></h1>
       </div>
       <div class="stage">
         <div class="controls">
@@ -87,9 +87,11 @@
           <input class="input" id="tempo" type="text" value="120" /><br /><br />
           <label>Note</label>
           <select class="select" id="note">
-            <option type="text" value="0">F3</option>
-            <option type="text" value="1">E4</option>
-            <option type="text" value="2">A4</option>
+            <option type="text" value="0">C#3</option>
+            <option type="text" value="1">D#3</option>
+            <option type="text" value="2">F#3</option>
+            <option type="text" value="3">G#3</option>
+            <option type="text" value="4">A#3</option>
           </select>
           <br /><br />
           <button class="add" on-click="['addLayer', layers]">Adicionar</button><br /><Br />
@@ -136,6 +138,8 @@
        0: synth1,
        1: synth2,
        2: synth3,
+       3: synth4,
+       4: synth5
      }
 
 
@@ -172,13 +176,19 @@
      )
 
      function synth1() {
-       callSynth("F3")
+       callSynth("C#3")
      }
      function synth2() {
-       callSynth("E4")
+       callSynth("D#3")
      }
      function synth3() {
-       callSynth("A4")
+       callSynth("F#3")
+     }
+     function synth4() {
+       callSynth("G#3")
+     }
+     function synth5() {
+       callSynth("A#3")
      }
 
      function callSynth(note) {
@@ -198,25 +208,6 @@
          "portamento" : 0.0
        }).toMaster();
        synth.triggerAttackRelease(note, 0.1)
-     }
-
-     function callSynth1() {
-       var synth = new Tone.Synth({
-         "oscillator" : {
-           "type" : "sine",
-           "harmonicity" : 0.5,
-           "modulationType" : "basic"
-         },
-         "envelope" : {
-           "attackCurve" : "linear",
-           "attack" : 0.01,
-           "decay" : 0.10,
-           "sustain" : 0.10,
-           "release" : 1.2,
-         },
-         "portamento" : 0.0
-       }).toMaster();
-       synth.triggerAttackRelease("C4", 0.1)
      }
     </script>
 
