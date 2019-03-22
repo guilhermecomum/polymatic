@@ -76,42 +76,42 @@
     <div id="target"></div>
 
     <script id="template" type="text/ractive">
-      <div class="header">
-        <h1>Polymatic <small>v1.4</small></h1>
-      </div>
-      <div class="stage">
-        <div class="controls">
-          <label>Sequência</label>
-          <input class="input" id="sequence" type="text" value="1000101010" /><br /><br />
-          <label>Tempo</label>
-          <input class="input" id="tempo" type="text" value="120" /><br /><br />
-          <label>Note</label>
-          <select class="select" id="note">
-            <option type="text" value="0">C#3</option>
-            <option type="text" value="1">D#3</option>
-            <option type="text" value="2">F#3</option>
-            <option type="text" value="3">G#3</option>
-            <option type="text" value="4">A#3</option>
-          </select>
-          <br /><br />
-          <button class="add" on-click="['addLayer', layers]">Adicionar</button><br /><Br />
-          <button class="control" on-click="@global.beet.stop()">Stop</button>
-          <button class="control" on-click="@global.beet.start()">Start</button>
-        </div>
-        <div class="layers">
-          <h2>Padrões</h2>
-          <ul>
-            {{#each layers: num}}
-            <li>
-              {{note}} - {{sequence}} - {{tempo}}bpm
-              <a href="#" class="remove" on-click="['removeLayer', num, layer]"> - remover</a>
-              <a href="#" class="play" on-click="['playLayer', layer]"> - play</a>
-              <a href="#" class="pause" on-click="['pauseLayer', layer]"> - pause</a>
-            </li>
-            {{/each}}
-          </ul>
-        </div>
-      </div>
+     <div class="header">
+       <h1>Polymatic <small>v1.5</small></h1>
+     </div>
+     <div class="stage">
+       <div class="controls">
+         <label>Sequência</label>
+         <input class="input" id="sequence" type="text" value="1000101000101000" /><br /><br />
+         <label>Tempo</label>
+         <input class="input" id="tempo" type="text" value="120" /><br /><br />
+         <label>Note</label>
+         <select class="select" id="note">
+           <option type="text" value="0">C#3</option>
+           <option type="text" value="1">D#3</option>
+           <option type="text" value="2">F#3</option>
+           <option type="text" value="3">G#3</option>
+           <option type="text" value="4">A#3</option>
+         </select>
+         <br /><br />
+         <button class="add" on-click="['addLayer', layers]">Adicionar</button><br /><Br />
+         <button class="control" on-click="@global.beet.stop()">Stop</button>
+         <button class="control" on-click="@global.beet.start()">Start</button>
+       </div>
+       <div class="layers">
+         <h2>Padrões</h2>
+         <ul>
+         {{#each layers: num}}
+           <li>
+            {{note}} - {{sequence}} - {{tempo}}bpm
+            <a href="#" class="remove" on-click="['removeLayer', num, layer]"> - remover</a>
+            <a href="#" class="play" on-click="['playLayer', layer]"> - play</a>
+            <a href="#" class="pause" on-click="['pauseLayer', layer]"> - pause</a>
+           </li>
+         {{/each}}
+         </ul>
+       </div>
+     </div>
     </script>
     <script src="beet.min.js"></script>
     <script src="ractive.js"></script>
@@ -152,11 +152,10 @@
              note = document.querySelector("#note").value
              noteName = document.querySelector("#note").options[note].text
              var pattern = beet.pattern(sequence);
-             var layer = beet.layer(pattern, callbacks[note]);
+             var layer = beet.layer(pattern, callSynth);
              layer.tempo = tempo
              beet.add(layer).start();
              ractive.push('layers', { index: (layers.length), sequence: sequence, tempo: tempo, layer: layer, note: noteName })
-             console.log("reactive.data: ", layers)
            });
          },
          removeLayer: function(ctx, num, layer) {
@@ -191,24 +190,27 @@
        callSynth("A#3")
      }
 
-     function callSynth(note) {
-       synth = new Tone.Synth({
-         "oscillator" : {
-           "type" : "sine",
-           "harmonicity" : 0.5,
-           "modulationType" : "basic"
-         },
-         "envelope" : {
-           "attackCurve" : "linear",
-           "attack" : 0.01,
-           "decay" : 0.10,
-           "sustain" : 0.10,
-           "release" : 1.2,
-         },
-         "portamento" : 0.0
-       }).toMaster();
-       synth.triggerAttackRelease(note, 0.1)
+     function callSynth(time, step, timeFromScheduled) {
+       var osc = context.createOscillator();
+       var gain = context.createGain();
+       osc.connect(gain);
+       gain.connect(context.destination);
+
+       beet.utils.envelope(gain.gain, time, {
+         start: 0,
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
+       });
+
+       osc.type = 'sine'
+       osc.frequency.value = beet.utils.ntof(noteName);
+       osc.start(time);
+       osc.stop(time + 0.5);
      }
+
     </script>
 
   </body>
