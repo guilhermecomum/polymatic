@@ -4,7 +4,6 @@
     <title>Polymatic</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="icon" href="./images/icons/homescreen144.png">
     <style type="text/css">
      .header {
        padding-left: 20px;
@@ -115,7 +114,6 @@
     </script>
     <script src="beet.min.js"></script>
     <script src="ractive.js"></script>
-    <script src="tone.js"></script>
     <script type="text/javascript">
      var ractive = new Ractive({
        target: '#target',
@@ -160,7 +158,7 @@
            });
          },
          removeLayer: function(ctx, num, layer) {
-           ractive.pop('layers', num)
+           ractive.splice('layers', num, 1)
            beet.remove(layer)
          },
          playLayer: function(ctx, layer) {
