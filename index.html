@@ -10,7 +10,7 @@
     <div id="target"></div>
     <script id="template" type="text/ractive">
      <div class="header">
-       <h1>Polymatic <small>v1.8</small></h1>
+       <h1>Polymatic <small>v2.0</small></h1>
      </div>
      <div class="stage">
        <div class="controls">
@@ -20,11 +20,17 @@
          <input class="input" id="tempo" type="text" value="120" /><br /><br />
          <label>Note</label>
          <select class="select" id="note">
-           <option type="text" value="0">C#3</option>
-           <option type="text" value="1">D#3</option>
-           <option type="text" value="2">F#3</option>
-           <option type="text" value="3">G#3</option>
-           <option type="text" value="4">A#3</option>
+           <option type="text" value="0">C#5</option>
+           <option type="text" value="1">D#5</option>
+           <option type="text" value="2">F#5</option>
+           <option type="text" value="3">G#5</option>
+           <option type="text" value="4">A#5</option>
+           <option type="text" value="5">Batida 1</option>
+           <option type="text" value="6">Batida 2</option>
+           <option type="text" value="7">Batida 3</option>
+           <option type="text" value="8">Batida 4</option>
+           <option type="text" value="9">Batida 5</option>
+           <option type="text" value="10">Batida 6</option>
          </select>
          <br /><br />
          <button class="add" on-click="['addLayer', layers]">Adicionar</button><br /><Br />
@@ -71,7 +77,13 @@
        1: synth2,
        2: synth3,
        3: synth4,
-       4: synth5
+       4: synth5,
+       5: drum1,
+       6: drum2,
+       7: drum3,
+       8: drum4,
+       9: drum5,
+       10: drum6,
      }
 
 
@@ -107,143 +119,155 @@
        }
      )
 
-     function synth1(time, step) {
-       options = {
-         note: 'c#3',
-         a: 0.04,
-         d: 0.01,
-         s: 0.3,
-         r: 0.3
-       };
+     function drum1(time, step) {
+       var source = context.createBufferSource();
+       beet.utils.load('hit1.wav', function(buffer){
+         source.buffer = buffer
+         source.connect(context.destination);
+         console.log(time)
+         source.start(time)
+       })
+     }
 
+     function drum2(time, step) {
+       var source = context.createBufferSource();
+       beet.utils.load('hit2.wav', function(buffer){
+         source.buffer = buffer
+         source.connect(context.destination);
+         console.log(time)
+         source.start(time)
+       })
+     }
+
+     function drum3(time, step) {
+       var source = context.createBufferSource();
+       beet.utils.load('hit3.wav', function(buffer){
+         source.buffer = buffer
+         source.connect(context.destination);
+         console.log(time)
+         source.start(time)
+       })
+     }
+
+     function drum4(time, step) {
+       var source = context.createBufferSource();
+       beet.utils.load('hit4.wav', function(buffer){
+         source.buffer = buffer
+         source.connect(context.destination);
+         console.log(time)
+         source.start(time)
+       })
+     }
+
+     function drum5(time, step) {
+       var source = context.createBufferSource();
+       beet.utils.load('hit5.wav', function(buffer){
+         source.buffer = buffer
+         source.connect(context.destination);
+         console.log(time)
+         source.start(time)
+       })
+     }
+
+     function drum6(time, step) {
+       var source = context.createBufferSource();
+       beet.utils.load('hit6.wav', function(buffer){
+         source.buffer = buffer
+         source.connect(context.destination);
+         console.log(time)
+         source.start(time)
+       })
+     }
+
+     function synth1(time, step) {
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
-       osc.frequency.value = beet.utils.ntof(options.note)
-
+       osc.frequency.value = 277
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peak: 0.8,
-         attack: options.a,
-         release: options.r,
-         decay: options.d,
-         sustain: options.s
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
        });
        osc.start(time);
-       osc.stop(time + options.a + options.d + options.r + 0.5);
+       osc.stop(time + 0.5);
      }
 
      function synth2(time, step) {
-       options = {
-         note: 'D#3',
-         a: 0.04,
-         d: 0.01,
-         s: 0.3,
-         r: 0.3
-       };
-
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
-       osc.frequency.value = beet.utils.ntof(options.note)
-
+       osc.frequency.value = 311
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peak: 0.8,
-         attack: options.a,
-         release: options.r,
-         decay: options.d,
-         sustain: options.s
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
        });
        osc.start(time);
-       osc.stop(time + options.a + options.d + options.r + 0.5);
+       osc.stop(time + 0.5);
      }
 
      function synth3(time, step) {
-       options = {
-         note: 'f#3',
-         a: 0.04,
-         d: 0.01,
-         s: 0.3,
-         r: 0.3
-       };
-
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
-       osc.frequency.value = beet.utils.ntof(options.note)
-
+       osc.frequency.value = 369
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peak: 0.8,
-         attack: options.a,
-         release: options.r,
-         decay: options.d,
-         sustain: options.s
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
        });
        osc.start(time);
-       osc.stop(time + options.a + options.d + options.r + 0.5);
+       osc.stop(time + 0.5);
      }
+
      function synth4(time, step) {
-       options = {
-         note: 'G#3',
-         a: 0.04,
-         d: 0.01,
-         s: 0.3,
-         r: 0.3
-       };
-
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
-       osc.frequency.value = beet.utils.ntof(options.note)
-
+       osc.frequency.value = 415
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peak: 0.8,
-         attack: options.a,
-         release: options.r,
-         decay: options.d,
-         sustain: options.s
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
        });
        osc.start(time);
-       osc.stop(time + options.a + options.d + options.r + 0.5);
+       osc.stop(time + 0.5);
      }
+
      function synth5(time, step) {
-       options = {
-         note: 'A#3',
-         a: 0.04,
-         d: 0.01,
-         s: 0.3,
-         r: 0.3
-       };
-
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
-       osc.frequency.value = beet.utils.ntof(options.note)
-
+       osc.frequency.value = 466
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peak: 0.8,
-         attack: options.a,
-         release: options.r,
-         decay: options.d,
-         sustain: options.s
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
        });
        osc.start(time);
-       osc.stop(time + options.a + options.d + options.r + 0.5);
+       osc.stop(time + 0.5);
      }
-
-
-
     </script>
-
-
   </body>
 </html>
