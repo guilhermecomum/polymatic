@@ -10,7 +10,7 @@
     <div id="target"></div>
     <script id="template" type="text/ractive">
      <div class="header">
-       <h1>Polymatic <small>v1.7</small></h1>
+       <h1>Polymatic <small>v1.8</small></h1>
      </div>
      <div class="stage">
        <div class="controls">
@@ -20,11 +20,11 @@
          <input class="input" id="tempo" type="text" value="120" /><br /><br />
          <label>Note</label>
          <select class="select" id="note">
-           <option type="text" value="0">277hz</option>
-           <option type="text" value="1">311hz</option>
-           <option type="text" value="2">369hz</option>
-           <option type="text" value="3">415hz</option>
-           <option type="text" value="4">466hz</option>
+           <option type="text" value="0">C#3</option>
+           <option type="text" value="1">D#3</option>
+           <option type="text" value="2">F#3</option>
+           <option type="text" value="3">G#3</option>
+           <option type="text" value="4">A#3</option>
          </select>
          <br /><br />
          <button class="add" on-click="['addLayer', layers]">Adicionar</button><br /><Br />
@@ -107,111 +107,140 @@
        }
      )
 
-     function synth1(time, step, timeFromScheduled) {
+     function synth1(time, step) {
+       options = {
+         note: 'c#3',
+         a: 0.04,
+         d: 0.01,
+         s: 0.3,
+         r: 0.3
+       };
+
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
+       osc.frequency.value = beet.utils.ntof(options.note)
 
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peake: 0.50,
-         attack: 0.02,
-         decay: 0.10,
-         sustain: 0.10,
-         release: 0.2
+         peak: 0.8,
+         attack: options.a,
+         release: options.r,
+         decay: options.d,
+         sustain: options.s
        });
-
-       osc.type = 'sine'
-       osc.frequency.value = 277;
        osc.start(time);
-       osc.stop(time + 0.5);
+       osc.stop(time + options.a + options.d + options.r + 0.5);
      }
 
-     function synth2(time, step, timeFromScheduled) {
+     function synth2(time, step) {
+       options = {
+         note: 'D#3',
+         a: 0.04,
+         d: 0.01,
+         s: 0.3,
+         r: 0.3
+       };
+
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
+       osc.frequency.value = beet.utils.ntof(options.note)
 
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peake: 0.50,
-         attack: 0.02,
-         decay: 0.10,
-         sustain: 0.10,
-         release: 0.2
+         peak: 0.8,
+         attack: options.a,
+         release: options.r,
+         decay: options.d,
+         sustain: options.s
        });
-
-       osc.type = 'sine'
-       osc.frequency.value = 311;
        osc.start(time);
-       osc.stop(time + 0.5);
+       osc.stop(time + options.a + options.d + options.r + 0.5);
      }
 
-     function synth3(time, step, timeFromScheduled) {
+     function synth3(time, step) {
+       options = {
+         note: 'f#3',
+         a: 0.04,
+         d: 0.01,
+         s: 0.3,
+         r: 0.3
+       };
+
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
+       osc.frequency.value = beet.utils.ntof(options.note)
 
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peake: 0.50,
-         attack: 0.02,
-         decay: 0.10,
-         sustain: 0.10,
-         release: 0.2
+         peak: 0.8,
+         attack: options.a,
+         release: options.r,
+         decay: options.d,
+         sustain: options.s
        });
-
-       osc.type = 'sine'
-       osc.frequency.value = 369;
        osc.start(time);
-       osc.stop(time + 0.5);
+       osc.stop(time + options.a + options.d + options.r + 0.5);
      }
+     function synth4(time, step) {
+       options = {
+         note: 'G#3',
+         a: 0.04,
+         d: 0.01,
+         s: 0.3,
+         r: 0.3
+       };
 
-
-     function synth4(time, step, timeFromScheduled) {
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
+       osc.frequency.value = beet.utils.ntof(options.note)
 
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peake: 0.50,
-         attack: 0.02,
-         decay: 0.10,
-         sustain: 0.10,
-         release: 0.2
+         peak: 0.8,
+         attack: options.a,
+         release: options.r,
+         decay: options.d,
+         sustain: options.s
        });
-
-       osc.type = 'sine'
-       osc.frequency.value = 415;
        osc.start(time);
-       osc.stop(time + 0.5);
+       osc.stop(time + options.a + options.d + options.r + 0.5);
      }
+     function synth5(time, step) {
+       options = {
+         note: 'A#3',
+         a: 0.04,
+         d: 0.01,
+         s: 0.3,
+         r: 0.3
+       };
 
-     function synth5(time, step, timeFromScheduled) {
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
        gain.connect(context.destination);
+       osc.frequency.value = beet.utils.ntof(options.note)
 
        beet.utils.envelope(gain.gain, time, {
          start: 0,
-         peake: 0.50,
-         attack: 0.02,
-         decay: 0.10,
-         sustain: 0.10,
-         release: 0.2
+         peak: 0.8,
+         attack: options.a,
+         release: options.r,
+         decay: options.d,
+         sustain: options.s
        });
-
-       osc.type = 'sine'
-       osc.frequency.value = 466;
        osc.start(time);
-       osc.stop(time + 0.5);
+       osc.stop(time + options.a + options.d + options.r + 0.5);
      }
+
+
 
     </script>
 
