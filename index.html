@@ -4,79 +4,13 @@
     <title>Polymatic</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <style type="text/css">
-     .header {
-       padding-left: 20px;
-     }
-     h1 small {
-       font-size: 13px;
-     }
-     .stage {
-       padding: 20px;
-       display: flex;
-       flex-wrap: wrap
-     }
-     .input {
-       font-size: 30px;
-       width: 100%;
-       border: 1px solid black;
-       padding: 5px;
-       box-sizing : border-box;
-       margin-bottom: 10px;
-     }
-     .select {
-       font-size: 30px;
-       width: 100%;
-       border: 1px solid black;
-       padding: 5px;
-       box-sizing : border-box;
-       margin-bottom: 10px;
-       background: none;
-     }
-     label {
-       font-size: 25px;
-       padding-bottom: 5px;
-       display: block;
-     }
-     button {
-       background: white;
-       border: 1px solid black;
-       padding: 16px;
-     }
-     .add {
-       width: 100%;
-       font-size: 20px;
-     }
-     .remove {
-       color: red;
-       font-size: 20px;
-       text-decoration: none;
-     }
-     .control {
-       width: 49%;
-       font-size: 20px;
-     }
-     .controls {
-       margin-right: 100px;
-     }
-
-     li {
-       font-size: 25px;
-     }
-
-     @media (max-width: 540px) {
-       .controls {
-         margin-right: 0;
-       }
-     }
-    </style>
+    <link rel="stylesheet" href="style.css" type="text/css">
   </head>
   <body>
     <div id="target"></div>
-
     <script id="template" type="text/ractive">
      <div class="header">
-       <h1>Polymatic <small>v1.6</small></h1>
+       <h1>Polymatic <small>v1.7</small></h1>
      </div>
      <div class="stage">
        <div class="controls">
@@ -86,11 +20,11 @@
          <input class="input" id="tempo" type="text" value="120" /><br /><br />
          <label>Note</label>
          <select class="select" id="note">
-           <option type="text" value="0" data-note="277">277hz</option>
-           <option type="text" value="1" data-note="311">311hz</option>
-           <option type="text" value="2" data-note="369">369hz</option>
-           <option type="text" value="3" data-note="415">415hz</option>
-           <option type="text" value="4" data-note="466">466hz</option>
+           <option type="text" value="0">277hz</option>
+           <option type="text" value="1">311hz</option>
+           <option type="text" value="2">369hz</option>
+           <option type="text" value="3">415hz</option>
+           <option type="text" value="4">466hz</option>
          </select>
          <br /><br />
          <button class="add" on-click="['addLayer', layers]">Adicionar</button><br /><Br />
@@ -148,10 +82,10 @@
              sequence = document.querySelector("#sequence").value
              tempo = document.querySelector("#tempo").value
              note = document.querySelector("#note").value
-             noteFreq = document.querySelector("#note").options[note].dataset.note
              noteName = document.querySelector("#note").options[note].text
+             callback = callbacks[note]
              var pattern = beet.pattern(sequence);
-             var layer = beet.layer(pattern, callSynth);
+             var layer = beet.layer(pattern, callback);
              layer.tempo = tempo
              beet.add(layer).start();
              ractive.push('layers', { index: (layers.length), sequence: sequence, tempo: tempo, layer: layer, note: noteName })
@@ -173,23 +107,7 @@
        }
      )
 
-     function synth1() {
-       callSynth("C#3")
-     }
-     function synth2() {
-       callSynth("D#3")
-     }
-     function synth3() {
-       callSynth("F#3")
-     }
-     function synth4() {
-       callSynth("G#3")
-     }
-     function synth5() {
-       callSynth("A#3")
-     }
-
-     function callSynth(time, step, timeFromScheduled) {
+     function synth1(time, step, timeFromScheduled) {
        var osc = context.createOscillator();
        var gain = context.createGain();
        osc.connect(gain);
@@ -205,12 +123,98 @@
        });
 
        osc.type = 'sine'
-       osc.frequency.value = noteFreq;
+       osc.frequency.value = 277;
+       osc.start(time);
+       osc.stop(time + 0.5);
+     }
+
+     function synth2(time, step, timeFromScheduled) {
+       var osc = context.createOscillator();
+       var gain = context.createGain();
+       osc.connect(gain);
+       gain.connect(context.destination);
+
+       beet.utils.envelope(gain.gain, time, {
+         start: 0,
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
+       });
+
+       osc.type = 'sine'
+       osc.frequency.value = 311;
+       osc.start(time);
+       osc.stop(time + 0.5);
+     }
+
+     function synth3(time, step, timeFromScheduled) {
+       var osc = context.createOscillator();
+       var gain = context.createGain();
+       osc.connect(gain);
+       gain.connect(context.destination);
+
+       beet.utils.envelope(gain.gain, time, {
+         start: 0,
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
+       });
+
+       osc.type = 'sine'
+       osc.frequency.value = 369;
+       osc.start(time);
+       osc.stop(time + 0.5);
+     }
+
+
+     function synth4(time, step, timeFromScheduled) {
+       var osc = context.createOscillator();
+       var gain = context.createGain();
+       osc.connect(gain);
+       gain.connect(context.destination);
+
+       beet.utils.envelope(gain.gain, time, {
+         start: 0,
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
+       });
+
+       osc.type = 'sine'
+       osc.frequency.value = 415;
+       osc.start(time);
+       osc.stop(time + 0.5);
+     }
+
+     function synth5(time, step, timeFromScheduled) {
+       var osc = context.createOscillator();
+       var gain = context.createGain();
+       osc.connect(gain);
+       gain.connect(context.destination);
+
+       beet.utils.envelope(gain.gain, time, {
+         start: 0,
+         peake: 0.50,
+         attack: 0.02,
+         decay: 0.10,
+         sustain: 0.10,
+         release: 0.2
+       });
+
+       osc.type = 'sine'
+       osc.frequency.value = 466;
        osc.start(time);
        osc.stop(time + 0.5);
      }
 
     </script>
+
 
   </body>
 </html>

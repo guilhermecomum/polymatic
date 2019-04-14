@@ -1,0 +1,64 @@
+.header {
+  padding-left: 20px;
+}
+h1 small {
+  font-size: 13px;
+}
+.stage {
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap
+}
+.input {
+  font-size: 30px;
+  width: 100%;
+  border: 1px solid black;
+  padding: 5px;
+  box-sizing : border-box;
+  margin-bottom: 10px;
+}
+.select {
+  font-size: 30px;
+  width: 100%;
+  border: 1px solid black;
+  padding: 5px;
+  box-sizing : border-box;
+  margin-bottom: 10px;
+  background: none;
+}
+label {
+  font-size: 25px;
+  padding-bottom: 5px;
+  display: block;
+}
+button {
+  background: white;
+  border: 1px solid black;
+  padding: 16px;
+}
+.add {
+  width: 100%;
+  font-size: 20px;
+}
+.remove {
+  color: red;
+  font-size: 20px;
+  text-decoration: none;
+}
+.control {
+  width: 49%;
+  font-size: 20px;
+}
+.controls {
+  margin-right: 100px;
+}
+
+li {
+  font-size: 25px;
+}
+
+@media (max-width: 540px) {
+  .controls {
+    margin-right: 0;
+  }
+}
