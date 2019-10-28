@@ -1,0 +1,46 @@
+{
+    "name": "Polymatic",
+    "short_name": "Polymatic",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "orientation": "portrait-primary",
+    "icons": [
+      {
+        "src": "/icons/logo-16.png",
+        "type": "image/png",
+        "sizes": "16x16"
+      },
+      {
+        "src": "/icons/logo-24.png",
+        "type": "image/png",
+        "sizes": "24x24"
+      },
+      {
+        "src": "/icons/logo-32.png",
+        "type": "image/png",
+        "sizes": "32x32"
+      },
+      {
+        "src": "/icons/logo-64.png",
+        "type": "image/png",
+        "sizes": "64x64"
+      },
+      {
+        "src": "/icons/logo-128.png",
+        "type": "image/png",
+        "sizes": "128x128"
+      },
+      {
+        "src": "/icons/logo-256.png",
+        "type": "image/png",
+        "sizes": "256x256"
+      },
+      {
+        "src": "/icons/logo-512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ]
+  }

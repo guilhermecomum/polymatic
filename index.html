@@ -5,10 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" href="style.css" type="text/css">
+    <link rel="manifest" href="/manifest.json">
+    <!-- ios support -->
+    <link rel="apple-touch-icon" href="/icons/logo-128.png">
+    <meta name="apple-mobile-web-app-status-bar" content="#000000">
+    <meta name="theme-color" content="#000000">
   </head>
   <body>
     <div id="target"></div>
-    <script id="template" type="text/ractive">
+    <script id="template" type="text/ractive"></script>
      <div class="header">
        <h1>Polymatic <small>v2.0</small></h1>
      </div>
@@ -267,6 +272,12 @@
        });
        osc.start(time);
        osc.stop(time + 0.5);
+     }
+
+     if('serviceWorker' in navigator){
+       navigator.serviceWorker.register('/sw.js')
+         .then(reg => console.log('service worker registered'))
+         .catch(err => console.log('service worker not registered', err));
      }
     </script>
   </body>
