@@ -2196,6 +2196,15 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
+beet.js@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/beet.js/-/beet.js-1.7.0.tgz#f069a9964b2ce1f0e2f6aee8e09078c6b101808f"
+  integrity sha1-8Gmplkss4fDi9q7o4JB4xrEBgI8=
+  dependencies:
+    bjorklund "^1.0.3"
+    wa-metro "^1.1.2"
+    watchjs "0.0.0"
+
 big.js@^5.2.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
@@ -2217,6 +2226,13 @@ bindings@^1.5.0:
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
   dependencies:
     file-uri-to-path "1.0.0"
+
+bjorklund@^1.0.3, bjorklund@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/bjorklund/-/bjorklund-1.0.4.tgz#6bb99ca7d3df90744d285399aac92f6bf3064bcd"
+  integrity sha1-a7mcp9PfkHRNKFOZqskva/MGS80=
+  dependencies:
+    lodash "^3.7.0"
 
 bluebird@^3.5.5:
   version "3.7.2"
@@ -6274,6 +6290,11 @@ lodash.uniq@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
+lodash@^3.7.0:
+  version "3.10.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
+  integrity sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y=
+
 loglevel@^1.6.6:
   version "1.6.7"
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.6.7.tgz#b3e034233188c68b889f5b862415306f565e2c56"
@@ -6362,6 +6383,11 @@ media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
   integrity sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=
+
+melanke-watchjs@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/melanke-watchjs/-/melanke-watchjs-1.5.2.tgz#acc1c85fc04f3832bb9366896c844143ac686787"
+  integrity sha512-yNo8NiKkZd4K0Y/SNhbeW5PAmylfaClrOPpNTRibybRTe93Ozv1/emTanP6xwxi9TO0FS9b9F94/JQedJ1/j9g==
 
 mem@^4.0.0:
   version "4.3.0"
@@ -10090,6 +10116,13 @@ w3c-xmlserializer@^1.1.2:
     webidl-conversions "^4.0.2"
     xml-name-validator "^3.0.0"
 
+wa-metro@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/wa-metro/-/wa-metro-1.1.2.tgz#3ea6a905cf7d203649237033fdb69572ea820202"
+  integrity sha1-PqapBc99IDZJI3Az/baVcuqCAgI=
+  dependencies:
+    webworkify "^1.0.2"
+
 wait-for-expect@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/wait-for-expect/-/wait-for-expect-3.0.2.tgz#d2f14b2f7b778c9b82144109c8fa89ceaadaa463"
@@ -10101,6 +10134,11 @@ walker@^1.0.7, walker@~1.0.5:
   integrity sha1-L3+bj9ENZ3JisYqITijRlhjgKPs=
   dependencies:
     makeerror "1.0.x"
+
+watchjs@0.0.0, watchjs@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/watchjs/-/watchjs-0.0.0.tgz#e1208f25b315b9a2aa6a89e880c9c689cfba1756"
+  integrity sha1-4SCPJbMVuaKqaonogMnGic+6F1Y=
 
 watchpack@^1.6.0:
   version "1.6.0"
@@ -10241,6 +10279,16 @@ websocket-extensions@>=0.1.1:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/websocket-extensions/-/websocket-extensions-0.1.3.tgz#5d2ff22977003ec687a4b87073dfbbac146ccf29"
   integrity sha512-nqHUnMXmBzT0w570r2JpJxfiSD1IzoI+HGVdd3aZ0yNi3ngvQ4jv1dtHt5VGxfI2yj5yqImPhOK4vmIh2xMbGg==
+
+webworkify-webpack@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/webworkify-webpack/-/webworkify-webpack-2.1.5.tgz#bf4336624c0626cbe85cf1ffde157f7aa90b1d1c"
+  integrity sha512-2akF8FIyUvbiBBdD+RoHpoTbHMQF2HwjcxfDvgztAX5YwbZNyrtfUMgvfgFVsgDhDPVTlkbb5vyasqDHfIDPQw==
+
+webworkify@^1.0.2:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/webworkify/-/webworkify-1.5.0.tgz#734ad87a774de6ebdd546e1d3e027da5b8f4a42c"
+  integrity sha512-AMcUeyXAhbACL8S2hqqdqOLqvJ8ylmIbNwUIqQujRSouf4+eUFaXbG6F1Rbu+srlJMmxQWsiU7mOJi0nMBfM1g==
 
 whatwg-encoding@^1.0.1, whatwg-encoding@^1.0.3, whatwg-encoding@^1.0.5:
   version "1.0.5"

@@ -6,9 +6,14 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "beet.js": "^1.7.0",
+    "bjorklund": "^1.0.4",
+    "melanke-watchjs": "^1.5.2",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
-    "react-scripts": "3.4.0"
+    "react-scripts": "3.4.0",
+    "watchjs": "^0.0.0",
+    "webworkify-webpack": "^2.1.5"
   },
   "scripts": {
     "start": "react-scripts start",
