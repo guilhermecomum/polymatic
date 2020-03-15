@@ -1,11 +1,19 @@
 class Clavis {
-  constructor(canvas, pattern, tempo) {
+  constructor() {
+    this.canvas = null;
+    this.context = null;
+    this.pattern = null;
+    this.tempo = 0;
+    this.animate = false;
+    this.lastRender = Date.now();
+    this.draw = this.draw.bind(this);
+  }
+
+  configure(canvas, pattern, tempo) {
     this.canvas = canvas;
     this.context = canvas.getContext("2d");
     this.pattern = pattern;
     this.tempo = tempo;
-    this.animate = false;
-    this.draw = this.draw.bind(this);
   }
 
   play() {
@@ -18,6 +26,9 @@ class Clavis {
   }
 
   draw() {
+    if (this.animate) {
+      window.requestAnimationFrame(this.draw);
+    }
     const { canvas, context, pattern } = this;
     const theme = {
       "canvas-padding": "20px",
@@ -154,9 +165,7 @@ class Clavis {
     context.restore();
 
     /* Request new frame if animation is enabled */
-    if (this.animate) {
-      window.requestAnimationFrame(this.draw);
-    }
+    //console.log(`${this.canvas.id} - ${this.animate}`);
   }
 }
 

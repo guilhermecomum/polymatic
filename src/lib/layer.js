@@ -3,9 +3,10 @@ import WatchJS from "melanke-watchjs";
 
 const watch = WatchJS.watch;
 
-function Layer(context, tempo, sequence, on, off) {
+function Layer(id, context, tempo, sequence, on, off) {
   if (!off) off = function() {};
   var self = this;
+  this.idi = id;
   this.on = on;
   this.off = off;
   this.tempo = tempo;

@@ -1,22 +1,45 @@
-import React, { useEffect } from "react";
-import Clavis from "./lib/clavis";
+import React, { useEffect, useRef } from "react";
+import shortid from "shortid";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-export default function Layer({ layer }) {
-  const canvasRef = React.useRef(null);
-  const { sequence, tempo } = layer;
-  console.log("Props: ", layer);
+export default function Layer({ guia, removeLayer }) {
+  const canvasRef = useRef();
+  const { sequence, tempo, layer, clavis } = guia;
+
   useEffect(() => {
-    const clavis = new Clavis(canvasRef.current, sequence, tempo);
+    clavis.configure(canvasRef.current, sequence, tempo);
     clavis.play();
-  }, []);
+  });
+
+  const handleStop = () => {
+    layer.stop();
+    clavis.pause();
+  };
+
+  const handleStart = () => {
+    layer.start();
+    clavis.play();
+  };
 
   return (
-    <div>
-      <canvas ref={canvasRef} width={640} height={425} />
+    <div className="layer">
+      <canvas
+        id={shortid.generate()}
+        ref={canvasRef}
+        width={640}
+        height={425}
+      />
       <div className="controls">
-        <i id="play" className="fas fa-play icon"></i>
-        <i className="fas fa-stop icon"></i>
-        <i className="fas fa-trash icon"></i>
+        <button onClick={() => handleStart()}>
+          <FontAwesomeIcon icon={faPlay} />
+        </button>
+        <button onClick={() => handleStop()}>
+          <FontAwesomeIcon icon={faStop} />
+        </button>
+        <button onClick={() => removeLayer(guia)}>
+          <FontAwesomeIcon icon={faTrash} />
+        </button>
       </div>
     </div>
   );

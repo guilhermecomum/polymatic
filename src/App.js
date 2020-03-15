@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import Beet from "./lib/beet";
+import Clavis from "./lib/clavis";
 import hit from "./samples/hit2.wav";
+import shortid from "shortid";
 import Layer from "./Layer";
+import Header from "./Header";
+
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 function App() {
   const [pattern, setPattern] = useState("1000101000101000");
   const [tempo, setTempo] = useState(120);
-  const [guias, setGuias] = useState([]);
+  const [layers, setLayers] = useState([]);
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   const context = new AudioContext();
@@ -19,60 +24,52 @@ function App() {
     const sequence = beet.pattern(pattern);
     const guia = { layer: beet.layer(sequence, drum) };
     guia.layer.tempo = 120;
-    beet.add(guia.layer).start();
-
-    setGuias([
-      ...guias,
+    beet.add(guia.layer);
+    beet.start();
+    setLayers([
+      ...layers,
       {
+        id: shortid.generate(),
         sequence: pattern,
         tempo: tempo,
-        layer: guia.layer
+        layer: guia.layer,
+        clavis: new Clavis()
       }
     ]);
   };
 
-  // const buildClavis = () => {
-  //   const tempo = 120;
-  //   const clavis = new Clavis(canvasRef.current, pattern, tempo);
-  //   clavis.draw();
-  // };
+  const removeLayer = guia => {
+    beet.remove(guia.layer);
+    setLayers(layers.filter(layer => layer.id !== guia.id));
+  };
 
   function drum(time, step) {
-    var source = context.createBufferSource();
-    beet.utils.load(beet.context, hit, function(buffer) {
+    const source = context.createBufferSource();
+    beet.load(beet.context, hit, function(buffer) {
       source.buffer = buffer;
       source.connect(context.destination);
       source.start(time);
     });
   }
 
-  // const synth1 = (time, step) => {
-  //   var osc = context.createOscillator();
-  //   var gain = context.createGain();
-  //   osc.connect(gain);
-  //   gain.connect(context.destination);
-  //   osc.frequency.value = 277;
-  //   beet.utils.envelope(gain.gain, time, {
-  //     start: 0,
-  //     peake: 0.5,
-  //     attack: 0.02,
-  //     decay: 0.1,
-  //     sustain: 0.1,
-  //     release: 0.2
-  //   });
-  //   osc.start(time);
-  //   osc.stop(time + 0.5);
-  // };
-  console.log("Layers: ", guias);
+  const headerProps = {
+    layers,
+    pattern,
+    setPattern,
+    beet,
+    tempo,
+    setTempo,
+    addLayer
+  };
 
   return (
     <div className="App">
-      <input placeholder="padrão" onChange={e => setPattern(e.target.value)} />
-      <input placeholder="tempo" onChange={e => setTempo(e.target.value)} />
-      <button onClick={() => addLayer()}>Adicinar </button>
-      {guias.map((layer, index) => (
-        <Layer key={index} layer={layer} />
-      ))}
+      <Header {...headerProps} />
+      <div className="wrapper">
+        {layers.map(layer => (
+          <Layer key={layer.id} guia={layer} removeLayer={removeLayer} />
+        ))}
+      </div>
     </div>
   );
 }
