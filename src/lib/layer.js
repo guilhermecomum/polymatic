@@ -17,14 +17,16 @@ function Layer(id, context, tempo, clavis, sequence, on, off) {
       self.metro.steps = sequence.seq.length;
     }
 
-    setTimeout(() => {
-      clavis.setCurrentStep(step);
-    }, 950);
-
     if (sequence.seq[step - 1] === "1") {
       self.on(time, step, timeFromScheduled);
+      setTimeout(() => {
+        clavis.setCurrentStep(step);
+      }, 950);
     } else {
       self.off(time, step, timeFromScheduled);
+      setTimeout(() => {
+        clavis.setCurrentStep(step);
+      }, 950);
     }
   });
 
