@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Beet from "./lib/beet";
 import Clavis from "./lib/clavis";
-import hit from "./samples/hit2.wav";
+import instruments from "./instruments";
 import shortid from "shortid";
 import Layer from "./Layer";
 import Header from "./Header";
@@ -10,11 +10,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 function App() {
-  const callbacks = { drum: drum, synth: synth };
   const [pattern, setPattern] = useState("1000101000101000");
   const [tempo, setTempo] = useState(120);
   const [layers, setLayers] = useState([]);
-  const [callback, setCallback] = useState("drum");
+  const [sample, setSample] = useState("drum1");
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   const context = new AudioContext();
@@ -26,7 +25,7 @@ function App() {
   const addLayer = () => {
     const sequence = beet.pattern(pattern);
     const clavis = new Clavis();
-    const guia = { layer: beet.layer(sequence, clavis, callbacks[callback]) };
+    const guia = { layer: beet.layer(sequence, clavis, callback) };
     guia.layer.tempo = tempo;
     beet.add(guia.layer);
     beet.start();
@@ -48,39 +47,40 @@ function App() {
     setLayers(layers.filter(layer => layer.id !== guia.id));
   };
 
-  function drum(time, step) {
+  function callback(time, step) {
+    console.log("Sample: ", instruments[sample]);
     const source = context.createBufferSource();
-    beet.load(beet.context, hit, function(buffer) {
+    beet.load(beet.context, instruments[sample], function(buffer) {
       source.buffer = buffer;
       source.connect(context.destination);
       source.start(time);
     });
   }
 
-  function synth(time, step) {
-    console.log("Step: ", step);
-    var osc = context.createOscillator();
-    var gain = context.createGain();
-    osc.connect(gain);
-    gain.connect(context.destination);
-    osc.frequency.value = 277;
-    beet.envelope(gain.gain, time, {
-      start: 0,
-      peake: 0.5,
-      attack: 0.02,
-      decay: 0.1,
-      sustain: 0.1,
-      release: 0.2
-    });
-    osc.start(time);
-    osc.stop(time + 0.5);
-  }
+  // function synth(time, step) {
+  //   console.log("Step: ", step);
+  //   var osc = context.createOscillator();
+  //   var gain = context.createGain();
+  //   osc.connect(gain);
+  //   gain.connect(context.destination);
+  //   osc.frequency.value = 277;
+  //   beet.envelope(gain.gain, time, {
+  //     start: 0,
+  //     peake: 0.5,
+  //     attack: 0.02,
+  //     decay: 0.1,
+  //     sustain: 0.1,
+  //     release: 0.2
+  //   });
+  //   osc.start(time);
+  //   osc.stop(time + 0.5);
+  // }
 
   const headerProps = {
     layers,
     pattern,
     setPattern,
-    setCallback,
+    setSample,
     beet,
     tempo,
     setTempo,

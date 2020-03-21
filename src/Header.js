@@ -1,4 +1,5 @@
 import React from "react";
+import instruments from "./instruments";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -13,7 +14,7 @@ function Header({
   layers,
   pattern,
   setPattern,
-  setCallback,
+  setSample,
   beet,
   tempo,
   setTempo,
@@ -32,6 +33,7 @@ function Header({
       guia.clavis.pause();
     }
   };
+
   return (
     <div className="header">
       <div>
@@ -70,9 +72,12 @@ function Header({
             onChange={e => setTempo(e.target.value)}
           />
         </InputGroup>
-        <Form.Control as="select" onChange={e => setCallback(e.target.value)}>
-          <option value="drum">drum</option>
-          <option value="synth">synth</option>
+        <Form.Control as="select" onChange={e => setSample(e.target.value)}>
+          {Object.keys(instruments).map((instrument, index) => (
+            <option key={index} value={instrument}>
+              {instrument}
+            </option>
+          ))}
         </Form.Control>
         <Button onClick={() => addLayer()}>Adicionar</Button>
       </div>
