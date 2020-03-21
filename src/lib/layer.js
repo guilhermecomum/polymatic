@@ -3,17 +3,22 @@ import WatchJS from "melanke-watchjs";
 
 const watch = WatchJS.watch;
 
-function Layer(id, context, tempo, sequence, on, off) {
+function Layer(id, context, tempo, clavis, sequence, on, off) {
   if (!off) off = function() {};
   var self = this;
   this.idi = id;
   this.on = on;
   this.off = off;
   this.tempo = tempo;
+  this.clavis = clavis;
+
   self.metro = new Metro(context, function(time, step, timeFromScheduled) {
     if (self.metro.steps !== sequence.seq.length) {
       self.metro.steps = sequence.seq.length;
     }
+
+    clavis.setCurrentStep(step);
+
     if (sequence.seq[step - 1] === "1") {
       self.on(time, step, timeFromScheduled);
     } else {

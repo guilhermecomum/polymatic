@@ -17,13 +17,15 @@ function App() {
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   const context = new AudioContext();
   const beet = new Beet({
-    context: context
+    context: context,
+    tempo: tempo
   });
 
   const addLayer = () => {
     const sequence = beet.pattern(pattern);
-    const guia = { layer: beet.layer(sequence, drum) };
-    guia.layer.tempo = 120;
+    const clavis = new Clavis();
+    const guia = { layer: beet.layer(sequence, clavis, drum) };
+    guia.layer.tempo = tempo;
     beet.add(guia.layer);
     beet.start();
     setLayers([
@@ -33,13 +35,14 @@ function App() {
         sequence: pattern,
         tempo: tempo,
         layer: guia.layer,
-        clavis: new Clavis()
+        clavis: clavis
       }
     ]);
   };
 
   const removeLayer = guia => {
     beet.remove(guia.layer);
+    guia.clavis.pause();
     setLayers(layers.filter(layer => layer.id !== guia.id));
   };
 

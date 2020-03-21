@@ -7,6 +7,8 @@ class Clavis {
     this.animate = false;
     this.lastRender = Date.now();
     this.draw = this.draw.bind(this);
+    this.currentStep = 1;
+    this.patternPos = {};
   }
 
   configure(canvas, pattern, tempo) {
@@ -14,6 +16,10 @@ class Clavis {
     this.context = canvas.getContext("2d");
     this.pattern = pattern;
     this.tempo = tempo;
+  }
+
+  setCurrentStep(step) {
+    this.currentStep = step;
   }
 
   play() {
@@ -149,23 +155,16 @@ class Clavis {
       } else {
         drawDotOff(x, y);
       }
+      this.patternPos[i] = { x, y };
     }
 
     /* Connect the dots */
     connectDots(patternDots);
 
     /* Draw the moving dot */
-    context.save();
-    const time = new Date();
-    const tempo = this.tempo / 60;
-    const posFromTempo =
-      ((2 * Math.PI) / tempo) * time.getSeconds() +
-      ((2 * Math.PI) / (tempo * 1000)) * time.getMilliseconds();
-    drawDotBeat(...coords(startAngle + posFromTempo));
-    context.restore();
-
-    /* Request new frame if animation is enabled */
-    //console.log(`${this.canvas.id} - ${this.animate}`);
+    const beatX = this.patternPos[this.currentStep - 1].x;
+    const beatY = this.patternPos[this.currentStep - 1].y;
+    drawDotBeat(beatX, beatY);
   }
 }
 
