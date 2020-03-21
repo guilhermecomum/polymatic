@@ -13,7 +13,7 @@ function App() {
   const [pattern, setPattern] = useState("1000101000101000");
   const [tempo, setTempo] = useState(120);
   const [layers, setLayers] = useState([]);
-  const [sample, setSample] = useState("drum1");
+  const [sample, setSample] = useState("agogo1");
   const [preview, setPreview] = useState(true);
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
