@@ -21,12 +21,12 @@ function Layer(id, context, tempo, clavis, sequence, on, off) {
       self.on(time, step, timeFromScheduled);
       setTimeout(() => {
         clavis.setCurrentStep(step);
-      }, 950);
+      }, 1000);
     } else {
       self.off(time, step, timeFromScheduled);
       setTimeout(() => {
         clavis.setCurrentStep(step);
-      }, 950);
+      }, 1000);
     }
   });
 

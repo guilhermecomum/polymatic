@@ -84,10 +84,10 @@ class Clavis {
       context.stroke();
     }
 
-    function drawStep(x, y, step) {
-      context.font = "12px serif";
-      context.fillText(step, x, y);
-    }
+    // function drawStep(x, y, step) {
+    //   context.font = "12px serif";
+    //   context.fillText(step, x, y);
+    // }
 
     function drawDot(x, y, { radius, stroke, fill }) {
       context.strokeStyle = stroke;
@@ -157,8 +157,8 @@ class Clavis {
       } else {
         drawDotOff(x, y);
       }
-      const [xStep, yStep] = coords(a, 100);
-      drawStep(xStep, yStep, i + 1);
+      //const [xStep, yStep] = coords(a, 100);
+      //drawStep(xStep, yStep, i + 1);
       this.patternPos[i] = { x, y };
     }
 
