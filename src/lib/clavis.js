@@ -32,9 +32,6 @@ class Clavis {
   }
 
   draw() {
-    if (this.animate) {
-      window.requestAnimationFrame(this.draw);
-    }
     const { canvas, context, pattern } = this;
     const theme = {
       "canvas-padding": "20px",
@@ -87,6 +84,11 @@ class Clavis {
       context.stroke();
     }
 
+    function drawStep(x, y, step) {
+      context.font = "12px serif";
+      context.fillText(step, x, y);
+    }
+
     function drawDot(x, y, { radius, stroke, fill }) {
       context.strokeStyle = stroke;
       context.fillStyle = fill;
@@ -136,25 +138,27 @@ class Clavis {
       context.stroke();
     }
 
-    function coords(angle) {
+    function coords(angle, r) {
       /* Find the equidistant points:
          Many thanks to
          https://math.stackexchange.com/questions/2820194/how-to-plot-n-coords-to-distribute-evenly-as-a-ring-of-points-around-a-circle
       */
-      const x = Math.cos(angle) * radius + width / 2;
-      const y = Math.sin(angle) * radius + height / 2;
+      const x = Math.cos(angle) * r + width / 2;
+      const y = Math.sin(angle) * r + height / 2;
       return [x, y];
     }
 
     for (let i = 0; i < pattern.length; i++) {
       const a = startAngle + angle * i;
-      const [x, y] = coords(a);
+      const [x, y] = coords(a, radius);
       if (pattern[i] === "1") {
         drawDotOn(x, y);
         patternDots.push([x, y]);
       } else {
         drawDotOff(x, y);
       }
+      const [xStep, yStep] = coords(a, 100);
+      drawStep(xStep, yStep, i + 1);
       this.patternPos[i] = { x, y };
     }
 
@@ -165,6 +169,9 @@ class Clavis {
     const beatX = this.patternPos[this.currentStep - 1].x;
     const beatY = this.patternPos[this.currentStep - 1].y;
     drawDotBeat(beatX, beatY);
+    if (this.animate) {
+      window.requestAnimationFrame(this.draw);
+    }
   }
 }
 

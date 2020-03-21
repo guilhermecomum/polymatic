@@ -10,9 +10,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 function App() {
+  const callbacks = { drum: drum, synth: synth };
   const [pattern, setPattern] = useState("1000101000101000");
   const [tempo, setTempo] = useState(120);
   const [layers, setLayers] = useState([]);
+  const [callback, setCallback] = useState("drum");
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   const context = new AudioContext();
@@ -24,7 +26,7 @@ function App() {
   const addLayer = () => {
     const sequence = beet.pattern(pattern);
     const clavis = new Clavis();
-    const guia = { layer: beet.layer(sequence, clavis, drum) };
+    const guia = { layer: beet.layer(sequence, clavis, callbacks[callback]) };
     guia.layer.tempo = tempo;
     beet.add(guia.layer);
     beet.start();
@@ -55,10 +57,30 @@ function App() {
     });
   }
 
+  function synth(time, step) {
+    console.log("Step: ", step);
+    var osc = context.createOscillator();
+    var gain = context.createGain();
+    osc.connect(gain);
+    gain.connect(context.destination);
+    osc.frequency.value = 277;
+    beet.envelope(gain.gain, time, {
+      start: 0,
+      peake: 0.5,
+      attack: 0.02,
+      decay: 0.1,
+      sustain: 0.1,
+      release: 0.2
+    });
+    osc.start(time);
+    osc.stop(time + 0.5);
+  }
+
   const headerProps = {
     layers,
     pattern,
     setPattern,
+    setCallback,
     beet,
     tempo,
     setTempo,

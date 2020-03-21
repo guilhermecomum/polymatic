@@ -6,7 +6,7 @@ const watch = WatchJS.watch;
 function Layer(id, context, tempo, clavis, sequence, on, off) {
   if (!off) off = function() {};
   var self = this;
-  this.idi = id;
+  this.id = id;
   this.on = on;
   this.off = off;
   this.tempo = tempo;
@@ -17,7 +17,9 @@ function Layer(id, context, tempo, clavis, sequence, on, off) {
       self.metro.steps = sequence.seq.length;
     }
 
-    clavis.setCurrentStep(step);
+    setTimeout(() => {
+      clavis.setCurrentStep(step);
+    }, 950);
 
     if (sequence.seq[step - 1] === "1") {
       self.on(time, step, timeFromScheduled);

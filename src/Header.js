@@ -1,12 +1,19 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
-import { Button, ButtonGroup, FormControl, InputGroup } from "react-bootstrap";
+import {
+  Button,
+  ButtonGroup,
+  FormControl,
+  InputGroup,
+  Form
+} from "react-bootstrap";
 
 function Header({
   layers,
   pattern,
   setPattern,
+  setCallback,
   beet,
   tempo,
   setTempo,
@@ -63,6 +70,10 @@ function Header({
             onChange={e => setTempo(e.target.value)}
           />
         </InputGroup>
+        <Form.Control as="select" onChange={e => setCallback(e.target.value)}>
+          <option value="drum">drum</option>
+          <option value="synth">synth</option>
+        </Form.Control>
         <Button onClick={() => addLayer()}>Adicionar</Button>
       </div>
     </div>
