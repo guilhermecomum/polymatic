@@ -14,6 +14,7 @@ function App() {
   const [tempo, setTempo] = useState(120);
   const [layers, setLayers] = useState([]);
   const [sample, setSample] = useState("drum1");
+  const [preview, setPreview] = useState(true);
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   const context = new AudioContext();
@@ -22,7 +23,13 @@ function App() {
     tempo: tempo
   });
 
+  const handlePattern = value => {
+    setPreview(true);
+    setPattern(value);
+  };
+
   const addLayer = () => {
+    setPreview(false);
     const sequence = beet.pattern(pattern);
     const clavis = new Clavis();
     const guia = { layer: beet.layer(sequence, clavis, callback) };
@@ -48,7 +55,6 @@ function App() {
   };
 
   function callback(time, step) {
-    console.log("Sample: ", instruments[sample]);
     const source = context.createBufferSource();
     beet.load(beet.context, instruments[sample], function(buffer) {
       source.buffer = buffer;
@@ -79,7 +85,7 @@ function App() {
   const headerProps = {
     layers,
     pattern,
-    setPattern,
+    handlePattern,
     setSample,
     beet,
     tempo,
@@ -94,6 +100,12 @@ function App() {
         {layers.map(layer => (
           <Layer key={layer.id} guia={layer} removeLayer={removeLayer} />
         ))}
+        {preview && pattern.length > 1 && (
+          <Layer
+            guia={{ sequence: pattern, clavis: new Clavis(), tempo }}
+            preview
+          />
+        )}
       </div>
     </div>
   );

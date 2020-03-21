@@ -13,7 +13,7 @@ import {
 function Header({
   layers,
   pattern,
-  setPattern,
+  handlePattern,
   setSample,
   beet,
   tempo,
@@ -59,7 +59,7 @@ function Header({
           <FormControl
             placeholder="padrão"
             value={pattern}
-            onChange={e => setPattern(e.target.value)}
+            onChange={e => handlePattern(e.target.value)}
           />
         </InputGroup>
         <InputGroup>
@@ -79,7 +79,10 @@ function Header({
             </option>
           ))}
         </Form.Control>
-        <Button onClick={() => addLayer()}>Adicionar</Button>
+
+        <Button className="ml-3" onClick={() => addLayer()}>
+          Adicionar
+        </Button>
       </div>
     </div>
   );

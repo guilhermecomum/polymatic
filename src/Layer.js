@@ -3,7 +3,7 @@ import shortid from "shortid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-export default function Layer({ guia, removeLayer }) {
+export default function Layer({ guia, removeLayer, preview }) {
   const canvasRef = useRef();
   const { sequence, tempo, layer, clavis } = guia;
 
@@ -30,17 +30,20 @@ export default function Layer({ guia, removeLayer }) {
         width={640}
         height={425}
       />
-      <div className="controls">
-        <button onClick={() => handleStart()}>
-          <FontAwesomeIcon icon={faPlay} />
-        </button>
-        <button onClick={() => handleStop()}>
-          <FontAwesomeIcon icon={faStop} />
-        </button>
-        <button onClick={() => removeLayer(guia)}>
-          <FontAwesomeIcon icon={faTrash} />
-        </button>
-      </div>
+      {preview && <p className="Preview">Pré-visualização</p>}
+      {removeLayer && (
+        <div className="controls">
+          <button onClick={() => handleStart()}>
+            <FontAwesomeIcon icon={faPlay} />
+          </button>
+          <button onClick={() => handleStop()}>
+            <FontAwesomeIcon icon={faStop} />
+          </button>
+          <button onClick={() => removeLayer(guia)}>
+            <FontAwesomeIcon icon={faTrash} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
