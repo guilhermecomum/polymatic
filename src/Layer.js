@@ -1,11 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import RangeSlider from "react-bootstrap-range-slider";
+import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css";
 import shortid from "shortid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 export default function Layer({ guia, removeLayer, preview }) {
   const canvasRef = useRef();
-  const { sequence, tempo, layer, clavis } = guia;
+  const [volume, setVolume] = useState(100);
+  const { sequence, tempo, layer, clavis, channel } = guia;
 
   useEffect(() => {
     clavis.configure(canvasRef.current, sequence, tempo);
@@ -20,6 +23,16 @@ export default function Layer({ guia, removeLayer, preview }) {
   const handleStart = () => {
     layer.start();
     clavis.play();
+  };
+
+  function remap(value, low1, high1, low2, high2) {
+    return low2 + ((high2 - low2) * (value - low1)) / (high1 - low1);
+  }
+
+  const handleVolume = value => {
+    const newVolume = remap(value, 0, 100, 0.0, 0.1);
+    setVolume(value);
+    channel.setVolume(newVolume);
   };
 
   return (
@@ -42,6 +55,17 @@ export default function Layer({ guia, removeLayer, preview }) {
           <button onClick={() => removeLayer(guia)}>
             <FontAwesomeIcon icon={faTrash} />
           </button>
+        </div>
+      )}
+      {!preview && (
+        <div className="mt-2">
+          <RangeSlider
+            value={volume}
+            min={0}
+            max={100}
+            tooltipLabel={currentValue => `${currentValue}%`}
+            onChange={e => handleVolume(Number(e.target.value))}
+          />
         </div>
       )}
     </div>

@@ -1,56 +1,51 @@
 import Metro from "./wa-metro.js";
-import WatchJS from "melanke-watchjs";
 
-const watch = WatchJS.watch;
+class Layer {
+  constructor(id, context, tempo, clavis, sequence, on, off) {
+    if (!off) off = function() {};
+    this.id = id;
+    this.on = on;
+    this.off = off;
+    this.tempo = tempo;
+    this.clavis = clavis;
+    this.context = context;
+    this.sequence = sequence;
+    this.metro = new Metro(context, (time, step, timeFromScheduled) => {
+      if (this.metro.steps !== this.sequence.seq.length) {
+        this.metro.steps = this.sequence.seq.length;
+      }
 
-function Layer(id, context, tempo, clavis, sequence, on, off) {
-  if (!off) off = function() {};
-  var self = this;
-  this.id = id;
-  this.on = on;
-  this.off = off;
-  this.tempo = tempo;
-  this.clavis = clavis;
+      if (sequence.seq[step - 1] === "1") {
+        this.on(time, step, timeFromScheduled);
+        setTimeout(() => {
+          clavis.setCurrentStep(step);
+        }, 1000);
+      } else {
+        this.off(time, step, timeFromScheduled);
+        setTimeout(() => {
+          clavis.setCurrentStep(step);
+        }, 1000);
+      }
+    });
+    this.metro.steps = sequence.seq.length;
+    this.metro.tempo = this.tempo;
+  }
 
-  self.metro = new Metro(context, function(time, step, timeFromScheduled) {
-    if (self.metro.steps !== sequence.seq.length) {
-      self.metro.steps = sequence.seq.length;
-    }
+  start() {
+    this.metro.start();
+  }
 
-    if (sequence.seq[step - 1] === "1") {
-      self.on(time, step, timeFromScheduled);
-      setTimeout(() => {
-        clavis.setCurrentStep(step);
-      }, 1000);
-    } else {
-      self.off(time, step, timeFromScheduled);
-      setTimeout(() => {
-        clavis.setCurrentStep(step);
-      }, 1000);
-    }
-  });
+  pause() {
+    this.metro.pause();
+  }
 
-  this.metro.steps = sequence.seq.length;
-  this.metro.tempo = this.tempo;
+  stop() {
+    this.metro.stop();
+  }
 
-  watch(self, ["tempo"], function() {
-    self.metro.tempo = self.tempo;
-  });
+  watch(value) {
+    this.metro.tempo = value;
+  }
 }
-
-Layer.prototype.start = function() {
-  this.metro.start();
-  return this;
-};
-
-Layer.prototype.pause = function() {
-  this.metro.pause();
-  return this;
-};
-
-Layer.prototype.stop = function() {
-  this.metro.stop();
-  return this;
-};
 
 export default Layer;
