@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
+import shortid from "shortid";
 import instruments from "./instruments";
+import presets from "./presets";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -7,19 +9,38 @@ import {
   ButtonGroup,
   FormControl,
   InputGroup,
-  Form
+  Form,
+  Dropdown
 } from "react-bootstrap";
 
 function Header({
   layers,
+  setPreview,
   pattern,
-  handlePattern,
-  setSample,
+  setPattern,
   beet,
-  tempo,
-  setTempo,
-  addLayer
+  handleStoreUpdate
 }) {
+  const [sample, setSample] = useState("agogo1");
+  const [tempo, setTempo] = useState(120);
+
+  const handlePattern = value => {
+    setPreview(true);
+    setPattern(value);
+  };
+
+  const handleNewClave = () => {
+    const newClave = {
+      name: shortid.generate(),
+      instruments: [{ pattern: pattern, tempo: tempo, sample: sample }]
+    };
+    handleStoreUpdate(newClave);
+  };
+
+  const handlePreset = value => {
+    handleStoreUpdate(presets[value]);
+  };
+
   const start = () => {
     for (const guia of layers) {
       guia.layer.start();
@@ -80,9 +101,22 @@ function Header({
           ))}
         </Form.Control>
 
-        <Button className="ml-3" onClick={() => addLayer()}>
+        <Button className="ml-2" onClick={() => handleNewClave()}>
           Adicionar
         </Button>
+
+        <Dropdown className="ml-2">
+          <Dropdown.Toggle variant="info" id="dropdown-basic">
+            presets
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            {Object.keys(presets).map((preset, index) => (
+              <Dropdown.Item key={index} onClick={() => handlePreset(preset)}>
+                {presets[preset].name}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
     </div>
   );

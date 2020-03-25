@@ -11,25 +11,19 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 function App() {
-  const [pattern, setPattern] = useState("1000101000101000");
-  const [tempo, setTempo] = useState(120);
   const [layers, setLayers] = useState([]);
-  const [sample, setSample] = useState("agogo1");
   const [preview, setPreview] = useState(true);
+  const [pattern, setPattern] = useState("1000101000101000");
+  const [store, updateStore] = useState([]);
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   const context = new AudioContext();
   const beet = new Beet({
     context: context,
-    tempo: tempo
+    tempo: 120
   });
 
-  const handlePattern = value => {
-    setPreview(true);
-    setPattern(value);
-  };
-
-  const addLayer = () => {
+  const handleLayer = (pattern, tempo, sample) => {
     setPreview(false);
     const sequence = beet.pattern(pattern);
     const clavis = new Clavis();
@@ -38,18 +32,29 @@ function App() {
     const guia = { layer: beet.layer(sequence, clavis, channel.callbackOn) };
     guia.layer.tempo = tempo;
     beet.add(guia.layer);
+    addLayer(pattern, tempo, guia.layer, clavis, channel);
+  };
+
+  const handleStoreUpdate = clave => {
+    clave.instruments.map(instrument => {
+      const { pattern, tempo, sample } = instrument;
+      updateStore([...store, { pattern, tempo, sample }]);
+      handleLayer(pattern, tempo, sample);
+    });
     beet.start();
-    setLayers([
-      ...layers,
-      {
+  };
+
+  const addLayer = (pattern, tempo, layer, clavis, channel) => {
+    setLayers(layers =>
+      layers.concat({
         id: shortid.generate(),
         sequence: pattern,
         tempo: tempo,
-        layer: guia.layer,
+        layer: layer,
         clavis: clavis,
         channel: channel
-      }
-    ]);
+      })
+    );
   };
 
   const removeLayer = guia => {
@@ -60,13 +65,11 @@ function App() {
 
   const headerProps = {
     layers,
-    pattern,
-    handlePattern,
-    setSample,
     beet,
-    tempo,
-    setTempo,
-    addLayer
+    pattern,
+    setPattern,
+    setPreview,
+    handleStoreUpdate
   };
 
   return (
@@ -78,7 +81,7 @@ function App() {
         ))}
         {preview && pattern.length > 1 && (
           <Layer
-            guia={{ sequence: pattern, clavis: new Clavis(), tempo }}
+            guia={{ sequence: pattern, clavis: new Clavis(), tempo: 120 }}
             preview
           />
         )}
