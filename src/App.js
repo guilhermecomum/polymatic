@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactGA from "react-ga";
 import Beet from "./lib/beet";
 import Clavis from "./lib/clavis";
 import Channel from "./lib/channel";
@@ -6,9 +7,11 @@ import instruments from "./instruments";
 import shortid from "shortid";
 import Layer from "./Layer";
 import Header from "./Header";
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+
+const trackingId = "UA-160360260-2";
+ReactGA.initialize(trackingId);
 
 function App() {
   const [layers, setLayers] = useState([]);
