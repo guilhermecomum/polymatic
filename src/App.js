@@ -10,14 +10,15 @@ import Header from "./Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-const trackingId = "UA-160360260-2";
-ReactGA.initialize(trackingId);
-
 function App() {
   const [layers, setLayers] = useState([]);
   const [preview, setPreview] = useState(true);
   const [pattern, setPattern] = useState("1000101000101000");
   const [store, updateStore] = useState([]);
+
+  const trackingId = "UA-160360260-2";
+  ReactGA.initialize(trackingId);
+  ReactGA.pageview(window.location.pathname + window.location.search);
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   const context = new AudioContext();
