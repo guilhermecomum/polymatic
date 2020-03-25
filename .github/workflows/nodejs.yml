@@ -18,8 +18,4 @@ jobs:
     - name: Install Packages
       run: npm install
     - name: Deploy to GH Pages
-      run: |
-        git config --global user.email "guilherme.ga@gmail.com"
-        git config --global user.name "guilhermecomum"
-        git remote set-url origin https:// 1e8cda576d2f8e0810905e6bed96bd85d04c2fed@github.com/guilhermecomum/polymatic.git
-        npm run deploy
+      run: npm run deploy
