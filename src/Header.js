@@ -56,7 +56,7 @@ function Header({
     <div className="header">
       <div>
         <h1 className="header-logo">
-          Polymatic <small>v3.0.4</small>
+          Polymatic <small>v3.1.0</small>
         </h1>
       </div>
       <div className="header-controls">
