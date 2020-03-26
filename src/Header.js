@@ -15,24 +15,21 @@ import {
 
 function Header({
   layers,
-  setPreview,
+  beet,
   pattern,
   setPattern,
-  beet,
+  patternError,
+  sequence,
+  setPreview,
   handleStoreUpdate
 }) {
   const [sample, setSample] = useState("agogo1");
   const [tempo, setTempo] = useState(120);
 
-  const handlePattern = value => {
-    setPreview(true);
-    setPattern(value);
-  };
-
   const handleNewClave = () => {
     const newClave = {
       name: shortid.generate(),
-      instruments: [{ pattern: pattern, tempo: tempo, sample: sample }]
+      instruments: [{ sequence: sequence, tempo: tempo, sample: sample }]
     };
     handleStoreUpdate(newClave);
   };
@@ -78,9 +75,10 @@ function Header({
             <InputGroup.Text id="basic-addon3">Padrão</InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl
-            placeholder="padrão"
+            placeholder="1010101 ou 3,4"
             value={pattern}
-            onChange={e => handlePattern(e.target.value)}
+            onChange={e => setPattern(e.target.value)}
+            isInvalid={pattern.length > 0 && patternError}
           />
         </InputGroup>
         <InputGroup>
@@ -101,7 +99,11 @@ function Header({
           ))}
         </Form.Control>
 
-        <Button className="ml-2" onClick={() => handleNewClave()}>
+        <Button
+          className="ml-2"
+          onClick={() => handleNewClave()}
+          disabled={patternError}
+        >
           Adicionar
         </Button>
 

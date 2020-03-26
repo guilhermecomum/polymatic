@@ -5,7 +5,7 @@ import shortid from "shortid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-export default function Layer({ guia, removeLayer, preview }) {
+export default function Layer({ guia, removeLayer }) {
   const canvasRef = useRef();
   const [volume, setVolume] = useState(100);
   const { sequence, tempo, layer, clavis, channel } = guia;
@@ -43,7 +43,6 @@ export default function Layer({ guia, removeLayer, preview }) {
         width={640}
         height={425}
       />
-      {preview && <p className="Preview">Pré-visualização</p>}
       {removeLayer && (
         <div className="controls">
           <button onClick={() => handleStart()}>
@@ -57,17 +56,15 @@ export default function Layer({ guia, removeLayer, preview }) {
           </button>
         </div>
       )}
-      {!preview && (
-        <div className="mt-2">
-          <RangeSlider
-            value={volume}
-            min={0}
-            max={100}
-            tooltipLabel={currentValue => `${currentValue}%`}
-            onChange={e => handleVolume(Number(e.target.value))}
-          />
-        </div>
-      )}
+      <div className="mt-2">
+        <RangeSlider
+          value={volume}
+          min={0}
+          max={100}
+          tooltipLabel={currentValue => `${currentValue}%`}
+          onChange={e => handleVolume(Number(e.target.value))}
+        />
+      </div>
     </div>
   );
 }

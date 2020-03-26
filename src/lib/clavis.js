@@ -163,7 +163,9 @@ class Clavis {
     }
 
     /* Connect the dots */
-    connectDots(patternDots);
+    if (patternDots.length >= 1) {
+      connectDots(patternDots);
+    }
 
     /* Draw the moving dot */
     const beatX = this.patternPos[this.currentStep - 1].x;

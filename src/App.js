@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactGA from "react-ga";
+import bjork from "bjorklund";
 import Beet from "./lib/beet";
 import Clavis from "./lib/clavis";
 import Channel from "./lib/channel";
 import instruments from "./instruments";
 import shortid from "shortid";
 import Layer from "./Layer";
+import Preview from "./Preview";
 import Header from "./Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
@@ -13,7 +15,9 @@ import "./App.css";
 function App() {
   const [layers, setLayers] = useState([]);
   const [preview, setPreview] = useState(true);
-  const [pattern, setPattern] = useState("1000101000101000");
+  const [pattern, setPattern] = useState("");
+  const [patternError, setPatternError] = useState(false);
+  const [sequence, setSequence] = useState("");
   const [store, updateStore] = useState([]);
 
   const trackingId = "UA-160360260-2";
@@ -27,32 +31,60 @@ function App() {
     tempo: 120
   });
 
-  const handleLayer = (pattern, tempo, sample) => {
+  useEffect(() => {
+    const handlePattern = value => {
+      const isEuclidian = new RegExp("^(\\d+(\\.\\d+)?),(\\d+(\\.\\d+)?)$");
+      const isBinary = new RegExp("^[0-1]{1,}$");
+      if (isEuclidian.test(pattern)) {
+        const [pulse, steps] = value
+          .split(",")
+          .map(number => parseInt(number))
+          .sort((a, b) => a - b);
+        const sequence = bjork(pulse, steps);
+        setSequence(sequence);
+        setPreview(true);
+        setPatternError(false);
+      } else if (isBinary.test(pattern)) {
+        setSequence(pattern);
+        setPreview(true);
+        setPatternError(false);
+      } else {
+        if (value === "") {
+          setSequence("");
+        }
+        setPreview(false);
+        setPatternError(true);
+      }
+    };
+    handlePattern(pattern);
+  }, [sequence, pattern]);
+
+  const handleLayer = (sequence, tempo, sample) => {
     setPreview(false);
-    const sequence = beet.pattern(pattern);
+    const beetPattern = beet.pattern(sequence);
     const clavis = new Clavis();
     const channel = new Channel();
     channel.configure(context, beet, instruments[sample]);
-    const guia = { layer: beet.layer(sequence, clavis, channel.callbackOn) };
+    const guia = { layer: beet.layer(beetPattern, clavis, channel.callbackOn) };
     guia.layer.tempo = tempo;
     beet.add(guia.layer);
-    addLayer(pattern, tempo, guia.layer, clavis, channel);
+    addLayer(sequence, tempo, guia.layer, clavis, channel);
   };
 
   const handleStoreUpdate = clave => {
     clave.instruments.map(instrument => {
-      const { pattern, tempo, sample } = instrument;
-      updateStore([...store, { pattern, tempo, sample }]);
-      handleLayer(pattern, tempo, sample);
+      const { sequence, tempo, sample } = instrument;
+      updateStore([...store, { sequence, tempo, sample }]);
+      handleLayer(sequence, tempo, sample);
     });
     beet.start();
   };
 
-  const addLayer = (pattern, tempo, layer, clavis, channel) => {
+  const addLayer = (sequence, tempo, layer, clavis, channel) => {
     setLayers(layers =>
       layers.concat({
         id: shortid.generate(),
-        sequence: pattern,
+        sequence: sequence,
         tempo: tempo,
         layer: layer,
         clavis: clavis,
@@ -72,6 +104,8 @@ function App() {
     beet,
     pattern,
     setPattern,
+    patternError,
+    sequence,
     setPreview,
     handleStoreUpdate
   };
@@ -83,11 +117,8 @@ function App() {
         {layers.map(layer => (
           <Layer key={layer.id} guia={layer} removeLayer={removeLayer} />
         ))}
-        {preview && pattern.length > 1 && (
-          <Layer
-            guia={{ sequence: pattern, clavis: new Clavis(), tempo: 120 }}
-            preview
-          />
+        {preview && sequence.length > 0 && (
+          <Preview {...{ sequence, clavis: new Clavis() }} />
         )}
       </div>
     </div>
