@@ -30,7 +30,7 @@ export default function Layer({ guia, removeLayer }) {
   }
 
   const handleVolume = value => {
-    const newVolume = remap(value, 0, 100, 0.0, 0.1);
+    const newVolume = remap(value, 0, 100, 0.0, 1.0);
     setVolume(value);
     channel.setVolume(newVolume);
   };
