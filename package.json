@@ -1,6 +1,6 @@
 {
   "name": "Polymatic",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "private": true,
   "homepage": "https://polymatic.ciberterreiro.org",
   "dependencies": {
@@ -11,8 +11,8 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "beet.js": "^1.7.0",
-    "bjorklund": "^1.0.4",
     "bootstrap": "^4.4.1",
+    "euclidean-rhythms": "^2.0.1",
     "gh-pages": "^2.2.0",
     "melanke-watchjs": "^1.5.2",
     "react": "^16.13.0",

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactGA from "react-ga";
-import bjork from "bjorklund";
+import er from "euclidean-rhythms";
 import Beet from "./lib/beet";
 import Clavis from "./lib/clavis";
 import Channel from "./lib/channel";
@@ -39,7 +39,7 @@ function App() {
           .split(",")
           .map(number => parseInt(number))
           .sort((a, b) => a - b);
-        const sequence = bjork(pulse, steps);
+        const sequence = er.getPattern(pulse, steps).join("");
         setSequence(sequence);
         setPreview(true);
         setPatternError(false);

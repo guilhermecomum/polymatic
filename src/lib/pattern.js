@@ -1,4 +1,4 @@
-import bjork from "bjorklund";
+import er from "euclidean-rhythms";
 import WatchJS from "melanke-watchjs";
 
 const watch = WatchJS.watch;
@@ -42,7 +42,7 @@ Pattern.prototype._createSequence = function(pulses, steps) {
   if (typeOfPulses === "number") {
     self.pulses = pulses;
     self.steps = steps || pulses;
-    self.seq = bjork(self.pulses, self.steps).split("");
+    self.seq = er.getPattern(self.pulses, self.steps);
   } else if (typeOfPulses === "string") {
     self.steps = pulses.length;
     self.seq = pulses.split("");

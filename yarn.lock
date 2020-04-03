@@ -2263,7 +2263,7 @@ bindings@^1.5.0:
   dependencies:
     file-uri-to-path "1.0.0"
 
-bjorklund@^1.0.3, bjorklund@^1.0.4:
+bjorklund@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/bjorklund/-/bjorklund-1.0.4.tgz#6bb99ca7d3df90744d285399aac92f6bf3064bcd"
   integrity sha1-a7mcp9PfkHRNKFOZqskva/MGS80=
@@ -4078,6 +4078,11 @@ etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
+
+euclidean-rhythms@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/euclidean-rhythms/-/euclidean-rhythms-2.0.1.tgz#35e2855fdeff600a2259f14a8a8f188477a00828"
+  integrity sha512-rI6/DLfI4Rjqrtl2eMNnQ6hWamauBviwhjpIHhLxIM9wDi39YUyM4FGxVNo5+ibHHQ2JdJKvCNYzSGCCxDz8dA==
 
 eventemitter3@^4.0.0:
   version "4.0.0"
