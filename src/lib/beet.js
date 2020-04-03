@@ -3,17 +3,17 @@ import Pattern from "./pattern";
 import Layer from "./layer";
 
 class Beet {
-  constructor({ context, tempo }) {
+  constructor({ context }) {
     this.context = context;
-    this.tempo = tempo || 120;
+    this.tempo = 120;
     this.layers = [];
   }
 
-  layer(sequence, clavis, on, off) {
+  layer(sequence, tempo, clavis, on, off) {
     return new Layer(
       shortid.generate(),
       this.context,
-      this.tempo,
+      tempo,
       clavis,
       sequence,
       on,

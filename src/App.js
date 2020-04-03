@@ -27,8 +27,7 @@ function App() {
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   const context = new AudioContext();
   const beet = new Beet({
-    context: context,
-    tempo: 120
+    context: context
   });
 
   useEffect(() => {
@@ -65,7 +64,9 @@ function App() {
     const clavis = new Clavis();
     const channel = new Channel();
     channel.configure(context, beet, instruments[sample]);
-    const guia = { layer: beet.layer(beetPattern, clavis, channel.callbackOn) };
+    const guia = {
+      layer: beet.layer(beetPattern, tempo, clavis, channel.callbackOn)
+    };
     guia.layer.tempo = tempo;
     beet.add(guia.layer);
     addLayer(sequence, tempo, guia.layer, clavis, channel);

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import packageJson from "../package.json";
 import shortid from "shortid";
 import instruments from "./instruments";
 import presets from "./presets";
@@ -56,7 +57,7 @@ function Header({
     <div className="header">
       <div>
         <h1 className="header-logo">
-          Polymatic <small>v3.1.1</small>
+          Polymatic <small>{packageJson.version}</small>
         </h1>
       </div>
       <div className="header-controls">

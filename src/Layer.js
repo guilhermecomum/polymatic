@@ -43,6 +43,10 @@ export default function Layer({ guia, removeLayer }) {
         width={640}
         height={425}
       />
+      <ul>
+        <li>sequence: {sequence}</li>
+        <li>tempo: {tempo}</li>
+      </ul>
       {removeLayer && (
         <div className="controls">
           <button onClick={() => handleStart()}>
