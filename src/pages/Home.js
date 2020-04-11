@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ReactGA from "react-ga";
 import er from "euclidean-rhythms";
 import Beet from "../lib/beet";
 import Clavis from "../lib/clavis";
@@ -17,10 +16,6 @@ function App() {
   const [patternError, setPatternError] = useState(false);
   const [sequence, setSequence] = useState("");
   const [store, updateStore] = useState([]);
-
-  const trackingId = "UA-160360260-2";
-  ReactGA.initialize(trackingId);
-  ReactGA.pageview(window.location.pathname + window.location.search);
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   const context = new AudioContext();

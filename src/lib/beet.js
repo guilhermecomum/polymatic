@@ -9,15 +9,14 @@ class Beet {
     this.layers = [];
   }
 
-  layer(sequence, tempo, clavis, on, off) {
+  layer(sequence, tempo, clavis, on) {
     return new Layer(
       shortid.generate(),
       this.context,
       tempo,
       clavis,
       sequence,
-      on,
-      off
+      on
     );
   }
 

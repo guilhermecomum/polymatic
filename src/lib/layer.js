@@ -1,11 +1,9 @@
 import Metro from "./wa-metro.js";
 
 class Layer {
-  constructor(id, context, tempo, clavis, sequence, on, off) {
-    if (!off) off = function() {};
+  constructor(id, context, tempo, clavis, sequence, on) {
     this.id = id;
     this.on = on;
-    this.off = off;
     this.tempo = tempo;
     this.clavis = clavis;
     this.context = context;
@@ -17,11 +15,6 @@ class Layer {
 
       if (sequence.seq[step - 1] === "1") {
         this.on(time, step, timeFromScheduled);
-        setTimeout(() => {
-          clavis.setCurrentStep(step);
-        }, 1000);
-      } else {
-        this.off(time, step, timeFromScheduled);
         setTimeout(() => {
           clavis.setCurrentStep(step);
         }, 1000);
