@@ -20,6 +20,7 @@
     "react-bootstrap-range-slider": "^0.3.1",
     "react-dom": "^16.13.0",
     "react-ga": "^2.7.0",
+    "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "shortid": "^2.2.15",
     "watchjs": "^0.0.0",

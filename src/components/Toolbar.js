@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import packageJson from "../package.json";
 import shortid from "shortid";
-import instruments from "./instruments";
-import presets from "./presets";
+import instruments from "../instruments";
+import presets from "../presets";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -14,7 +13,7 @@ import {
   Dropdown
 } from "react-bootstrap";
 
-function Header({
+function Toolbar({
   layers,
   beet,
   pattern,
@@ -54,13 +53,8 @@ function Header({
   };
 
   return (
-    <div className="header">
-      <div>
-        <h1 className="header-logo">
-          Polymatic <small>{packageJson.version}</small>
-        </h1>
-      </div>
-      <div className="header-controls">
+    <div className="toolbar">
+      <div className="toolbar-controls">
         <ButtonGroup aria-label="Basic example">
           <Button variant="secondary" onClick={() => start()}>
             <FontAwesomeIcon icon={faPlay} />
@@ -70,7 +64,7 @@ function Header({
           </Button>
         </ButtonGroup>
       </div>
-      <div className="header-form">
+      <div className="toolbar-form">
         <InputGroup>
           <InputGroup.Prepend>
             <InputGroup.Text id="basic-addon3">Padrão</InputGroup.Text>
@@ -124,4 +118,4 @@ function Header({
     </div>
   );
 }
-export default Header;
+export default Toolbar;
