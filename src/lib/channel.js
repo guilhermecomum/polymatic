@@ -26,12 +26,9 @@ class Channel {
     gainNode.connect(this.context.destination);
 
     const source = this.context.createBufferSource();
-
-    this.beet.load(this.beet.context, this.instrument, function(buffer) {
-      source.buffer = buffer;
-      source.connect(gainNode);
-      source.start(time);
-    });
+    source.buffer = this.instrument;
+    source.connect(gainNode);
+    source.start(time);
   };
 }
 

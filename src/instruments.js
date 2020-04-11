@@ -2,7 +2,7 @@ import agogo1 from "./samples/agogo1.wav";
 import agogo2 from "./samples/agogo2.wav";
 import bass from "./samples/bass.wav";
 import block from "./samples/block.wav";
-import bum from "./samples/bum.wav";
+import bumbo from "./samples/bum.wav";
 import claves from "./samples/claves.wav";
 import conga1 from "./samples/conga1.wav";
 import conga2 from "./samples/conga2.wav";
@@ -23,7 +23,7 @@ const instruments = {
   agogo2,
   bass,
   block,
-  bum,
+  bumbo,
   claves,
   conga1,
   conga2,

@@ -3,13 +3,12 @@ import er from "euclidean-rhythms";
 import Beet from "../lib/beet";
 import Clavis from "../lib/clavis";
 import Channel from "../lib/channel";
-import instruments from "../instruments";
 import shortid from "shortid";
 import Layer from "../components/Layer";
 import Preview from "../components/Preview";
 import Toolbar from "../components/Toolbar";
 
-function App() {
+function Home({ context, instruments }) {
   const [layers, setLayers] = useState([]);
   const [preview, setPreview] = useState(true);
   const [pattern, setPattern] = useState("");
@@ -17,8 +16,6 @@ function App() {
   const [sequence, setSequence] = useState("");
   const [store, updateStore] = useState([]);
 
-  window.AudioContext = window.AudioContext || window.webkitAudioContext;
-  const context = new AudioContext();
   const beet = new Beet({
     context: context
   });
@@ -119,4 +116,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home;
