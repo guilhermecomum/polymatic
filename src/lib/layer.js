@@ -18,6 +18,10 @@ class Layer {
         setTimeout(() => {
           clavis.setCurrentStep(step);
         }, 1000);
+      } else {
+        setTimeout(() => {
+          clavis.setCurrentStep(step);
+        }, 1000);
       }
     });
     this.metro.steps = sequence.seq.length;
