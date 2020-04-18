@@ -23,7 +23,7 @@ class BufferLoader {
             return;
           }
           this.bufferList[instrument] = buffer;
-          if (++this.loadCount == Object.keys(this.instruments).length)
+          if (++this.loadCount === Object.keys(this.instruments).length)
             this.onload(this.bufferList);
         },
         error => {
@@ -43,10 +43,6 @@ class BufferLoader {
     Object.keys(this.instruments).forEach(instrument => {
       this.loadBuffer(instrument);
     });
-
-    // for (var i = 0; i < Object.keys(this.instruments).length; ++i) {
-    //   this.loadBuffer(this.urlList[i], i);
-    // }
   }
 }
 

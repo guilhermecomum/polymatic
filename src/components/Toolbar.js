@@ -87,6 +87,7 @@ function Toolbar({
           />
         </InputGroup>
         <Form.Control as="select" onChange={e => setSample(e.target.value)}>
+          <option>Instrumentos</option>
           {Object.keys(instruments).map((instrument, index) => (
             <option key={index} value={instrument}>
               {instrument}

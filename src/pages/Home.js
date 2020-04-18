@@ -63,7 +63,7 @@ function Home({ context, instruments }) {
   };
 
   const handleStoreUpdate = clave => {
-    clave.instruments.map(instrument => {
+    clave.instruments.forEach(instrument => {
       const { sequence, tempo, sample } = instrument;
       updateStore([...store, { sequence, tempo, sample }]);
       handleLayer(sequence, tempo, sample);

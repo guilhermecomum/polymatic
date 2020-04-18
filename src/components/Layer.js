@@ -4,6 +4,7 @@ import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css";
 import shortid from "shortid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { Button, ButtonGroup } from "react-bootstrap";
 
 export default function Layer({ guia, removeLayer }) {
   const canvasRef = useRef();
@@ -49,15 +50,17 @@ export default function Layer({ guia, removeLayer }) {
       </ul>
       {removeLayer && (
         <div className="controls">
-          <button onClick={() => handleStart()}>
-            <FontAwesomeIcon icon={faPlay} />
-          </button>
-          <button onClick={() => handleStop()}>
-            <FontAwesomeIcon icon={faStop} />
-          </button>
-          <button onClick={() => removeLayer(guia)}>
-            <FontAwesomeIcon icon={faTrash} />
-          </button>
+          <ButtonGroup aria-label="Basic example">
+            <Button onClick={() => handleStart()}>
+              <FontAwesomeIcon icon={faPlay} />
+            </Button>
+            <Button onClick={() => handleStop()}>
+              <FontAwesomeIcon icon={faStop} />
+            </Button>
+            <Button onClick={() => removeLayer(guia)}>
+              <FontAwesomeIcon icon={faTrash} />
+            </Button>
+          </ButtonGroup>
         </div>
       )}
       <div className="mt-2">

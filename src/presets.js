@@ -13,7 +13,7 @@ const presets = {
       {
         sequence: "10101",
         tempo: 120,
-        sample: "bum"
+        sample: "bumbo"
       },
       {
         sequence: "10110101",

@@ -1,0 +1,25 @@
+$theme-colors: (
+    "primary": #cc2c11,
+    "dark": #030303,
+    "gray-100": #cc2c11,
+    "gray-200": #cc2c11,
+    "gray-300": #cc2c11,
+    "gray-400": #cc2c11,
+    "gray-500": #cc2c11,
+    "gray-600": #cc2c11,
+    "gray-700": #cc2c11,
+    "gray-800": #cc2c11,
+    "gray-900": #cc2c11,
+    "gray": #cc2c11,
+    "gray-dark": #cc2c11,
+    "secondary": #cc2c11,
+    "success": #cc2c11,
+    "info": #cc2c11,
+    "warning": #cc2c11,
+    "danger": #cc2c11,
+    "light": #fff
+
+);
+
+// Import Bootstrap and its default variables
+@import '~bootstrap/scss/bootstrap.scss';

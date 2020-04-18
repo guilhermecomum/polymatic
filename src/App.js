@@ -5,8 +5,10 @@ import Home from "./pages/Home";
 import Header from "./components/Header";
 import BufferLoader from "./lib/bufferLoader";
 import instruments from "./instruments";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "./custom.scss";
 import "./App.css";
+
+const context = new AudioContext();
 
 function App() {
   const [loadedSamples, setLoadedSamples] = useState();
@@ -14,7 +16,8 @@ function App() {
   ReactGA.initialize(trackingId);
   ReactGA.pageview(window.location.pathname + window.location.search);
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
-  const context = new AudioContext();
+
+  const finishedLoading = bufferList => setLoadedSamples(bufferList);
 
   useEffect(() => {
     let bufferLoader = new BufferLoader(context, instruments, finishedLoading);
@@ -22,11 +25,10 @@ function App() {
     bufferLoader.load();
   }, []);
 
-  const finishedLoading = bufferList => setLoadedSamples(bufferList);
-
   return (
     <HashRouter basename="/">
       <Header />
+
       <Route
         exact
         path="/"

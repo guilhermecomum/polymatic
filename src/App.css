@@ -1,3 +1,7 @@
+body {
+    background: #030303
+}
+
 .toolbar {
     display: flex;
     padding: 20px 0;

@@ -39,17 +39,17 @@ class Clavis {
       "canvas-height": 200,
       "outer-circle-radius": 80,
       "outer-circle-line-width": 2,
-      "outer-circle-stroke-style": "#ccc",
-      "dot-path-stroke": "#000",
+      "outer-circle-stroke-style": "#fff",
+      "dot-path-stroke": "#cc2c11",
       "dot-on-radius": 4,
-      "dot-on-stroke-style": "#000",
-      "dot-on-fill-style": "#000",
+      "dot-on-stroke-style": "#cc2c11",
+      "dot-on-fill-style": "#cc2c11",
       "dot-off-radius": 2,
-      "dot-off-stroke-style": "#ccc",
-      "dot-off-fill-style": "#ccc",
-      "dot-beat-radius": 5,
-      "dot-beat-stroke-style": "#fc0",
-      "dot-beat-fill-style": "#fc0"
+      "dot-off-stroke-style": "#fff",
+      "dot-off-fill-style": "#fff",
+      "dot-beat-radius": 8,
+      "dot-beat-stroke-style": "#cc2c11",
+      "dot-beat-fill-style": "#cc2c11"
     };
 
     /* Canvas dimensions */
