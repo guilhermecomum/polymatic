@@ -59,7 +59,7 @@ function Home({ context, instruments }) {
     };
     guia.layer.tempo = tempo;
     beet.add(guia.layer);
-    addLayer(sequence, tempo, guia.layer, clavis, channel);
+    addLayer(sequence, tempo, guia.layer, clavis, channel, sample);
   };
 
   const handleStoreUpdate = clave => {
@@ -71,7 +71,7 @@ function Home({ context, instruments }) {
     beet.start();
   };
 
-  const addLayer = (sequence, tempo, layer, clavis, channel) => {
+  const addLayer = (sequence, tempo, layer, clavis, channel, sample) => {
     setLayers(layers =>
       layers.concat({
         id: shortid.generate(),
@@ -79,7 +79,8 @@ function Home({ context, instruments }) {
         tempo: tempo,
         layer: layer,
         clavis: clavis,
-        channel: channel
+        channel: channel,
+        sample: sample
       })
     );
   };

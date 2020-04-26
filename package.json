@@ -1,6 +1,6 @@
 {
   "name": "Polymatic",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "private": true,
   "homepage": "https://polymatic.ciberterreiro.org",
   "dependencies": {
@@ -49,5 +49,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "semantic-release": "^17.0.7"
   }
 }

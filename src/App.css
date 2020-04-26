@@ -31,6 +31,12 @@ body {
     display: flex;
     align-items: center;
     flex-direction: column;
+    color: #fff;
+}
+
+.volume {
+    display: flex;
+    align-items: center;
 }
 
 @media (max-width: 799px) {

@@ -9,7 +9,7 @@ import { Button, ButtonGroup } from "react-bootstrap";
 export default function Layer({ guia, removeLayer }) {
   const canvasRef = useRef();
   const [volume, setVolume] = useState(100);
-  const { sequence, tempo, layer, clavis, channel } = guia;
+  const { sequence, tempo, layer, clavis, channel, sample } = guia;
 
   useEffect(() => {
     clavis.configure(canvasRef.current, sequence, tempo);
@@ -47,6 +47,7 @@ export default function Layer({ guia, removeLayer }) {
       <ul>
         <li>sequence: {sequence}</li>
         <li>tempo: {tempo}</li>
+        <li>instrumento: {sample}</li>
       </ul>
       {removeLayer && (
         <div className="controls">
@@ -63,7 +64,8 @@ export default function Layer({ guia, removeLayer }) {
           </ButtonGroup>
         </div>
       )}
-      <div className="mt-2">
+      <div className="mt-2 volume">
+        <span className="mr-2">Vol.</span>
         <RangeSlider
           value={volume}
           min={0}
