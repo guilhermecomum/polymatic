@@ -1,3 +1,9 @@
+/**
+ Original code
+ Author: Ehsan Ziya <ehsan.ziya@gmail.com>
+ source: https:github.com/zya/beet.js
+**/
+
 import work from "webworkify-webpack";
 
 function Metro(context, callback) {

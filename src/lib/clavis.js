@@ -1,3 +1,9 @@
+/**
+Original code from Lincoln de Sousa
+author: Lincoln de Sousa <lincoln@clarete.li>
+source: https://github.com/clarete/clavis/
+**/
+
 class Clavis {
   constructor() {
     this.canvas = null;

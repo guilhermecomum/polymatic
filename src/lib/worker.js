@@ -1,3 +1,9 @@
+/**
+ Original code
+ Author: Ehsan Ziya <ehsan.ziya@gmail.com>
+ source: https:github.com/zya/beet.js
+**/
+
 export default function(self) {
   var interval = 25;
   var timer = null;

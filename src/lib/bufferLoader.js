@@ -1,3 +1,8 @@
+/**
+Original code from Boris Simus
+source: https://www.html5rocks.com/en/tutorials/webaudio/intro/
+**/
+
 class BufferLoader {
   constructor(context, instruments, callback) {
     this.context = context;

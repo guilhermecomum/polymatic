@@ -1,3 +1,9 @@
+/**
+ Original code
+ Author: Ehsan Ziya <ehsan.ziya@gmail.com>
+ source: https:github.com/zya/beet.js
+**/
+
 import er from "euclidean-rhythms";
 import WatchJS from "melanke-watchjs";
 
