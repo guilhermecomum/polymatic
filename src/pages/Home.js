@@ -48,7 +48,7 @@ function Home({ context, instruments }) {
     handlePattern(pattern);
   }, [sequence, pattern]);
 
-  const handleLayer = (sequence, tempo, sample) => {
+  const handleLayer = (sequence, tempo, sample, polymetric) => {
     setPreview(false);
     const beetPattern = beet.pattern(sequence);
     const clavis = new Clavis();
@@ -59,24 +59,47 @@ function Home({ context, instruments }) {
     };
     guia.layer.tempo = tempo;
     beet.add(guia.layer);
-    addLayer(sequence, tempo, guia.layer, clavis, channel, sample);
+    addLayer(sequence, tempo, guia.layer, clavis, channel, sample, polymetric);
   };
 
   const handleStoreUpdate = clave => {
     clave.instruments.forEach(instrument => {
-      const { sequence, tempo, sample } = instrument;
+      const { sequence, tempo, sample, polymetric } = instrument;
       updateStore([...store, { sequence, tempo, sample }]);
-      handleLayer(sequence, tempo, sample);
+      handleLayer(sequence, tempo, sample, polymetric);
     });
     beet.start();
   };
 
-  const addLayer = (sequence, tempo, layer, clavis, channel, sample) => {
+  const addLayer = (
+    sequence,
+    tempo,
+    layer,
+    clavis,
+    channel,
+    sample,
+    polymetric
+  ) => {
+    if (polymetric && layers.length > 0) {
+      let firstSteps = layers[0].sequence.length;
+      let newSteps = sequence.length;
+      if (newSteps !== firstSteps) {
+        var suggestTempo = tempo;
+        if (firstSteps > newSteps) {
+          let ratio = firstSteps / newSteps;
+          suggestTempo = tempo * ratio;
+        } else {
+          let ratio = newSteps / firstSteps;
+          suggestTempo = tempo / ratio;
+        }
+      }
+    }
+
     setLayers(layers =>
       layers.concat({
         id: shortid.generate(),
         sequence: sequence,
-        tempo: tempo,
+        tempo: suggestTempo ? suggestTempo : tempo,
         layer: layer,
         clavis: clavis,
         channel: channel,

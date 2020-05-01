@@ -25,11 +25,12 @@ function Toolbar({
 }) {
   const [sample, setSample] = useState("agogo1");
   const [tempo, setTempo] = useState(120);
+  const [polymetric, setPolymetric] = useState(false);
 
   const handleNewClave = () => {
     const newClave = {
       name: shortid.generate(),
-      instruments: [{ sequence: sequence, tempo: tempo, sample: sample }]
+      instruments: [{ sequence, tempo, sample, polymetric }]
     };
     handleStoreUpdate(newClave);
   };
@@ -94,6 +95,15 @@ function Toolbar({
             </option>
           ))}
         </Form.Control>
+
+        <Form.Check
+          inline
+          className="ml-2 polymetric"
+          type="checkbox"
+          label="Polimetria"
+          checked={polymetric}
+          onChange={() => setPolymetric(!polymetric)}
+        />
 
         <Button
           className="ml-2"
