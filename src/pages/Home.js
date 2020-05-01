@@ -53,13 +53,39 @@ function Home({ context, instruments }) {
     const beetPattern = beet.pattern(sequence);
     const clavis = new Clavis();
     const channel = new Channel();
+    var suggestTempo = tempo;
+
     channel.configure(context, beet, instruments[sample]);
+
+    if (polymetric && layers.length > 0) {
+      let firstSteps = layers[0].sequence.length;
+
+      let newSteps = sequence.length;
+      if (newSteps !== firstSteps) {
+        if (firstSteps > newSteps) {
+          let ratio = firstSteps / newSteps;
+          suggestTempo = tempo * ratio;
+        } else {
+          let ratio = newSteps / firstSteps;
+          suggestTempo = tempo / ratio;
+        }
+      }
+    }
+
     const guia = {
-      layer: beet.layer(beetPattern, tempo, clavis, channel.callbackOn)
+      layer: beet.layer(beetPattern, suggestTempo, clavis, channel.callbackOn)
     };
     guia.layer.tempo = tempo;
     beet.add(guia.layer);
-    addLayer(sequence, tempo, guia.layer, clavis, channel, sample, polymetric);
+    addLayer(
+      sequence,
+      suggestTempo,
+      guia.layer,
+      clavis,
+      channel,
+      sample,
+      polymetric
+    );
   };
 
   const handleStoreUpdate = clave => {
@@ -71,35 +97,12 @@ function Home({ context, instruments }) {
     beet.start();
   };
 
-  const addLayer = (
-    sequence,
-    tempo,
-    layer,
-    clavis,
-    channel,
-    sample,
-    polymetric
-  ) => {
-    if (polymetric && layers.length > 0) {
-      let firstSteps = layers[0].sequence.length;
-      let newSteps = sequence.length;
-      if (newSteps !== firstSteps) {
-        var suggestTempo = tempo;
-        if (firstSteps > newSteps) {
-          let ratio = firstSteps / newSteps;
-          suggestTempo = tempo * ratio;
-        } else {
-          let ratio = newSteps / firstSteps;
-          suggestTempo = tempo / ratio;
-        }
-      }
-    }
-
+  const addLayer = (sequence, tempo, layer, clavis, channel, sample) => {
     setLayers(layers =>
       layers.concat({
         id: shortid.generate(),
         sequence: sequence,
-        tempo: suggestTempo ? suggestTempo : tempo,
+        tempo: tempo,
         layer: layer,
         clavis: clavis,
         channel: channel,
