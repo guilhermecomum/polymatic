@@ -168,7 +168,7 @@ function Toolbar({ context, instruments }) {
         <Button
           className="ml-2"
           onClick={() => handleNewClave()}
-          disabled={patternError || !hasClaves}
+          disabled={patternError || state.preview.length === 0}
         >
           Adicionar
         </Button>

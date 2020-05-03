@@ -16,7 +16,7 @@ export default function Layer({ clave }) {
   useEffect(() => {
     clavis.configure(canvasRef.current, sequence, tempo);
     clave.start();
-  });
+  }, [clave, clavis, sequence, tempo]);
 
   const handleStop = () => {
     clave.stop();
