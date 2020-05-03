@@ -41,7 +41,7 @@ function Toolbar({ context, instruments }) {
       baseTempo,
       state.preview,
       tempo,
-      instruments[sample],
+      { name: sample, sample: instruments[sample] },
       polymetric
     );
     dispatch({ type: "claves.add", id: shortid.generate(), clave });
@@ -52,13 +52,10 @@ function Toolbar({ context, instruments }) {
   const handlePreset = value => {
     presets[value].instruments.forEach(preset => {
       const { sequence, tempo, sample } = preset;
-      const clave = new Clave(
-        context,
-        baseTempo,
-        sequence,
-        tempo,
-        instruments[sample]
-      );
+      const clave = new Clave(context, baseTempo, sequence, tempo, {
+        name: sample,
+        sample: instruments[sample]
+      });
       dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
   };

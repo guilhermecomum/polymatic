@@ -11,8 +11,9 @@ class Clave {
     this.clavis = new Clavis();
     this.channel = new Channel();
     this.tempo = tempo;
-    this.instruments = instrument;
-    this.channel.configure(context, this.beet, this.instruments);
+    this.instrument = instrument.name;
+    this.sample = instrument.sample;
+    this.channel.configure(context, this.beet, this.sample);
     this.beetLayer = null;
     this.polymetric = polymetric;
 
