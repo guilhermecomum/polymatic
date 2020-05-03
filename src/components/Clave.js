@@ -11,6 +11,7 @@ export default function Clave({ clave }) {
   const canvasRef = useRef();
   const [volume, setVolume] = useState(100);
   const { sequence, tempo, clavis, instrument } = clave;
+  const [shift, setShift] = useState(0);
   const { dispatch } = useContext(store);
   const { state } = useContext(store);
 
@@ -43,6 +44,11 @@ export default function Clave({ clave }) {
     clave.setVolume(newVolume);
   };
 
+  const handleRotate = value => {
+    setShift(value);
+    clave.shift(value);
+  };
+
   return (
     <div className="layer">
       <canvas
@@ -51,6 +57,15 @@ export default function Clave({ clave }) {
         width={640}
         height={425}
       />
+      <div className="mt-2 volume">
+        <span className="mr-2">Rotação</span>
+        <RangeSlider
+          value={shift}
+          min={1}
+          max={sequence.length - 1}
+          onChange={e => handleRotate(Number(e.target.value))}
+        />
+      </div>
       <ul>
         <li>sequence: {sequence}</li>
         <li>tempo: {tempo}</li>

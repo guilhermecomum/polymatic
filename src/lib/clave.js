@@ -61,6 +61,11 @@ class Clave {
     return new Pattern(pulses, steps);
   }
 
+  shift(value) {
+    this.sequence = this.beet.shift(this.beetLayer, value);
+    console.log("New Equece: ", this.sequence);
+  }
+
   remove() {
     this.player.stop();
     this.clavis.pause();

@@ -13,13 +13,13 @@ class Player {
     this.tempo = tempo;
     this.clavis = clavis;
     this.context = context;
-    this.sequence = sequence;
+    this.pattern = pattern;
     this.metro = new Metro(context, (time, step, timeFromScheduled) => {
-      if (this.metro.steps !== this.sequence.seq.length) {
-        this.metro.steps = this.sequence.seq.length;
+      if (this.metro.steps !== this.pattern.sequence.length) {
+        this.metro.steps = this.pattern.sequence.length;
       }
 
-      if (sequence.seq[step - 1] === "1") {
+      if (this.pattern.sequence[step - 1] === "1") {
         this.on(time, step, timeFromScheduled);
         setTimeout(() => {
           clavis.setCurrentStep(step);
@@ -30,7 +30,7 @@ class Player {
         }, 1000);
       }
     });
-    this.metro.steps = sequence.seq.length;
+    this.metro.steps = this.pattern.sequence.length;
     this.metro.tempo = this.tempo;
   }
 

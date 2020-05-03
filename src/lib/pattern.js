@@ -5,56 +5,46 @@
 **/
 
 import er from "euclidean-rhythms";
-import WatchJS from "melanke-watchjs";
 
-const watch = WatchJS.watch;
+class Pattern {
+  constructor(pulses, steps) {
+    this.pulses = pulses;
+    this.steps = steps;
+    this.sequence = "";
+    this.createSequence(pulses, steps);
+  }
 
-function Pattern(pulses, steps) {
-  var self = this;
+  update(pulses, steps) {
+    this.createSequence(pulses, steps);
+  }
 
-  self._createSequence(pulses, steps);
+  shift(offset) {
+    if (offset === this.sequence.length) return this.pulses;
 
-  watch(this, ["pulses", "steps"], function() {
-    self.update(this.pulses, this.steps);
-  });
+    var tail = this.sequence.splice(this.sequence.length - offset, offset);
 
-  return this;
+    for (var i = 0; i < tail.length; i++) {
+      this.sequence.unshift(tail[i]);
+    }
+
+    this.pulses = this.sequence.join("");
+    this.steps = this.sequence.length;
+
+    return this;
+  }
+
+  createSequence(pulses, steps) {
+    var typeOfPulses = typeof pulses;
+
+    if (typeOfPulses === "number") {
+      this.steps = steps;
+      this.sequence = er.getPattern(pulses, steps);
+      this.pulses = this.sequence.join("");
+    } else if (typeOfPulses === "string") {
+      this.steps = pulses.length;
+      this.sequence = pulses.split("");
+    }
+  }
 }
-
-Pattern.prototype.update = function(pulses, steps) {
-  var self = this;
-  self._createSequence(pulses, steps);
-
-  return this;
-};
-
-Pattern.prototype.shift = function(offset) {
-  var off =
-    offset > this.seq.length ? (offset = offset - this.seq.length) : offset;
-  if (off === this.seq.length) return this;
-
-  var tail = this.seq.splice(this.seq.length - off, off);
-
-  for (var i = 0; i < tail.length; i++) {
-    this.seq.unshift(tail[i]);
-  }
-  return this;
-};
-
-Pattern.prototype._createSequence = function(pulses, steps) {
-  var self = this;
-  var typeOfPulses = typeof pulses;
-
-  if (typeOfPulses === "number") {
-    self.pulses = pulses;
-    self.steps = steps || pulses;
-    self.seq = er.getPattern(self.pulses, self.steps);
-  } else if (typeOfPulses === "string") {
-    self.steps = pulses.length;
-    self.seq = pulses.split("");
-  }
-
-  return this;
-};
 
 export default Pattern;
