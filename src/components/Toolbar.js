@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import shortid from "shortid";
 import er from "euclidean-rhythms";
 import instrumentsList from "../instruments";
@@ -25,6 +25,7 @@ function Toolbar({ context, instruments }) {
   const [polymetric, setPolymetric] = useState(false);
   const { dispatch } = useContext(store);
   const { state } = useContext(store);
+  const patternInput = useRef(null);
   let baseTempo = "";
 
   if (state.claves.length > 0) {
@@ -41,7 +42,8 @@ function Toolbar({ context, instruments }) {
       polymetric
     );
     dispatch({ type: "claves.add", id: shortid.generate(), clave });
-    //dispatch({ type: "preview.update", pattern: "" });
+    dispatch({ type: "preview.update", pattern: "" });
+    patternInput.current.value = "";
   };
 
   const handlePreset = value => {
@@ -112,7 +114,7 @@ function Toolbar({ context, instruments }) {
           </InputGroup.Prepend>
           <FormControl
             placeholder="1010101 ou 3,4"
-            //value={pattern}
+            ref={patternInput}
             onChange={e => handlePattern(e.target.value)}
             isInvalid={patternError}
           />
@@ -149,7 +151,7 @@ function Toolbar({ context, instruments }) {
         <Button
           className="ml-2"
           onClick={() => handleNewClave()}
-          disabled={patternError}
+          disabled={patternError || state.preview.length === 0}
         >
           Adicionar
         </Button>

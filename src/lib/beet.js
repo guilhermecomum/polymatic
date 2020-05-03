@@ -45,8 +45,14 @@ class Beet {
     });
   }
 
+  stop() {
+    this.layers.forEach(layer => {
+      layer.stop();
+    });
+  }
+
   pause() {
-    this.layers.forEach(function(layer) {
+    this.layers.forEach(layer => {
       layer.pause();
     });
   }

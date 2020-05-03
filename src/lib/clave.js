@@ -51,8 +51,13 @@ class Clave {
     this.clavis.play();
   }
 
-  stop() {
+  pause() {
     this.beet.pause();
+    this.clavis.pause();
+  }
+
+  stop() {
+    this.beet.stop();
     this.clavis.pause();
   }
 }
