@@ -8,16 +8,15 @@ import instruments from "./instruments";
 import "./custom.scss";
 import "./App.css";
 
-const context = new AudioContext();
+const context = new (window.AudioContext || window.webkitAudioContext)();
 
 function App() {
   const [loadedSamples, setLoadedSamples] = useState();
   const trackingId = "UA-160360260-2";
   ReactGA.initialize(trackingId);
   ReactGA.pageview(window.location.pathname + window.location.search);
-  window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-  const finishedLoading = bufferList => setLoadedSamples(bufferList);
+  const finishedLoading = (bufferList) => setLoadedSamples(bufferList);
 
   useEffect(() => {
     let bufferLoader = new BufferLoader(context, instruments, finishedLoading);
@@ -32,7 +31,7 @@ function App() {
       <Route
         exact
         path="/"
-        render={routeProps => (
+        render={(routeProps) => (
           <Home {...routeProps} instruments={loadedSamples} context={context} />
         )}
       />

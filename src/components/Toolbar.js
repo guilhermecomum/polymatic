@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import shortid from "shortid";
-import instruments from "../instruments";
+import er from "euclidean-rhythms";
+import instrumentsList from "../instruments";
 import presets from "../presets";
+import Clave from "../lib/clave";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -13,43 +16,80 @@ import {
   Dropdown
 } from "react-bootstrap";
 
-function Toolbar({
-  layers,
-  beet,
-  pattern,
-  setPattern,
-  patternError,
-  sequence,
-  setPreview,
-  handleStoreUpdate
-}) {
+import { store } from "../store";
+
+function Toolbar({ context, instruments }) {
+  const [patternError, setPatternError] = useState(false);
   const [sample, setSample] = useState("agogo1");
   const [tempo, setTempo] = useState(120);
   const [polymetric, setPolymetric] = useState(false);
+  const { dispatch } = useContext(store);
+  const { state } = useContext(store);
+  let baseTempo = "";
+
+  if (state.claves.length > 0) {
+    baseTempo = state.claves[0].sequence;
+  }
 
   const handleNewClave = () => {
-    const newClave = {
-      name: shortid.generate(),
-      instruments: [{ sequence, tempo, sample, polymetric }]
-    };
-    handleStoreUpdate(newClave);
+    const clave = new Clave(
+      context,
+      baseTempo,
+      state.preview,
+      tempo,
+      instruments[sample],
+      polymetric
+    );
+    dispatch({ type: "claves.add", id: shortid.generate(), clave });
+    //dispatch({ type: "preview.update", pattern: "" });
   };
 
   const handlePreset = value => {
-    handleStoreUpdate(presets[value]);
+    presets[value].instruments.forEach(preset => {
+      const { sequence, tempo, sample } = preset;
+      const clave = new Clave(
+        context,
+        baseTempo,
+        sequence,
+        tempo,
+        instruments[sample]
+      );
+      dispatch({ type: "claves.add", id: shortid.generate(), clave });
+    });
+  };
+
+  const handlePattern = value => {
+    const isEuclidian = new RegExp("^(\\d+),(\\d+)$");
+    const isBinary = new RegExp("^[0-1]{1,}$");
+    if (isEuclidian.test(value)) {
+      const [pulse, steps] = value
+        .split(",")
+        .map(number => parseInt(number))
+        .sort((a, b) => a - b);
+      const newPattern = er.getPattern(pulse, steps).join("");
+      dispatch({ type: "preview.update", pattern: newPattern });
+      setPatternError(false);
+    } else if (isBinary.test(value)) {
+      dispatch({ type: "preview.update", pattern: value });
+      setPatternError(false);
+    } else {
+      setPatternError(true);
+    }
+    if (value === "") {
+      dispatch({ type: "preview.update", pattern: value });
+      setPatternError(false);
+    }
   };
 
   const start = () => {
-    for (const guia of layers) {
-      guia.layer.start();
-      guia.clavis.play();
+    for (const clave of state.claves) {
+      clave.start();
     }
   };
 
   const stop = () => {
-    for (const guia of layers) {
-      guia.layer.stop();
-      guia.clavis.pause();
+    for (const clave of state.claves) {
+      clave.stop();
     }
   };
 
@@ -72,9 +112,9 @@ function Toolbar({
           </InputGroup.Prepend>
           <FormControl
             placeholder="1010101 ou 3,4"
-            value={pattern}
-            onChange={e => setPattern(e.target.value)}
-            isInvalid={pattern.length > 0 && patternError}
+            //value={pattern}
+            onChange={e => handlePattern(e.target.value)}
+            isInvalid={patternError}
           />
         </InputGroup>
         <InputGroup>
@@ -89,7 +129,7 @@ function Toolbar({
         </InputGroup>
         <Form.Control as="select" onChange={e => setSample(e.target.value)}>
           <option>Instrumentos</option>
-          {Object.keys(instruments).map((instrument, index) => (
+          {Object.keys(instrumentsList).map((instrument, index) => (
             <option key={index} value={instrument}>
               {instrument}
             </option>
@@ -103,6 +143,7 @@ function Toolbar({
           label="Polimetria"
           checked={polymetric}
           onChange={() => setPolymetric(!polymetric)}
+          disabled={state.claves.length === 0}
         />
 
         <Button
