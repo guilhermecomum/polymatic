@@ -23,6 +23,11 @@ const createReducer = () => {
           ...state,
           claves: state.claves.filter(clave => clave.id !== action.id)
         };
+      case "claves.removeAll":
+        return {
+          ...state,
+          claves: []
+        };
       default:
         throw new Error(`Cêsásiessionibuspassnasavassi?`);
     }

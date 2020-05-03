@@ -4,9 +4,10 @@ import er from "euclidean-rhythms";
 import instrumentsList from "../instruments";
 import presets from "../presets";
 import Clave from "../lib/clave";
+import AlertModal from "./AlertModal";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faStop, faTimes } from "@fortawesome/free-solid-svg-icons";
 import {
   Button,
   ButtonGroup,
@@ -25,6 +26,8 @@ function Toolbar({ context, instruments }) {
   const [polymetric, setPolymetric] = useState(false);
   const { dispatch } = useContext(store);
   const { state } = useContext(store);
+  const [modalShow, setModalShow] = useState(false);
+  const hasClaves = state.claves.length > 0 ? true : false;
   const patternInput = useRef(null);
   let baseTempo = "";
 
@@ -95,15 +98,29 @@ function Toolbar({ context, instruments }) {
     }
   };
 
+  const removeAll = () => {
+    stop();
+    dispatch({ type: "claves.removeAll" });
+    setModalShow(false);
+  };
+
   return (
     <div className="toolbar">
+      <AlertModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        onConfirm={() => removeAll()}
+      />
       <div className="toolbar-controls">
         <ButtonGroup aria-label="Basic example">
-          <Button variant="secondary" onClick={() => start()}>
+          <Button onClick={() => start()}>
             <FontAwesomeIcon icon={faPlay} />
           </Button>
-          <Button variant="secondary" onClick={() => stop()}>
+          <Button onClick={() => stop()}>
             <FontAwesomeIcon icon={faStop} />
+          </Button>
+          <Button onClick={() => setModalShow(true)} disabled={!hasClaves}>
+            <FontAwesomeIcon icon={faTimes} />
           </Button>
         </ButtonGroup>
       </div>
@@ -145,13 +162,13 @@ function Toolbar({ context, instruments }) {
           label="Polimetria"
           checked={polymetric}
           onChange={() => setPolymetric(!polymetric)}
-          disabled={state.claves.length === 0}
+          disabled={!hasClaves}
         />
 
         <Button
           className="ml-2"
           onClick={() => handleNewClave()}
-          disabled={patternError || state.preview.length === 0}
+          disabled={patternError || !hasClaves}
         >
           Adicionar
         </Button>
