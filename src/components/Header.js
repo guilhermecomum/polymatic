@@ -1,7 +1,7 @@
 import React from "react";
 import packageJson from "../../package.json";
 import { Link } from "react-router-dom";
-import { Navbar } from "react-bootstrap";
+import { Navbar, Nav } from "react-bootstrap";
 
 function Header() {
   return (
@@ -13,7 +13,11 @@ function Header() {
           </Link>
         </h3>
       </Navbar.Brand>
-      <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+      <Nav className="mr-auto">
+        <Nav>
+          <Link to="/sobre">sobre</Link>
+        </Nav>
+      </Nav>
     </Navbar>
   );
 }
