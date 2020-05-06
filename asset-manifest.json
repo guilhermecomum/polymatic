@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.dacbd3e1.chunk.css",
-    "main.js": "/static/js/main.26cf9999.chunk.js",
-    "main.js.map": "/static/js/main.26cf9999.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.7bd78248.js",
-    "runtime-main.js.map": "/static/js/runtime-main.7bd78248.js.map",
-    "static/css/2.7a0adbd3.chunk.css": "/static/css/2.7a0adbd3.chunk.css",
-    "static/js/2.e0dec705.chunk.js": "/static/js/2.e0dec705.chunk.js",
-    "static/js/2.e0dec705.chunk.js.map": "/static/js/2.e0dec705.chunk.js.map",
+    "main.css": "/static/css/main.494231aa.chunk.css",
+    "main.js": "/static/js/main.ba0a8cde.chunk.js",
+    "main.js.map": "/static/js/main.ba0a8cde.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.f31e6870.js",
+    "runtime-main.js.map": "/static/js/runtime-main.f31e6870.js.map",
+    "static/css/2.121813d4.chunk.css": "/static/css/2.121813d4.chunk.css",
+    "static/js/2.a6409a40.chunk.js": "/static/js/2.a6409a40.chunk.js",
+    "static/js/2.a6409a40.chunk.js.map": "/static/js/2.a6409a40.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.720a46de49d32c817754abc6e20b5a9e.js": "/precache-manifest.720a46de49d32c817754abc6e20b5a9e.js",
+    "precache-manifest.8829308708339d21d418f43464e6ec13.js": "/precache-manifest.8829308708339d21d418f43464e6ec13.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/2.7a0adbd3.chunk.css.map": "/static/css/2.7a0adbd3.chunk.css.map",
-    "static/css/main.dacbd3e1.chunk.css.map": "/static/css/main.dacbd3e1.chunk.css.map",
-    "static/js/2.e0dec705.chunk.js.LICENSE.txt": "/static/js/2.e0dec705.chunk.js.LICENSE.txt",
+    "static/css/2.121813d4.chunk.css.map": "/static/css/2.121813d4.chunk.css.map",
+    "static/css/main.494231aa.chunk.css.map": "/static/css/main.494231aa.chunk.css.map",
+    "static/js/2.a6409a40.chunk.js.LICENSE.txt": "/static/js/2.a6409a40.chunk.js.LICENSE.txt",
     "static/media/agogo1.wav": "/static/media/agogo1.b8f6e210.wav",
     "static/media/agogo2.wav": "/static/media/agogo2.5844966c.wav",
     "static/media/bass.wav": "/static/media/bass.b2419d4f.wav",
@@ -35,10 +35,10 @@
     "static/media/tamborim.wav": "/static/media/tamborim.a6cbfb58.wav"
   },
   "entrypoints": [
-    "static/js/runtime-main.7bd78248.js",
-    "static/css/2.7a0adbd3.chunk.css",
-    "static/js/2.e0dec705.chunk.js",
-    "static/css/main.dacbd3e1.chunk.css",
-    "static/js/main.26cf9999.chunk.js"
+    "static/js/runtime-main.f31e6870.js",
+    "static/css/2.121813d4.chunk.css",
+    "static/js/2.a6409a40.chunk.js",
+    "static/css/main.494231aa.chunk.css",
+    "static/js/main.ba0a8cde.chunk.js"
   ]
 }
