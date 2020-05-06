@@ -1,6 +1,6 @@
 {
   "name": "Polymatic",
-  "version": "3.3.1",
+  "version": "4.0.0",
   "private": true,
   "homepage": "https://polymatic.ciberterreiro.org",
   "dependencies": {
