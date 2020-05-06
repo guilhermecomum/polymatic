@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 function Header() {
   return (
@@ -50,7 +49,11 @@ function Header() {
         <p>Mas como isso acontece? Leia o nosso manual.</p>
 
         <p>
-          <a href={`${process.env.PUBLIC_URL}/manual.pdf`} target="_blank">
+          <a
+            href={`${process.env.PUBLIC_URL}/manual.pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Baixar manual
           </a>
         </p>

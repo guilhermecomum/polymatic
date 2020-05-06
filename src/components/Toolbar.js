@@ -45,8 +45,6 @@ function Toolbar({ context, instruments }) {
       polymetric
     );
     dispatch({ type: "claves.add", id: shortid.generate(), clave });
-    dispatch({ type: "preview.update", pattern: "" });
-    patternInput.current.value = "";
   };
 
   const handlePreset = value => {

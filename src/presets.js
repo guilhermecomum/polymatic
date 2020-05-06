@@ -9,8 +9,8 @@ const presets = {
     name: "Son cubano",
     instruments: [
       {
-        sequence: "10101",
-        tempo: 120,
+        sequence: "1001001000101000",
+        tempo: 92,
         sample: "claves"
       }
     ]
@@ -18,7 +18,7 @@ const presets = {
   [shortid.generate()]: {
     name: "Rumba",
     instruments: [
-      { sequence: "1001001001001000", tempo: 120, sample: "claves" }
+      { sequence: "1001000100101000", tempo: 110, sample: "claves" }
     ]
   },
   [shortid.generate()]: {
