@@ -5,7 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.0] - 2020-05-31
+## [4.0.1] - 2020-05-10
+
+### Changed
+Fixes preview behavior
+Fixes keep claves stop when changes pages
+Fixes polymetric checkbox behavior
+
+
+## [4.0.0] - 2020-04-31
 
 ### Changed
 Refactor application
@@ -17,7 +25,7 @@ Adds remove all button
 Adds about page
 Adds manual
 
-## [3.3.0] - 2020-05-01
+## [3.3.0] - 2020-04-01
 ### Added
 Adds polymetric option
 Calculates automatically the polymetric based on the first clave
