@@ -10,12 +10,12 @@ export default function Preview() {
 
   useEffect(() => {
     if (canvasRef.current) {
-      clavis.configure(canvasRef.current, state.preview, 120);
+      clavis.configure(canvasRef.current, state.previewPattern, 120);
       clavis.draw();
     }
-  }, [state.preview, clavis]);
+  }, [state.previewPattern, clavis]);
 
-  if (!state.preview || state.previewllength === 0) {
+  if (!state.previewPattern || state.previewPattern.length === 0) {
     return null;
   }
 

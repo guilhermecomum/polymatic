@@ -14,7 +14,7 @@ function Home({ context, instruments }) {
         {state.claves.map(clave => (
           <Layer key={clave.id} clave={clave} />
         ))}
-        <Preview />
+        {state.previewVisibility && <Preview />}
       </div>
     </div>
   );

@@ -3,10 +3,13 @@ import React, { createContext, useReducer } from "react";
 const initialState = {
   // type: String
   // This is the pattern shown by the preview
-  preview: "",
+  previewPattern: "",
+  previewVisibility: false,
   // type: Map<String,Clave>
   // This is the list of claves shown by the main screen
-  claves: []
+  polymetric: false,
+  claves: [],
+  isPlaying: false
 };
 
 const store = createContext(initialState);
@@ -14,8 +17,16 @@ const store = createContext(initialState);
 const createReducer = () => {
   return (state, action) => {
     switch (action.type) {
-      case "preview.update":
-        return { ...state, preview: action.pattern };
+      case "previewPattern.update":
+        return {
+          ...state,
+          previewPattern: action.pattern
+        };
+      case "preview.visibility":
+        return {
+          ...state,
+          previewVisibility: action.visible
+        };
       case "claves.add":
         return { ...state, claves: [...state.claves, action.clave] };
       case "claves.remove":
@@ -26,8 +37,18 @@ const createReducer = () => {
       case "claves.removeAll":
         return {
           ...state,
-          claves: []
+          claves: [],
+          polymetric: false
         };
+      case "toggle.polymetric":
+        return {
+          ...state,
+          polymetric: !state.polymetric
+        };
+      case "start.all":
+        return { ...state, isPlaying: true };
+      case "stop.all":
+        return { ...state, isPlaying: false };
       default:
         throw new Error(`Cêsásiessionibuspassnasavassi?`);
     }

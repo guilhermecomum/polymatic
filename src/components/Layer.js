@@ -12,10 +12,12 @@ export default function Layer({ clave }) {
   const [volume, setVolume] = useState(100);
   const { sequence, tempo, clavis, channel, instrument } = clave;
   const { dispatch } = useContext(store);
+  const { state } = useContext(store);
 
   useEffect(() => {
     clavis.configure(canvasRef.current, sequence, tempo);
-    clave.start();
+    clavis.draw();
+    if (state.isPlaying) clave.start();
   }, [clave, clavis, sequence, tempo]);
 
   const handleStop = () => {

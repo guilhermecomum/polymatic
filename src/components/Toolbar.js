@@ -23,7 +23,6 @@ function Toolbar({ context, instruments }) {
   const [patternError, setPatternError] = useState(false);
   const [sample, setSample] = useState("agogo1");
   const [tempo, setTempo] = useState(120);
-  const [polymetric, setPolymetric] = useState(false);
   const { dispatch } = useContext(store);
   const { state } = useContext(store);
   const [modalShow, setModalShow] = useState(false);
@@ -39,12 +38,15 @@ function Toolbar({ context, instruments }) {
     const clave = new Clave(
       context,
       baseTempo,
-      state.preview,
+      state.previewPattern,
       tempo,
       { name: sample, sample: instruments[sample] },
-      polymetric
+      state.polymetric
     );
     dispatch({ type: "claves.add", id: shortid.generate(), clave });
+    dispatch({ type: "previewPattern.update", pattern: state.previewPattern });
+    dispatch({ type: "preview.visibility", visible: false });
+    dispatch({ type: "start.all" });
   };
 
   const handlePreset = value => {
@@ -56,6 +58,7 @@ function Toolbar({ context, instruments }) {
       });
       dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
+    dispatch({ type: "start.all" });
   };
 
   const handlePattern = value => {
@@ -67,18 +70,19 @@ function Toolbar({ context, instruments }) {
         .map(number => parseInt(number))
         .sort((a, b) => a - b);
       const newPattern = er.getPattern(pulse, steps).join("");
-      dispatch({ type: "preview.update", pattern: newPattern });
+      dispatch({ type: "previewPattern.update", pattern: newPattern });
       setPatternError(false);
     } else if (isBinary.test(value)) {
-      dispatch({ type: "preview.update", pattern: value });
+      dispatch({ type: "previewPattern.update", pattern: value });
       setPatternError(false);
     } else {
       setPatternError(true);
     }
     if (value === "") {
-      dispatch({ type: "preview.update", pattern: value });
+      dispatch({ type: "previewPattern.update", pattern: value });
       setPatternError(false);
     }
+    dispatch({ type: "preview.visibility", visible: true });
   };
 
   const start = () => {
@@ -91,6 +95,7 @@ function Toolbar({ context, instruments }) {
     for (const clave of state.claves) {
       clave.stop();
     }
+    dispatch({ type: "stop.all", isPlaying: true });
   };
 
   const removeAll = () => {
@@ -155,15 +160,15 @@ function Toolbar({ context, instruments }) {
           className="ml-2 polymetric"
           type="checkbox"
           label="Polimetria"
-          checked={polymetric}
-          onChange={() => setPolymetric(!polymetric)}
+          checked={state.polymetric}
+          onChange={() => dispatch({ type: "toggle.polymetric" })}
           disabled={!hasClaves}
         />
 
         <Button
           className="ml-2"
           onClick={() => handleNewClave()}
-          disabled={patternError || state.preview.length === 0}
+          disabled={patternError || state.previewPattern.length === 0}
         >
           Adicionar
         </Button>
