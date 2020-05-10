@@ -6,7 +6,7 @@
 
 import Metro from "./wa-metro.js";
 
-class Layer {
+class Player {
   constructor(id, context, tempo, clavis, sequence, on) {
     this.id = id;
     this.on = on;
@@ -51,4 +51,4 @@ class Layer {
   }
 }
 
-export default Layer;
+export default Player;

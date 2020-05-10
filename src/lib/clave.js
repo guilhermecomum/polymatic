@@ -1,21 +1,21 @@
-import Beet from "./beet";
 import Clavis from "./clavis";
-import Channel from "./channel";
+import Pattern from "./pattern";
+import Player from "./player";
 import shortid from "shortid";
 
 class Clave {
   constructor(context, baseTempo, sequence, tempo, instrument, polymetric) {
     this.id = shortid.generate();
-    this.beet = new Beet({ context });
-    this.sequence = sequence;
-    this.clavis = new Clavis();
-    this.channel = new Channel();
+    this.context = context;
     this.tempo = tempo;
+    this.sequence = sequence;
     this.instrument = instrument.name;
     this.sample = instrument.sample;
-    this.channel.configure(context, this.beet, this.sample);
-    this.beetLayer = null;
     this.polymetric = polymetric;
+    this.clavis = new Clavis();
+    this.pattern = new Pattern(sequence);
+    this.volume = 1.0;
+    this.player = null;
 
     if (this.polymetric) {
       let firstSteps = baseTempo.length;
@@ -32,33 +32,52 @@ class Clave {
       }
     }
 
-    const layer = this.beet.layer(
-      this.beet.pattern(this.sequence),
+    this.player = new Player(
+      shortid.generate(),
+      this.context,
       this.tempo,
       this.clavis,
-      this.channel.callbackOn
+      this.pattern,
+      this.callbackOn
     );
-    this.beet.add(layer);
-    this.beetLayer = layer;
+  }
+
+  callbackOn = (time, step) => {
+    const gainNode = this.context.createGain();
+    gainNode.gain.value = this.volume;
+    gainNode.connect(this.context.destination);
+
+    const source = this.context.createBufferSource();
+    source.buffer = this.sample;
+    source.connect(gainNode);
+    source.start(time);
+  };
+
+  setVolume(volume) {
+    this.volume = volume;
+  }
+
+  pattern(pulses, steps) {
+    return new Pattern(pulses, steps);
   }
 
   remove() {
-    this.beet.remove(this.beetLayer);
+    this.player.stop();
     this.clavis.pause();
   }
 
   start() {
-    this.beet.start();
+    this.player.start();
     this.clavis.play();
   }
 
   pause() {
-    this.beet.pause();
+    this.player.pause();
     this.clavis.pause();
   }
 
   stop() {
-    this.beet.stop();
+    this.player.stop();
     this.clavis.pause();
   }
 }

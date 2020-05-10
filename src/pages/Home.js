@@ -1,5 +1,5 @@
 import React from "react";
-import Layer from "../components/Layer";
+import Clave from "../components/Clave";
 import Preview from "../components/Preview";
 import Toolbar from "../components/Toolbar";
 import { store } from "../store";
@@ -12,7 +12,7 @@ function Home({ context, instruments }) {
       <Toolbar context={context} instruments={instruments} />
       <div className="wrapper">
         {state.claves.map(clave => (
-          <Layer key={clave.id} clave={clave} />
+          <Clave key={clave.id} clave={clave} />
         ))}
         {state.previewVisibility && <Preview />}
       </div>

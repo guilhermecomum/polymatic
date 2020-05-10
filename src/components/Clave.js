@@ -7,10 +7,10 @@ import { faPlay, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Button, ButtonGroup } from "react-bootstrap";
 import { store } from "../store";
 
-export default function Layer({ clave }) {
+export default function Clave({ clave }) {
   const canvasRef = useRef();
   const [volume, setVolume] = useState(100);
-  const { sequence, tempo, clavis, channel, instrument } = clave;
+  const { sequence, tempo, clavis, instrument } = clave;
   const { dispatch } = useContext(store);
   const { state } = useContext(store);
 
@@ -18,7 +18,7 @@ export default function Layer({ clave }) {
     clavis.configure(canvasRef.current, sequence, tempo);
     clavis.draw();
     if (state.isPlaying) clave.start();
-  }, [clave, clavis, sequence, tempo]);
+  }, [state.isPlaying, clave, clavis, sequence, tempo]);
 
   const handleStop = () => {
     clave.stop();
@@ -40,7 +40,7 @@ export default function Layer({ clave }) {
   const handleVolume = value => {
     const newVolume = remap(value, 0, 100, 0.0, 1.0);
     setVolume(value);
-    channel.setVolume(newVolume);
+    clave.setVolume(newVolume);
   };
 
   return (

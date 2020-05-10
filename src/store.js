@@ -30,9 +30,13 @@ const createReducer = () => {
       case "claves.add":
         return { ...state, claves: [...state.claves, action.clave] };
       case "claves.remove":
+        const filteredClaves = state.claves.filter(
+          clave => clave.id !== action.id
+        );
         return {
           ...state,
-          claves: state.claves.filter(clave => clave.id !== action.id)
+          claves: filteredClaves,
+          polymetric: filteredClaves.length > 0 ? state.polymetric : false
         };
       case "claves.removeAll":
         return {
