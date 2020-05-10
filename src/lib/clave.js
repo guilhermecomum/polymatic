@@ -8,12 +8,11 @@ class Clave {
     this.id = shortid.generate();
     this.context = context;
     this.tempo = tempo;
-    this.sequence = sequence;
+    this.pattern = new Pattern(sequence);
     this.instrument = instrument.name;
     this.sample = instrument.sample;
     this.polymetric = polymetric;
     this.clavis = new Clavis();
-    this.pattern = new Pattern(sequence);
     this.volume = 1.0;
     this.player = null;
 
@@ -62,8 +61,7 @@ class Clave {
   }
 
   shift(value) {
-    this.sequence = this.beet.shift(this.beetLayer, value);
-    console.log("New Equece: ", this.sequence);
+    this.pattern = this.pattern.shift(value);
   }
 
   remove() {

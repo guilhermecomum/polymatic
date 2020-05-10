@@ -13,25 +13,25 @@ describe("Pattern class", () => {
 });
 
 describe("Shift pattern", () => {
-  const pattern = new Pattern("10010");
-
-  it("should shift the pattern in -1 step", () => {
-    expect(pattern.shift(-1).pulses).toBe("00101");
-  });
+  const pattern = new Pattern("1110");
 
   it("should shift the pattern in 1 step", () => {
-    expect(pattern.shift(1).pulses).toBe("01001");
+    expect(pattern.shift(1).pulses).toBe("0111");
   });
 
   it("should shift the pattern in 2 step", () => {
-    expect(pattern.shift(1).pulses).toBe("10100");
+    expect(pattern.shift(2).pulses).toBe("1011");
   });
 
   it("should shift the pattern in 3 step", () => {
-    expect(pattern.shift(1).pulses).toBe("01010");
+    expect(pattern.shift(3).pulses).toBe("1101");
   });
 
-  it("should shift the pattern in 4 step", () => {
-    expect(pattern.shift(1).pulses).toBe("00101");
+  it("should shift the pattern in 2 step", () => {
+    expect(pattern.shift(2).pulses).toBe("1011");
   });
+
+  // it("should shift the pattern in 4 step", () => {
+  //   expect(pattern.shift(1).pulses).toBe("00101");
+  // });p
 });

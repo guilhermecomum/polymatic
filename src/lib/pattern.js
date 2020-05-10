@@ -12,6 +12,7 @@ class Pattern {
     this.steps = steps;
     this.sequence = "";
     this.createSequence(pulses, steps);
+    this.offset = 0;
   }
 
   update(pulses, steps) {
@@ -19,21 +20,34 @@ class Pattern {
   }
 
   shift(offset) {
-    if (offset === this.sequence.length) return this.pulses;
+    const isIncreasing = this.offset < offset ? true : false;
 
-    var tail = this.sequence.splice(this.sequence.length - offset, offset);
+    if (isIncreasing) {
+      const tail = this.sequence.splice(this.sequence.length - 1, 1);
 
-    for (var i = 0; i < tail.length; i++) {
-      this.sequence.unshift(tail[i]);
+      for (let i = 0; i < tail.length; i++) {
+        this.sequence.unshift(tail[i]);
+      }
+
+      this.pulses = this.sequence.join("");
+      this.steps = this.sequence.length;
+    } else {
+      const head = this.sequence.splice(0, 1);
+
+      for (let i = 0; i < head.length; i++) {
+        this.sequence.push(head[i]);
+      }
+
+      this.pulses = this.sequence.join("");
+      this.steps = this.sequence.length;
     }
 
-    this.pulses = this.sequence.join("");
-    this.steps = this.sequence.length;
-
+    this.offset = offset;
     return this;
   }
 
   createSequence(pulses, steps) {
+    //console.log("Pattern created");
     var typeOfPulses = typeof pulses;
 
     if (typeOfPulses === "number") {
