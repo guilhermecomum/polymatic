@@ -9,7 +9,9 @@ const initialState = {
   // This is the list of claves shown by the main screen
   polymetric: false,
   claves: [],
-  isPlaying: false
+  isPlaying: false,
+  instruments: null,
+  context: null
 };
 
 const store = createContext(initialState);
@@ -17,6 +19,12 @@ const store = createContext(initialState);
 const createReducer = () => {
   return (state, action) => {
     switch (action.type) {
+      case "load.app":
+        return {
+          ...state,
+          instruments: action.instruments,
+          context: action.context
+        };
       case "previewPattern.update":
         return {
           ...state,

@@ -69,7 +69,7 @@ export default function Clave({ clave }) {
           min={1}
           max={sequence.join("").length}
           onChange={e => handleRotate(Number(e.target.value))}
-          tooltip={false}
+          tooltip="off"
         />
       </div>
       <ul>

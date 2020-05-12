@@ -5,9 +5,15 @@ import instrumentsList from "../instruments";
 import presets from "../presets";
 import Clave from "../lib/clave";
 import AlertModal from "./AlertModal";
+import { useHistory } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faStop, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlay,
+  faStop,
+  faTimes,
+  faShareAlt
+} from "@fortawesome/free-solid-svg-icons";
 import {
   Button,
   ButtonGroup,
@@ -19,32 +25,42 @@ import {
 
 import { store } from "../store";
 
-function Toolbar({ context, instruments }) {
+function Toolbar() {
+  const history = useHistory();
   const [patternError, setPatternError] = useState(false);
   const [sample, setSample] = useState("agogo1");
   const [tempo, setTempo] = useState(120);
   const { dispatch } = useContext(store);
-  const { state } = useContext(store);
+  const {
+    state: {
+      claves,
+      instruments,
+      context,
+      previewPattern,
+      polymetric,
+      previewVisibility
+    }
+  } = useContext(store);
   const [modalShow, setModalShow] = useState(false);
-  const hasClaves = state.claves.length > 0 ? true : false;
+  const hasClaves = claves.length > 0 ? true : false;
   const patternInput = useRef(null);
   let baseTempo = "";
 
-  if (state.claves.length > 0) {
-    baseTempo = state.claves[0].sequence;
+  if (claves.length > 0) {
+    baseTempo = claves[0].pattern.sequence.join("");
   }
 
   const handleNewClave = () => {
     const clave = new Clave(
       context,
       baseTempo,
-      state.previewPattern,
+      previewPattern,
       tempo,
       { name: sample, sample: instruments[sample] },
-      state.polymetric
+      polymetric
     );
     dispatch({ type: "claves.add", id: shortid.generate(), clave });
-    dispatch({ type: "previewPattern.update", pattern: state.previewPattern });
+    dispatch({ type: "previewPattern.update", pattern: previewPattern });
     dispatch({ type: "preview.visibility", visible: false });
     dispatch({ type: "start.all" });
   };
@@ -82,17 +98,20 @@ function Toolbar({ context, instruments }) {
       dispatch({ type: "previewPattern.update", pattern: value });
       setPatternError(false);
     }
-    dispatch({ type: "preview.visibility", visible: true });
+
+    if (!previewVisibility) {
+      dispatch({ type: "preview.visibility", visible: true });
+    }
   };
 
   const start = () => {
-    for (const clave of state.claves) {
+    for (const clave of claves) {
       clave.start();
     }
   };
 
   const stop = () => {
-    for (const clave of state.claves) {
+    for (const clave of claves) {
       clave.stop();
     }
     dispatch({ type: "stop.all", isPlaying: true });
@@ -102,6 +121,21 @@ function Toolbar({ context, instruments }) {
     stop();
     dispatch({ type: "claves.removeAll" });
     setModalShow(false);
+  };
+
+  const share = () => {
+    stop();
+    dispatch({ type: "claves.removeAll" });
+
+    let shareLink = claves.map(clave => {
+      return {
+        sequence: clave.pattern.sequence.join(""),
+        tempo: clave.tempo,
+        sample: clave.instrument
+      };
+    });
+
+    history.push(`/guias?guias=${JSON.stringify(shareLink)}`);
   };
 
   return (
@@ -160,7 +194,7 @@ function Toolbar({ context, instruments }) {
           className="ml-2 polymetric"
           type="checkbox"
           label="Polimetria"
-          checked={state.polymetric}
+          checked={polymetric}
           onChange={() => dispatch({ type: "toggle.polymetric" })}
           disabled={!hasClaves}
         />
@@ -168,7 +202,7 @@ function Toolbar({ context, instruments }) {
         <Button
           className="ml-2"
           onClick={() => handleNewClave()}
-          disabled={patternError || state.previewPattern.length === 0}
+          disabled={patternError || previewPattern.length === 0}
         >
           Adicionar
         </Button>
@@ -185,6 +219,10 @@ function Toolbar({ context, instruments }) {
             ))}
           </Dropdown.Menu>
         </Dropdown>
+
+        <Button onClick={() => share()}>
+          <FontAwesomeIcon icon={faShareAlt} />
+        </Button>
       </div>
     </div>
   );

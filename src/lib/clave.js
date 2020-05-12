@@ -7,8 +7,9 @@ class Clave {
   constructor(context, baseTempo, sequence, tempo, instrument, polymetric) {
     this.id = shortid.generate();
     this.context = context;
-    this.tempo = tempo;
+    this.baseTempo = baseTempo;
     this.pattern = new Pattern(sequence);
+    this.tempo = tempo;
     this.instrument = instrument.name;
     this.sample = instrument.sample;
     this.polymetric = polymetric;
@@ -17,9 +18,9 @@ class Clave {
     this.player = null;
 
     if (this.polymetric) {
-      let firstSteps = baseTempo.length;
+      let firstSteps = this.baseTempo.length;
 
-      let newSteps = this.sequence.length;
+      let newSteps = this.pattern.sequence.length;
       if (newSteps !== firstSteps) {
         if (firstSteps > newSteps) {
           let ratio = firstSteps / newSteps;
