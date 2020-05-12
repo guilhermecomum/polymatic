@@ -47,7 +47,6 @@ class Pattern {
   }
 
   createSequence(pulses, steps) {
-    //console.log("Pattern created");
     var typeOfPulses = typeof pulses;
 
     if (typeOfPulses === "number") {
