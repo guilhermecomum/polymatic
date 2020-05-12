@@ -220,7 +220,7 @@ function Toolbar() {
           </Dropdown.Menu>
         </Dropdown>
 
-        <Button onClick={() => share()}>
+        <Button onClick={() => share()} disabled={!hasClaves}>
           <FontAwesomeIcon icon={faShareAlt} />
         </Button>
       </div>

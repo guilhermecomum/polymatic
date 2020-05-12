@@ -24,7 +24,6 @@ function Home({ context, instruments }) {
       });
       dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
-    dispatch({ type: "start.all" });
   };
   let query = useQuery();
 
