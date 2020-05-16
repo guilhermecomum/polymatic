@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-import { HashRouter, Route } from "react-router-dom";
+import { HashRouter, Route, Switch } from "react-router-dom";
 import ReactGA from "react-ga";
 import About from "./pages/About";
 import Home from "./pages/Home";
@@ -32,7 +32,7 @@ function App() {
     let bufferLoader = new BufferLoader(context, instruments, finishedLoading);
 
     bufferLoader.load();
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return (
@@ -45,15 +45,11 @@ function App() {
   return (
     <HashRouter basename="/">
       <Header />
-      <Route exact path="/sobre">
-        <About />
-      </Route>
-      <Route exact path="/">
-        <Home />
-      </Route>
-      <Route exact path="/guias">
-        <Home />
-      </Route>
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route exact path="/sobre" component={About} />
+        <Route exact path="/guias" component={Home} />
+      </Switch>
     </HashRouter>
   );
 }

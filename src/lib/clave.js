@@ -63,6 +63,7 @@ class Clave {
 
   shift(value) {
     this.pattern = this.pattern.shift(value);
+    this.clavis.draw();
   }
 
   remove() {

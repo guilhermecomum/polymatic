@@ -1,10 +1,11 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
 
-export default function AlertModal(props) {
+export default function AlertModal({ show, onHide, onConfirm }) {
   return (
     <Modal
-      {...props}
+      show={show}
+      onHide={onHide}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -19,10 +20,10 @@ export default function AlertModal(props) {
         <p>Você confirma que deseja apagar todas as guias?</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={props.onHide}>
+        <Button variant="secondary" onClick={onHide}>
           Fechar
         </Button>
-        <Button onClick={props.onConfirm}>Remover</Button>
+        <Button onClick={onConfirm}>Remover</Button>
       </Modal.Footer>
     </Modal>
   );
