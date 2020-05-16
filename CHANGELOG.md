@@ -5,31 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2020-05-16
+### Added
+- New samples
+### Changed
+- Fixes share link
+- Fixes rotation bug
+
 ## [5.0.0] - 2020-05-12
 ### Added
-Shareable links
-Rotation
-Small refactoring simplifying Clave class
+- Shareable links
+- Rotation
+- Small refactoring simplifying Clave class
 
 ## [4.0.1] - 2020-05-10
 
 ### Changed
-Fixes preview behavior
-Fixes keep claves stop when changes pages
-Fixes polymetric checkbox behavior
+- Fixes preview behavior
+- Fixes keep claves stop when changes pages
+- Fixes polymetric checkbox behavior
 
 
 ## [4.0.0] - 2020-04-31
 
 ### Changed
-Refactor application
-Fixes stop behavior
-Updates presets
+- Refactor application
+- Fixes stop behavior
+- Updates presets
 
 ### Added
-Adds remove all button
-Adds about page
-Adds manual
+- Adds remove all button
+- Adds about page
+- Adds manual
 
 ## [3.3.0] - 2020-04-01
 ### Added
