@@ -9,6 +9,7 @@ const initialState = {
   // This is the list of claves shown by the main screen
   polymetric: false,
   claves: [],
+  shareableLink: "",
   isPlaying: false,
   instruments: null,
   context: null
@@ -51,6 +52,18 @@ const createReducer = () => {
           ...state,
           claves: [],
           polymetric: false
+        };
+      case "claves.share":
+        const newShareLink = state.claves.map(clave => {
+          return {
+            sequence: clave.pattern.sequence.join(""),
+            tempo: clave.tempo,
+            sample: clave.instrument
+          };
+        });
+        return {
+          ...state,
+          shareableLink: JSON.stringify(newShareLink)
         };
       case "toggle.polymetric":
         return {

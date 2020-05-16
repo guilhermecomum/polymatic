@@ -30,6 +30,7 @@ function Toolbar() {
   const [patternError, setPatternError] = useState(false);
   const [sample, setSample] = useState("agogo1");
   const [tempo, setTempo] = useState(120);
+
   const { dispatch } = useContext(store);
   const {
     state: {
@@ -38,7 +39,8 @@ function Toolbar() {
       context,
       previewPattern,
       polymetric,
-      previewVisibility
+      previewVisibility,
+      shareableLink
     }
   } = useContext(store);
   const [modalShow, setModalShow] = useState(false);
@@ -124,10 +126,7 @@ function Toolbar() {
   };
 
   const share = () => {
-    stop();
-    dispatch({ type: "claves.removeAll" });
-
-    let shareLink = claves.map(clave => {
+    const newShareLink = claves.map(clave => {
       return {
         sequence: clave.pattern.sequence.join(""),
         tempo: clave.tempo,
@@ -135,7 +134,14 @@ function Toolbar() {
       };
     });
 
-    history.push(`/guias?guias=${JSON.stringify(shareLink)}`);
+    const newShareableLink = JSON.stringify(newShareLink);
+
+    if (newShareableLink !== shareableLink) {
+      stop();
+      dispatch({ type: "claves.share", shareableLink: newShareableLink });
+      dispatch({ type: "claves.removeAll" });
+      history.push(`/guias?guias=${newShareableLink}`);
+    }
   };
 
   return (

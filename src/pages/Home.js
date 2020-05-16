@@ -7,32 +7,31 @@ import { store } from "../store";
 import { useLocation } from "react-router-dom";
 import Clave from "../lib/clave";
 
-function Home({ context, instruments }) {
+function Home() {
   const { state } = React.useContext(store);
   const { dispatch } = useContext(store);
+  const useQuery = () => new URLSearchParams(useLocation().search);
+  const query = useQuery();
+  const guias = query.get("guias");
+  const claves = JSON.parse(guias);
 
-  const useQuery = () => {
-    return new URLSearchParams(useLocation().search);
-  };
-
-  const handlePreset = claves => {
-    claves.forEach(preset => {
+  const handlePreset = async claves => {
+    await claves.forEach(preset => {
       const { sequence, tempo, sample } = preset;
       const clave = new Clave(state.context, 120, sequence, tempo, {
         name: sample,
         sample: state.instruments[sample]
       });
-      dispatch({ type: "claves.add", id: shortid.generate(), clave });
+      return dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
+    dispatch({ type: "claves.share" });
   };
-  let query = useQuery();
 
   useEffect(() => {
-    let claves = JSON.parse(query.get("guias"));
-    if (claves) {
+    if (guias && claves) {
       handlePreset(claves);
     }
-  }, []);
+  }, [guias]);
 
   return (
     <div className="App">
