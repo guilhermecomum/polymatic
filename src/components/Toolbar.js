@@ -49,7 +49,7 @@ function Toolbar() {
   let baseTempo = "";
 
   if (claves.length > 0) {
-    baseTempo = claves[0].pattern.sequence.join("");
+    baseTempo = claves[0].sequence;
   }
 
   const handleNewClave = () => {

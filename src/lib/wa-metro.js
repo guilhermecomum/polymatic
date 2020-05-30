@@ -6,81 +6,76 @@
 
 import work from "webworkify-webpack";
 
-function Metro(context, callback) {
-  var self = this;
+class Metro {
+  constructor(context, callback) {
+    if (!context) throw new Error("Context is mandatory");
+    if (!callback) throw new Error("Callback is mandatory");
 
-  if (!context) throw new Error("Context is mandatory");
-  if (!callback) throw new Error("Callback is mandatory");
+    this.context = context;
+    this.tempo = 120;
+    this.callback = callback;
+    this.look_ahead = 1.0;
+    this.is_running = false;
+    this.scheduler_interval = 20;
+    this.next_event_time = 0.0;
+    this.first = true;
+    this.step = 1;
+    this.worker = work(require.resolve("./worker.js"));
+    this.worker.onmessage = event => {
+      if (event.data === "tick" && this.is_running) {
+        this.scheduler();
+      }
+    };
 
-  this.context = context;
-  this.steps = 16;
-  this.tempo = 120;
-  this.callback = callback;
-  this.look_ahead = 1.0;
+    this.worker.postMessage({
+      interval: this.scheduler_interval
+    });
+  }
 
-  this._step = 1;
-  this._scheduler_interval = 20;
-  this._next_event_time = 0.0;
-  this._first = true;
-  this._is_running = false;
-
-  this._worker = work(require.resolve("./worker.js"));
-
-  this._worker.onmessage = function(event) {
-    if (event.data === "tick" && self._is_running) {
-      self._scheduler();
+  start(callback) {
+    if (this.is_running) {
+      console.log("already started");
+      return;
     }
-  };
+    this.is_running = true;
+    this.worker.postMessage("start");
+  }
 
-  this._worker.postMessage({
-    interval: self._scheduler_interval
-  });
+  pause() {
+    this.is_running = false;
+    this.worker.postMessage("stop");
+  }
+
+  stop() {
+    this.first = true;
+    this.step = 1;
+    this.is_running = false;
+    this.worker.postMessage("stop");
+  }
+
+  scheduler() {
+    if (this.step === 1 && this.first) {
+      this.next_event_time = this.context.currentTime;
+    }
+    while (this.next_event_time < this.context.currentTime + this.look_ahead) {
+      var event_time_from_scheduled =
+        this.next_event_time - this.context.currentTime;
+      this.callback(this.next_event_time, this.step, event_time_from_scheduled);
+      this.next();
+    }
+  }
+
+  next() {
+    this.step++;
+    if (this.first) {
+      this.next_event_time = this.context.currentTime;
+      this.first = false;
+    }
+    if (this.step > this.steps) {
+      this.step = 1;
+    }
+    this.next_event_time += ((60.0 / this.tempo) * 4) / 16;
+  }
 }
-
-Metro.prototype.start = function(callback) {
-  if (this._is_running) {
-    console.log("already started");
-    return;
-  }
-  this._is_running = true;
-  this._worker.postMessage("start");
-};
-
-Metro.prototype.pause = function() {
-  this._is_running = false;
-  this._worker.postMessage("stop");
-};
-
-Metro.prototype.stop = function() {
-  this._first = true;
-  this._step = 1;
-  this._is_running = false;
-  this._worker.postMessage("stop");
-};
-
-Metro.prototype._scheduler = function _scheduler() {
-  var self = this;
-  if (this._step === 1 && this._first) {
-    this._next_event_time = this.context.currentTime;
-  }
-  while (this._next_event_time < this.context.currentTime + this.look_ahead) {
-    var event_time_from_scheduled =
-      self._next_event_time - self.context.currentTime;
-    this.callback(self._next_event_time, self._step, event_time_from_scheduled);
-    this._next();
-  }
-};
-
-Metro.prototype._next = function _next() {
-  this._step++;
-  if (this._first) {
-    this._next_event_time = this.context.currentTime;
-    this._first = false;
-  }
-  if (this._step > this.steps) {
-    this._step = 1;
-  }
-  this._next_event_time += ((60.0 / this.tempo) * 4) / this.steps;
-};
 
 export default Metro;

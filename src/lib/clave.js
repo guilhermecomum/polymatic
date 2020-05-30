@@ -1,26 +1,34 @@
 import Clavis from "./clavis";
-import Pattern from "./pattern";
-import Player from "./player";
 import shortid from "shortid";
+import Metro from "./wa-metro.js";
 
 class Clave {
   constructor(context, baseTempo, sequence, tempo, instrument, polymetric) {
     this.id = shortid.generate();
     this.context = context;
     this.baseTempo = baseTempo;
-    this.pattern = new Pattern(sequence);
     this.tempo = tempo;
     this.instrument = instrument.name;
     this.sample = instrument.sample;
-    this.polymetric = polymetric;
+    this.isPolymetric = polymetric;
     this.clavis = new Clavis();
     this.volume = 1.0;
-    this.player = null;
 
-    if (this.polymetric) {
+    // Pattern
+    this.sequence = sequence;
+    this.steps = sequence.length;
+    this.offset = 0;
+
+    // Player
+    this.metro = new Metro(context, this.metroCallback);
+
+    this.metro.steps = this.steps;
+    this.metro.tempo = this.tempo;
+
+    if (this.isPolymetric) {
       let firstSteps = this.baseTempo.length;
 
-      let newSteps = this.pattern.sequence.length;
+      let newSteps = this.steps;
       if (newSteps !== firstSteps) {
         if (firstSteps > newSteps) {
           let ratio = firstSteps / newSteps;
@@ -31,15 +39,6 @@ class Clave {
         }
       }
     }
-
-    this.player = new Player(
-      shortid.generate(),
-      this.context,
-      this.tempo,
-      this.clavis,
-      this.pattern,
-      this.callbackOn
-    );
   }
 
   callbackOn = (time, step) => {
@@ -53,36 +52,71 @@ class Clave {
     source.start(time);
   };
 
+  metroCallback = (time, step, timeFromScheduled) => {
+    if (this.metro.steps !== this.sequence.length) {
+      this.metro.steps = this.sequence.length;
+    }
+
+    if (this.sequence[step - 1] === "1") {
+      this.callbackOn(time, step, timeFromScheduled);
+      setTimeout(() => {
+        this.clavis.setCurrentStep(step);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        this.clavis.setCurrentStep(step);
+      }, 1000);
+    }
+  };
+
   setVolume(volume) {
     this.volume = volume;
   }
 
-  pattern(pulses, steps) {
-    return new Pattern(pulses, steps);
-  }
+  shift(offset) {
+    const isIncreasing = this.offset < offset ? true : false;
 
-  shift(value) {
-    this.pattern = this.pattern.shift(value);
+    if (isIncreasing) {
+      const tail = this.sequence.splice(this.sequence.length - 1, 1);
+
+      for (let i = 0; i < tail.length; i++) {
+        this.sequence.unshift(tail[i]);
+      }
+
+      this.sequence = this.sequence.join("");
+      this.steps = this.sequence.length;
+    } else {
+      const head = this.sequence.splice(0, 1);
+
+      for (let i = 0; i < head.length; i++) {
+        this.sequence.push(head[i]);
+      }
+
+      this.sequence = this.sequence.join("");
+      this.steps = this.sequence.length;
+    }
+
+    this.offset = offset;
     this.clavis.draw();
   }
 
   remove() {
-    this.player.stop();
+    this.metro.stop();
     this.clavis.pause();
   }
 
   start() {
-    this.player.start();
+    this.metro.start();
     this.clavis.play();
   }
 
   pause() {
-    this.player.pause();
+    this.metro.pause();
     this.clavis.pause();
   }
 
   stop() {
-    this.player.stop();
+    this.metro.stop();
     this.clavis.pause();
   }
 }

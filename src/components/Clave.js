@@ -10,12 +10,7 @@ import { store } from "../store";
 export default function Clave({ clave }) {
   const canvasRef = useRef();
   const [volume, setVolume] = useState(100);
-  const {
-    pattern: { sequence },
-    tempo,
-    clavis,
-    instrument
-  } = clave;
+  const { sequence, tempo, clavis, instrument } = clave;
   const [shift, setShift] = useState(0);
   const { dispatch } = useContext(store);
   const { state } = useContext(store);
@@ -67,13 +62,13 @@ export default function Clave({ clave }) {
         <RangeSlider
           value={shift}
           min={1}
-          max={sequence.join("").length}
+          max={sequence.length}
           onChange={e => handleRotate(Number(e.target.value))}
           tooltip="off"
         />
       </div>
       <ul>
-        <li>padrão: {sequence.join("")}</li>
+        <li>padrão: {sequence}</li>
         <li>tempo: {tempo}</li>
         <li>instrumento: {instrument}</li>
       </ul>
