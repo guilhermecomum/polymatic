@@ -14,7 +14,7 @@ export default function Clave({ clave }) {
     pattern: { sequence },
     tempo,
     clavis,
-    instrument
+    instrument,
   } = clave;
   const [shift, setShift] = useState(0);
   const { dispatch } = useContext(store);
@@ -43,13 +43,13 @@ export default function Clave({ clave }) {
     return low2 + ((high2 - low2) * (value - low1)) / (high1 - low1);
   }
 
-  const handleVolume = value => {
+  const handleVolume = (value) => {
     const newVolume = remap(value, 0, 100, 0.0, 1.0);
     setVolume(value);
     clave.setVolume(newVolume);
   };
 
-  const handleRotate = value => {
+  const handleRotate = (value) => {
     setShift(value);
     clave.shift(value);
   };

@@ -13,7 +13,7 @@ class Clavis {
     this.animate = false;
     this.lastRender = Date.now();
     this.draw = this.draw.bind(this);
-    this.currentStep = 1;
+    this.currentStep = 0;
     this.patternPos = {};
   }
 
@@ -175,8 +175,8 @@ class Clavis {
     }
 
     /* Draw the moving dot */
-    const beatX = this.patternPos[this.currentStep - 1].x;
-    const beatY = this.patternPos[this.currentStep - 1].y;
+    const beatX = this.patternPos[this.currentStep].x;
+    const beatY = this.patternPos[this.currentStep].y;
     drawDotBeat(beatX, beatY);
     if (this.animate) {
       window.requestAnimationFrame(this.draw);

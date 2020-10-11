@@ -1,26 +1,23 @@
 import Clavis from "./clavis";
 import Pattern from "./pattern";
-import Player from "./player";
 import shortid from "shortid";
+import * as Tone from "tone";
 
 class Clave {
-  constructor(context, baseTempo, sequence, tempo, instrument, polymetric) {
+  constructor(baseTempo, sequence, tempo, polymetric, heart) {
     this.id = shortid.generate();
-    this.context = context;
     this.baseTempo = baseTempo;
     this.pattern = new Pattern(sequence);
     this.tempo = tempo;
-    this.instrument = instrument.name;
-    this.sample = instrument.sample;
+    this.volume = 1.0;
     this.polymetric = polymetric;
     this.clavis = new Clavis();
-    this.volume = 1.0;
-    this.player = null;
+    this.size = this.pattern.sequence.length;
 
     if (this.polymetric) {
       let firstSteps = this.baseTempo.length;
 
-      let newSteps = this.pattern.sequence.length;
+      let newSteps = this.size;
       if (newSteps !== firstSteps) {
         if (firstSteps > newSteps) {
           let ratio = firstSteps / newSteps;
@@ -32,26 +29,30 @@ class Clave {
       }
     }
 
-    this.player = new Player(
-      shortid.generate(),
-      this.context,
-      this.tempo,
-      this.clavis,
-      this.pattern,
-      this.callbackOn
-    );
+    this.indexArray = (count) => {
+      const indices = [];
+      for (let i = 0; i < count; i++) {
+        indices.push(i);
+      }
+      return indices;
+    };
+
+    this.tick = (time, value) => {
+      Tone.Draw.schedule(() => {
+        this.clavis.setCurrentStep(value);
+      }, time);
+      if (this.pattern.sequence[value] === "1") {
+        heart.player(0).start(time, 0, "16t");
+      }
+    };
+
+    const seq = new Tone.Sequence(
+      this.tick,
+      this.indexArray(this.size),
+      `${this.size}n`
+    ).start(0);
+    Tone.Transport.start();
   }
-
-  callbackOn = (time, step) => {
-    const gainNode = this.context.createGain();
-    gainNode.gain.value = this.volume;
-    gainNode.connect(this.context.destination);
-
-    const source = this.context.createBufferSource();
-    source.buffer = this.sample;
-    source.connect(gainNode);
-    source.start(time);
-  };
 
   setVolume(volume) {
     this.volume = volume;
@@ -67,22 +68,18 @@ class Clave {
   }
 
   remove() {
-    this.player.stop();
     this.clavis.pause();
   }
 
   start() {
-    this.player.start();
     this.clavis.play();
   }
 
   pause() {
-    this.player.pause();
     this.clavis.pause();
   }
 
   stop() {
-    this.player.stop();
     this.clavis.pause();
   }
 }

@@ -10,7 +10,7 @@ import "./custom.scss";
 import "./App.sass";
 import { store } from "./store";
 import { Spinner } from "react-bootstrap";
-const context = new (window.AudioContext || window.webkitAudioContext)();
+import * as Tone from "tone";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -20,18 +20,24 @@ function App() {
   const { dispatch } = useContext(store);
 
   useEffect(() => {
-    const finishedLoading = bufferList => {
-      dispatch({
-        type: "load.app",
-        instruments: bufferList,
-        context: context
-      });
-      setLoading(false);
-    };
+    const heart = new Tone.Players({
+      urls: {
+        0: "A1.mp3",
+        1: "Cs2.mp3",
+        2: "E2.mp3",
+        3: "Fs2.mp3",
+      },
+      fadeOut: "64n",
+      baseUrl: "https:tonejs.github.io/audio/casio/",
+      onload: () => {
+        setLoading(false);
+      },
+    }).toDestination();
 
-    let bufferLoader = new BufferLoader(context, instruments, finishedLoading);
-
-    bufferLoader.load();
+    dispatch({
+      type: "load.app",
+      heart: heart,
+    });
   }, [dispatch]);
 
   if (loading) {

@@ -23,7 +23,7 @@ function Home() {
         sample: state.instruments[sample]
       });
       return dispatch({ type: "claves.add", id: shortid.generate(), clave });
-    });
+    }, state.heart);
     dispatch({ type: "claves.share" });
   };
 

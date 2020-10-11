@@ -6,13 +6,13 @@ import presets from "../presets";
 import Clave from "../lib/clave";
 import AlertModal from "./AlertModal";
 import { useHistory } from "react-router-dom";
-
+import * as Tone from "tone";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlay,
   faStop,
   faTimes,
-  faShareAlt
+  faShareAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Button,
@@ -20,7 +20,7 @@ import {
   FormControl,
   InputGroup,
   Form,
-  Dropdown
+  Dropdown,
 } from "react-bootstrap";
 
 import { store } from "../store";
@@ -40,8 +40,9 @@ function Toolbar() {
       previewPattern,
       polymetric,
       previewVisibility,
-      shareableLink
-    }
+      shareableLink,
+      heart,
+    },
   } = useContext(store);
   const [modalShow, setModalShow] = useState(false);
   const hasClaves = claves.length > 0 ? true : false;
@@ -54,38 +55,37 @@ function Toolbar() {
 
   const handleNewClave = () => {
     const clave = new Clave(
-      context,
       baseTempo,
       previewPattern,
       tempo,
-      { name: sample, sample: instruments[sample] },
-      polymetric
+      polymetric,
+      heart
     );
+    Tone.start();
+
     dispatch({ type: "claves.add", id: shortid.generate(), clave });
     dispatch({ type: "previewPattern.update", pattern: previewPattern });
     dispatch({ type: "preview.visibility", visible: false });
     dispatch({ type: "start.all" });
   };
 
-  const handlePreset = value => {
-    presets[value].instruments.forEach(preset => {
+  const handlePreset = (value) => {
+    presets[value].instruments.forEach((preset) => {
       const { sequence, tempo, sample } = preset;
-      const clave = new Clave(context, baseTempo, sequence, tempo, {
-        name: sample,
-        sample: instruments[sample]
-      });
+      const clave = new Clave(baseTempo, sequence, false, tempo, heart);
       dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
     dispatch({ type: "start.all" });
+    Tone.start();
   };
 
-  const handlePattern = value => {
+  const handlePattern = (value) => {
     const isEuclidian = new RegExp("^(\\d+),(\\d+)$");
     const isBinary = new RegExp("^[0-1]{1,}$");
     if (isEuclidian.test(value)) {
       const [pulse, steps] = value
         .split(",")
-        .map(number => parseInt(number))
+        .map((number) => parseInt(number))
         .sort((a, b) => a - b);
       const newPattern = er.getPattern(pulse, steps).join("");
       dispatch({ type: "previewPattern.update", pattern: newPattern });
@@ -126,11 +126,11 @@ function Toolbar() {
   };
 
   const share = () => {
-    const newShareLink = claves.map(clave => {
+    const newShareLink = claves.map((clave) => {
       return {
         sequence: clave.pattern.sequence.join(""),
         tempo: clave.tempo,
-        sample: clave.instrument
+        sample: clave.instrument,
       };
     });
 
@@ -172,7 +172,7 @@ function Toolbar() {
           <FormControl
             placeholder="1010101 ou 3,4"
             ref={patternInput}
-            onChange={e => handlePattern(e.target.value)}
+            onChange={(e) => handlePattern(e.target.value)}
             isInvalid={patternError}
           />
         </InputGroup>
@@ -183,10 +183,10 @@ function Toolbar() {
           <FormControl
             placeholder="tempo"
             value={tempo}
-            onChange={e => setTempo(e.target.value)}
+            onChange={(e) => setTempo(e.target.value)}
           />
         </InputGroup>
-        <Form.Control as="select" onChange={e => setSample(e.target.value)}>
+        <Form.Control as="select" onChange={(e) => setSample(e.target.value)}>
           <option>Instrumentos</option>
           {Object.keys(instrumentsList).map((instrument, index) => (
             <option key={index} value={instrument}>

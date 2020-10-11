@@ -7,6 +7,7 @@ const initialState = {
   previewVisibility: false,
   // type: Map<String,Clave>
   // This is the list of claves shown by the main screen
+  heart: {},
   polymetric: false,
   claves: [],
   shareableLink: "",
@@ -23,6 +24,7 @@ const createReducer = () => {
       case "load.app":
         return {
           ...state,
+          heart: action.heart,
           instruments: action.instruments,
           context: action.context
         };
