@@ -10,7 +10,6 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
-    "beet.js": "^1.7.0",
     "bootstrap": "^4.4.1",
     "euclidean-rhythms": "^2.0.1",
     "gh-pages": "^2.2.0",
@@ -23,9 +22,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "shortid": "^2.2.15",
-    "tone": "^14.7.58",
-    "watchjs": "^0.0.0",
-    "webworkify-webpack": "^2.1.5"
+    "tone": "^14.7.58"
   },
   "scripts": {
     "start": "react-scripts start",
