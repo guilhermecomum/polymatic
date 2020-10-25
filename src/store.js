@@ -7,13 +7,12 @@ const initialState = {
   previewVisibility: false,
   // type: Map<String,Clave>
   // This is the list of claves shown by the main screen
-  heart: {},
+  samplers: {},
   polymetric: false,
   claves: [],
   shareableLink: "",
   isPlaying: false,
   instruments: null,
-  context: null
 };
 
 const store = createContext(initialState);
@@ -24,9 +23,8 @@ const createReducer = () => {
       case "load.app":
         return {
           ...state,
-          heart: action.heart,
+          samplers: action.samplers,
           instruments: action.instruments,
-          context: action.context
         };
       case "previewPattern.update":
         return {

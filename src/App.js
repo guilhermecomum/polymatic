@@ -4,7 +4,6 @@ import ReactGA from "react-ga";
 import About from "./pages/About";
 import Home from "./pages/Home";
 import Header from "./components/Header";
-import BufferLoader from "./lib/bufferLoader";
 import instruments from "./instruments";
 import "./custom.scss";
 import "./App.sass";
@@ -20,23 +19,15 @@ function App() {
   const { dispatch } = useContext(store);
 
   useEffect(() => {
-    const heart = new Tone.Players({
+    const samplers = new Tone.ToneAudioBuffers({
       urls: {
-        0: "A1.mp3",
-        1: "Cs2.mp3",
-        2: "E2.mp3",
-        3: "Fs2.mp3",
+        ...instruments,
       },
-      fadeOut: "64n",
-      baseUrl: "https:tonejs.github.io/audio/casio/",
-      onload: () => {
-        setLoading(false);
-      },
-    }).toDestination();
-
+      onload: () => setLoading(false),
+    });
     dispatch({
       type: "load.app",
-      heart: heart,
+      samplers: samplers,
     });
   }, [dispatch]);
 

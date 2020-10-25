@@ -6,7 +6,6 @@ import presets from "../presets";
 import Clave from "../lib/clave";
 import AlertModal from "./AlertModal";
 import { useHistory } from "react-router-dom";
-import * as Tone from "tone";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlay,
@@ -28,41 +27,38 @@ import { store } from "../store";
 function Toolbar() {
   const history = useHistory();
   const [patternError, setPatternError] = useState(false);
-  const [sample, setSample] = useState("agogo1");
+  const [instrument, setInstrument] = useState("agogo1");
   const [tempo, setTempo] = useState(120);
 
   const { dispatch } = useContext(store);
   const {
     state: {
       claves,
-      instruments,
-      context,
       previewPattern,
       polymetric,
       previewVisibility,
       shareableLink,
-      heart,
+      samplers,
     },
   } = useContext(store);
   const [modalShow, setModalShow] = useState(false);
   const hasClaves = claves.length > 0 ? true : false;
   const patternInput = useRef(null);
-  let baseTempo = "";
+  let prevSequence = "";
 
   if (claves.length > 0) {
-    baseTempo = claves[0].pattern.sequence.join("");
+    prevSequence = claves[0].pattern.sequence.join("");
   }
 
   const handleNewClave = () => {
     const clave = new Clave(
-      baseTempo,
       previewPattern,
       tempo,
+      instrument,
+      samplers.get(instrument),
       polymetric,
-      heart
+      prevSequence
     );
-    Tone.start();
-
     dispatch({ type: "claves.add", id: shortid.generate(), clave });
     dispatch({ type: "previewPattern.update", pattern: previewPattern });
     dispatch({ type: "preview.visibility", visible: false });
@@ -71,12 +67,11 @@ function Toolbar() {
 
   const handlePreset = (value) => {
     presets[value].instruments.forEach((preset) => {
-      const { sequence, tempo, sample } = preset;
-      const clave = new Clave(baseTempo, sequence, false, tempo, heart);
+      const { sequence, tempo, instrument } = preset;
+      const clave = new Clave(sequence, tempo, samplers.get(instrument));
       dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
     dispatch({ type: "start.all" });
-    Tone.start();
   };
 
   const handlePattern = (value) => {
@@ -119,8 +114,15 @@ function Toolbar() {
     dispatch({ type: "stop.all", isPlaying: true });
   };
 
+  const remove = () => {
+    for (const clave of claves) {
+      clave.remove();
+    }
+    dispatch({ type: "stop.all", isPlaying: true });
+  };
+
   const removeAll = () => {
-    stop();
+    remove();
     dispatch({ type: "claves.removeAll" });
     setModalShow(false);
   };
@@ -186,7 +188,10 @@ function Toolbar() {
             onChange={(e) => setTempo(e.target.value)}
           />
         </InputGroup>
-        <Form.Control as="select" onChange={(e) => setSample(e.target.value)}>
+        <Form.Control
+          as="select"
+          onChange={(e) => setInstrument(e.target.value)}
+        >
           <option>Instrumentos</option>
           {Object.keys(instrumentsList).map((instrument, index) => (
             <option key={index} value={instrument}>

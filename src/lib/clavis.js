@@ -34,7 +34,6 @@ class Clavis {
   }
 
   pause() {
-    this.currentStep = 1;
     this.animate = false;
   }
 

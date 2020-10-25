@@ -22,7 +22,7 @@ export default function Clave({ clave }) {
 
   useEffect(() => {
     clavis.configure(canvasRef.current, sequence, tempo);
-    clavis.draw();
+    clavis.play();
     if (state.isPlaying) clave.start();
   }, [state.isPlaying, clave, clavis, sequence, tempo]);
 
@@ -44,7 +44,7 @@ export default function Clave({ clave }) {
   }
 
   const handleVolume = (value) => {
-    const newVolume = remap(value, 0, 100, 0.0, 1.0);
+    const newVolume = remap(value, 0, 100, -80, 3);
     setVolume(value);
     clave.setVolume(newVolume);
   };
@@ -68,7 +68,7 @@ export default function Clave({ clave }) {
           value={shift}
           min={1}
           max={sequence.join("").length}
-          onChange={e => handleRotate(Number(e.target.value))}
+          onChange={(e) => handleRotate(Number(e.target.value))}
           tooltip="off"
         />
       </div>
@@ -98,8 +98,8 @@ export default function Clave({ clave }) {
           value={volume}
           min={0}
           max={100}
-          tooltipLabel={currentValue => `${currentValue}%`}
-          onChange={e => handleVolume(Number(e.target.value))}
+          tooltipLabel={(currentValue) => `${currentValue}%`}
+          onChange={(e) => handleVolume(Number(e.target.value))}
         />
       </div>
     </div>
