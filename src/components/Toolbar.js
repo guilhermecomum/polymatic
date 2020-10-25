@@ -7,6 +7,7 @@ import Clave from "../lib/clave";
 import AlertModal from "./AlertModal";
 import { useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as Tone from "tone";
 import {
   faPlay,
   faStop,
@@ -101,6 +102,13 @@ function Toolbar() {
     }
   };
 
+  const previewSample = () => {
+    const player = new Tone.Player({
+      url: samplers.get(instrument),
+    }).toDestination();
+    player.start(0);
+  };
+
   const start = () => {
     for (const clave of claves) {
       clave.start();
@@ -188,18 +196,23 @@ function Toolbar() {
             onChange={(e) => setTempo(e.target.value)}
           />
         </InputGroup>
-        <Form.Control
-          as="select"
-          onChange={(e) => setInstrument(e.target.value)}
-        >
-          <option>Instrumentos</option>
-          {Object.keys(instrumentsList).map((instrument, index) => (
-            <option key={index} value={instrument}>
-              {instrument}
-            </option>
-          ))}
-        </Form.Control>
-
+        <InputGroup>
+          <InputGroup.Prepend>
+            <Button onClick={() => previewSample()}>
+              <FontAwesomeIcon icon={faPlay} />
+            </Button>
+          </InputGroup.Prepend>
+          <Form.Control
+            as="select"
+            onChange={(e) => setInstrument(e.target.value)}
+          >
+            {Object.keys(instrumentsList).map((instrument, index) => (
+              <option key={index} value={instrument}>
+                {instrument}
+              </option>
+            ))}
+          </Form.Control>
+        </InputGroup>
         <Form.Check
           inline
           className="ml-2 polymetric"
