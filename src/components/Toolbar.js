@@ -6,13 +6,12 @@ import presets from "../presets";
 import Clave from "../lib/clave";
 import AlertModal from "./AlertModal";
 import { useHistory } from "react-router-dom";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlay,
   faStop,
   faTimes,
-  faShareAlt
+  faShareAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Button,
@@ -20,7 +19,7 @@ import {
   FormControl,
   InputGroup,
   Form,
-  Dropdown
+  Dropdown,
 } from "react-bootstrap";
 
 import { store } from "../store";
@@ -28,38 +27,37 @@ import { store } from "../store";
 function Toolbar() {
   const history = useHistory();
   const [patternError, setPatternError] = useState(false);
-  const [sample, setSample] = useState("agogo1");
+  const [instrument, setInstrument] = useState("agogo1");
   const [tempo, setTempo] = useState(120);
 
   const { dispatch } = useContext(store);
   const {
     state: {
       claves,
-      instruments,
-      context,
       previewPattern,
       polymetric,
       previewVisibility,
-      shareableLink
-    }
+      shareableLink,
+      samplers,
+    },
   } = useContext(store);
   const [modalShow, setModalShow] = useState(false);
   const hasClaves = claves.length > 0 ? true : false;
   const patternInput = useRef(null);
-  let baseTempo = "";
+  let prevSequence = "";
 
   if (claves.length > 0) {
-    baseTempo = claves[0].pattern.sequence.join("");
+    prevSequence = claves[0].pattern.sequence.join("");
   }
 
   const handleNewClave = () => {
     const clave = new Clave(
-      context,
-      baseTempo,
       previewPattern,
       tempo,
-      { name: sample, sample: instruments[sample] },
-      polymetric
+      instrument,
+      samplers.get(instrument),
+      polymetric,
+      prevSequence
     );
     dispatch({ type: "claves.add", id: shortid.generate(), clave });
     dispatch({ type: "previewPattern.update", pattern: previewPattern });
@@ -67,25 +65,22 @@ function Toolbar() {
     dispatch({ type: "start.all" });
   };
 
-  const handlePreset = value => {
-    presets[value].instruments.forEach(preset => {
-      const { sequence, tempo, sample } = preset;
-      const clave = new Clave(context, baseTempo, sequence, tempo, {
-        name: sample,
-        sample: instruments[sample]
-      });
+  const handlePreset = (value) => {
+    presets[value].instruments.forEach((preset) => {
+      const { sequence, tempo, instrument } = preset;
+      const clave = new Clave(sequence, tempo, samplers.get(instrument));
       dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
     dispatch({ type: "start.all" });
   };
 
-  const handlePattern = value => {
+  const handlePattern = (value) => {
     const isEuclidian = new RegExp("^(\\d+),(\\d+)$");
     const isBinary = new RegExp("^[0-1]{1,}$");
     if (isEuclidian.test(value)) {
       const [pulse, steps] = value
         .split(",")
-        .map(number => parseInt(number))
+        .map((number) => parseInt(number))
         .sort((a, b) => a - b);
       const newPattern = er.getPattern(pulse, steps).join("");
       dispatch({ type: "previewPattern.update", pattern: newPattern });
@@ -119,18 +114,25 @@ function Toolbar() {
     dispatch({ type: "stop.all", isPlaying: true });
   };
 
+  const remove = () => {
+    for (const clave of claves) {
+      clave.remove();
+    }
+    dispatch({ type: "stop.all", isPlaying: true });
+  };
+
   const removeAll = () => {
-    stop();
+    remove();
     dispatch({ type: "claves.removeAll" });
     setModalShow(false);
   };
 
   const share = () => {
-    const newShareLink = claves.map(clave => {
+    const newShareLink = claves.map((clave) => {
       return {
         sequence: clave.pattern.sequence.join(""),
         tempo: clave.tempo,
-        sample: clave.instrument
+        sample: clave.instrument,
       };
     });
 
@@ -172,7 +174,7 @@ function Toolbar() {
           <FormControl
             placeholder="1010101 ou 3,4"
             ref={patternInput}
-            onChange={e => handlePattern(e.target.value)}
+            onChange={(e) => handlePattern(e.target.value)}
             isInvalid={patternError}
           />
         </InputGroup>
@@ -183,10 +185,13 @@ function Toolbar() {
           <FormControl
             placeholder="tempo"
             value={tempo}
-            onChange={e => setTempo(e.target.value)}
+            onChange={(e) => setTempo(e.target.value)}
           />
         </InputGroup>
-        <Form.Control as="select" onChange={e => setSample(e.target.value)}>
+        <Form.Control
+          as="select"
+          onChange={(e) => setInstrument(e.target.value)}
+        >
           <option>Instrumentos</option>
           {Object.keys(instrumentsList).map((instrument, index) => (
             <option key={index} value={instrument}>

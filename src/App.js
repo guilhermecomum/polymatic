@@ -4,13 +4,12 @@ import ReactGA from "react-ga";
 import About from "./pages/About";
 import Home from "./pages/Home";
 import Header from "./components/Header";
-import BufferLoader from "./lib/bufferLoader";
 import instruments from "./instruments";
 import "./custom.scss";
 import "./App.sass";
 import { store } from "./store";
 import { Spinner } from "react-bootstrap";
-const context = new (window.AudioContext || window.webkitAudioContext)();
+import * as Tone from "tone";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -20,18 +19,16 @@ function App() {
   const { dispatch } = useContext(store);
 
   useEffect(() => {
-    const finishedLoading = bufferList => {
-      dispatch({
-        type: "load.app",
-        instruments: bufferList,
-        context: context
-      });
-      setLoading(false);
-    };
-
-    let bufferLoader = new BufferLoader(context, instruments, finishedLoading);
-
-    bufferLoader.load();
+    const samplers = new Tone.ToneAudioBuffers({
+      urls: {
+        ...instruments,
+      },
+      onload: () => setLoading(false),
+    });
+    dispatch({
+      type: "load.app",
+      samplers: samplers,
+    });
   }, [dispatch]);
 
   if (loading) {
