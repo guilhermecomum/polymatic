@@ -26,6 +26,9 @@ body
     display: flex;
     flex-wrap: wrap
 
+.sequence
+  .active
+    color: #cc2c11
 
 .layer
     display: flex;
@@ -33,6 +36,29 @@ body
     flex-direction: column;
     color: #fff;
     margin-right: 55px
+
+.guia
+  position: relative
+  display: flex
+  justify-content: center
+  align-items: center
+  .tempo
+    position: absolute
+
+    text-align: center
+
+    .tempoInput
+      font-size: 25px
+      text-align: center;
+      background: none;
+      border: none;
+      color: #fff;
+      display: block;
+      &:focus
+        outline: none
+    p
+     margin: 0
+     font-size: 14px
 
 .volume
     display: flex;

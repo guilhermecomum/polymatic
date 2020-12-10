@@ -9,17 +9,21 @@ import { store } from "../store";
 
 export default function Clave({ clave }) {
   const canvasRef = useRef();
-  const [volume, setVolume] = useState(100);
+  const tempoRef = useRef();
+
   const {
     pattern: { sequence },
-    tempo,
+    context,
     clavis,
     instrument,
+    bpm,
+    activeStep,
   } = clave;
   const [shift, setShift] = useState(0);
+  const [volume, setVolume] = useState(100);
+  const [tempo, setTempo] = useState(bpm);
   const { dispatch } = useContext(store);
   const { state } = useContext(store);
-
   useEffect(() => {
     clavis.configure(canvasRef.current, sequence, tempo);
     clavis.play();
@@ -56,12 +60,24 @@ export default function Clave({ clave }) {
 
   return (
     <div className="layer">
-      <canvas
-        id={shortid.generate()}
-        ref={canvasRef}
-        width={640}
-        height={425}
-      />
+      <div className="guia">
+        <canvas
+          id={shortid.generate()}
+          ref={canvasRef}
+          width={640}
+          height={425}
+        />
+        <div className="tempo" ref={tempoRef}>
+          <input
+            className="tempoInput"
+            onChange={(e) => setTempo(e.target.value)}
+            onBlur={() => clave.setBpm(tempo)}
+            type="text"
+            value={tempo}
+          />
+          <p className="bpm">BPM</p>
+        </div>
+      </div>
       <div className="mt-2 volume">
         <span className="mr-2">Rotação</span>
         <RangeSlider
@@ -73,8 +89,20 @@ export default function Clave({ clave }) {
         />
       </div>
       <ul>
-        <li>padrão: {sequence.join("")}</li>
-        <li>tempo: {tempo}</li>
+        <li>
+          padrão:
+          <span className="sequence">
+            {sequence.map((step, index) => (
+              <span
+                className={index === clave.activeStep ? "active" : ""}
+                key={index}
+              >
+                {step}
+              </span>
+            ))}
+          </span>
+        </li>
+
         <li>instrumento: {instrument}</li>
       </ul>
 

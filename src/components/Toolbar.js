@@ -68,8 +68,8 @@ function Toolbar() {
 
   const handlePreset = (value) => {
     presets[value].instruments.forEach((preset) => {
-      const { sequence, tempo, instrument } = preset;
-      const clave = new Clave(sequence, tempo, samplers.get(instrument));
+      const { sequence, tempo, sample } = preset;
+      const clave = new Clave(sequence, tempo, sample, samplers.get(sample));
       dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
     dispatch({ type: "start.all" });
