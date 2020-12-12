@@ -31,7 +31,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -b gh-pages -d build",
-    "staging": "npm run build && gh-pages -b staging -o staging -d build"
+    "staging": "npm run build && cp CI build/CNAME && gh-pages -b staging -o staging -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
