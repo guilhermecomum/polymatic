@@ -48,9 +48,12 @@ export default function Clave({ clave }) {
   }
 
   const handleVolume = (value) => {
-    const newVolume = remap(value, 0, 100, -80, 3);
     setVolume(value);
-    clave.setVolume(newVolume);
+    if (value === 0) {
+      clave.setVolume(-1000);
+    } else {
+      clave.setVolume(value * 0.3 - 24);
+    }
   };
 
   const handleRotate = (value) => {

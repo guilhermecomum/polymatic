@@ -139,7 +139,7 @@ function Toolbar() {
     const newShareLink = claves.map((clave) => {
       return {
         sequence: clave.pattern.sequence.join(""),
-        tempo: clave.tempo,
+        tempo: clave.bpm,
         sample: clave.instrument,
       };
     });

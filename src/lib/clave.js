@@ -16,7 +16,7 @@ class Clave {
     this.prevSequence = prevSequence;
     this.pattern = new Pattern(sequence);
     this.bpm = bpm;
-    this.volume = 3;
+    this.volume = 0;
     this.polymetric = polymetric;
     this.clavis = new Clavis();
     this.size = this.pattern.sequence.length;
@@ -29,7 +29,7 @@ class Clave {
       pan: 0,
       context: this.context,
     });
-    this.context.transport.bpm.value = this.bpm;
+
     this.player = new Tone.Player({
       url: this.sample,
       context: this.context,
@@ -49,6 +49,8 @@ class Clave {
         }
       }
     }
+
+    this.context.transport.bpm.value = this.bpm;
 
     this.indexArray = (count) => {
       const indices = [];
