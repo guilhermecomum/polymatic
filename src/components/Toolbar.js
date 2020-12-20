@@ -13,6 +13,8 @@ import {
   faStop,
   faTimes,
   faShareAlt,
+  faBackward,
+  faForward,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Button,
@@ -109,6 +111,20 @@ function Toolbar() {
     player.start(0);
   };
 
+  const slower = () => {
+    for (const clave of claves) {
+      clave.slower();
+      dispatch({ type: "claves.edit", id: clave.id, clave });
+    }
+  };
+
+  const faster = () => {
+    for (const clave of claves) {
+      clave.faster();
+      dispatch({ type: "claves.edit", id: clave.id, clave });
+    }
+  };
+
   const start = () => {
     for (const clave of claves) {
       clave.start();
@@ -163,11 +179,17 @@ function Toolbar() {
       />
       <div className="toolbar-controls">
         <ButtonGroup aria-label="Basic example">
+          <Button onClick={() => slower()}>
+            <FontAwesomeIcon icon={faBackward} />
+          </Button>
           <Button onClick={() => start()}>
             <FontAwesomeIcon icon={faPlay} />
           </Button>
           <Button onClick={() => stop()}>
             <FontAwesomeIcon icon={faStop} />
+          </Button>
+          <Button onClick={() => faster()}>
+            <FontAwesomeIcon icon={faForward} />
           </Button>
           <Button onClick={() => setModalShow(true)} disabled={!hasClaves}>
             <FontAwesomeIcon icon={faTimes} />

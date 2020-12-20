@@ -10,25 +10,32 @@ import { store } from "../store";
 export default function Clave({ clave }) {
   const canvasRef = useRef();
   const tempoRef = useRef();
-
   const {
     pattern: { sequence },
-    context,
     clavis,
     instrument,
     bpm,
     activeStep,
   } = clave;
+
   const [shift, setShift] = useState(0);
   const [volume, setVolume] = useState(100);
   const [tempo, setTempo] = useState(bpm);
+  const [editingTempo, setEditingTempo] = useState(false);
   const { dispatch } = useContext(store);
   const { state } = useContext(store);
+
   useEffect(() => {
     clavis.configure(canvasRef.current, sequence, tempo);
     clavis.play();
     if (state.isPlaying) clave.start();
-  }, [state.isPlaying, clave, clavis, sequence, tempo]);
+  }, [state.isPlaying, clave, clavis, sequence, tempo, bpm]);
+
+  useEffect(() => {
+    if (tempoRef.current) {
+      tempoRef.current.focus();
+    }
+  }, [editingTempo]);
 
   const handleStop = () => {
     clave.stop();
@@ -43,10 +50,6 @@ export default function Clave({ clave }) {
     dispatch({ type: "claves.remove", id: clave.id });
   };
 
-  function remap(value, low1, high1, low2, high2) {
-    return low2 + ((high2 - low2) * (value - low1)) / (high1 - low1);
-  }
-
   const handleVolume = (value) => {
     setVolume(value);
     if (value === 0) {
@@ -54,11 +57,24 @@ export default function Clave({ clave }) {
     } else {
       clave.setVolume(value * 0.3 - 24);
     }
+    dispatch({ type: "claves.edit", id: clave.id, clave });
   };
 
   const handleRotate = (value) => {
     setShift(value);
     clave.shift(value);
+    dispatch({ type: "claves.edit", id: clave.id, clave });
+  };
+
+  const handleTempo = (value) => {
+    clave.setBpm(value);
+    dispatch({ type: "claves.edit", id: clave.id, clave });
+    setEditingTempo(false);
+  };
+
+  const handleEditTempo = () => {
+    setEditingTempo(true);
+    setTempo(bpm);
   };
 
   return (
@@ -70,15 +86,30 @@ export default function Clave({ clave }) {
           width={640}
           height={425}
         />
-        <div className="tempo" ref={tempoRef}>
-          <input
-            className="tempoInput"
-            onChange={(e) => setTempo(e.target.value)}
-            onBlur={() => clave.setBpm(tempo)}
-            type="text"
-            value={tempo}
-          />
-          <p className="bpm">BPM</p>
+        <div className="tempo">
+          <div>
+            {editingTempo ? (
+              <input
+                ref={tempoRef}
+                pattern="[0-9]*"
+                className="tempoInput"
+                onChange={(e) =>
+                  setTempo(Number(e.target.value.replace(/\D/, "")))
+                }
+                onBlur={(e) =>
+                  handleTempo(Number(e.target.value.replace(/\D/, "")))
+                }
+                type="text"
+                value={tempo}
+              />
+            ) : (
+              <p className="tempoInput" onClick={() => handleEditTempo()}>
+                {bpm}
+              </p>
+            )}
+
+            <p className="bpm">BPM</p>
+          </div>
         </div>
       </div>
       <div className="mt-2 volume">
@@ -97,7 +128,7 @@ export default function Clave({ clave }) {
           <span className="sequence">
             {sequence.map((step, index) => (
               <span
-                className={index === clave.activeStep ? "active" : ""}
+                className={index === activeStep ? "active" : ""}
                 key={index}
               >
                 {step}

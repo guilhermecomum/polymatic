@@ -35,13 +35,13 @@ function Home() {
     if (claves) {
       handlePreset(claves);
     }
-  }, [guias]);
+  }, [claves, dispatch, state.samplers, guias]);
 
   return (
     <div className="App">
       <Toolbar />
       <div className="wrapper">
-        {state.claves.map(clave => (
+        {state.claves.map((clave) => (
           <Layer key={clave.id} clave={clave} />
         ))}
         {state.previewVisibility && <Preview />}

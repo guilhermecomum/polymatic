@@ -121,6 +121,18 @@ class Clave {
     this.clavis.pause();
     this.seq.stop();
   }
+
+  faster() {
+    this.setBpm(this.bpm + 10);
+  }
+
+  slower() {
+    if (this.bpm - 10 >= 10) {
+      this.setBpm(this.bpm - 10);
+    } else {
+      this.setBpm(10);
+    }
+  }
 }
 
 export default Clave;

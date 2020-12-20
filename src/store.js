@@ -29,46 +29,54 @@ const createReducer = () => {
       case "previewPattern.update":
         return {
           ...state,
-          previewPattern: action.pattern
+          previewPattern: action.pattern,
         };
       case "preview.visibility":
         return {
           ...state,
-          previewVisibility: action.visible
+          previewVisibility: action.visible,
         };
       case "claves.add":
         return { ...state, claves: [...state.claves, action.clave] };
       case "claves.remove":
         const filteredClaves = state.claves.filter(
-          clave => clave.id !== action.id
+          (clave) => clave.id !== action.id
         );
         return {
           ...state,
           claves: filteredClaves,
-          polymetric: filteredClaves.length > 0 ? state.polymetric : false
+          polymetric: filteredClaves.length > 0 ? state.polymetric : false,
+        };
+      case "claves.edit":
+        const claveIndex = state.claves.findIndex(
+          (clave) => clave.id === action.id
+        );
+        state.claves[claveIndex] = action.clave;
+        return {
+          ...state,
         };
       case "claves.removeAll":
         return {
           ...state,
           claves: [],
-          polymetric: false
+          polymetric: false,
         };
       case "claves.share":
-        const newShareLink = state.claves.map(clave => {
+        const newShareLink = state.claves.map((clave) => {
           return {
             sequence: clave.pattern.sequence.join(""),
             tempo: clave.tempo,
-            sample: clave.instrument
+            sample: clave.instrument,
           };
         });
         return {
           ...state,
-          shareableLink: JSON.stringify(newShareLink)
+          shareableLink: JSON.stringify(newShareLink),
         };
       case "toggle.polymetric":
         return {
           ...state,
-          polymetric: !state.polymetric
+          polymetric: !state.polymetric,
         };
       case "start.all":
         return { ...state, isPlaying: true };
