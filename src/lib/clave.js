@@ -75,8 +75,6 @@ class Clave {
       events: this.indexArray(this.size),
       subdivision: `${this.size}n`,
     }).start(0);
-    Tone.start();
-    this.context.transport.start();
   }
 
   setVolume(volume) {
@@ -111,6 +109,7 @@ class Clave {
   }
 
   start() {
+    Tone.start();
     this.context.transport.start();
     this.seq.start();
     this.clavis.play();

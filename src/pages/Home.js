@@ -35,7 +35,7 @@ function Home() {
     if (claves) {
       handlePreset(claves);
     }
-  }, [claves, dispatch, state.samplers, guias]);
+  }, [guias]);
 
   return (
     <div className="App">
