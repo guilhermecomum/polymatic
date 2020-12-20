@@ -122,14 +122,14 @@ class Clave {
   }
 
   faster() {
-    this.setBpm(this.bpm + 10);
+    this.setBpm(this.bpm + 1);
   }
 
   slower() {
-    if (this.bpm - 10 >= 10) {
-      this.setBpm(this.bpm - 10);
+    if (this.bpm >= 2) {
+      this.setBpm(this.bpm - 1);
     } else {
-      this.setBpm(10);
+      this.setBpm(1);
     }
   }
 }
