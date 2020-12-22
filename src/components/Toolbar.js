@@ -215,7 +215,7 @@ function Toolbar() {
           <FormControl
             placeholder="tempo"
             value={tempo}
-            onChange={(e) => setTempo(e.target.value)}
+            onChange={(e) => setTempo(Number(e.target.value))}
           />
         </InputGroup>
         <InputGroup>
