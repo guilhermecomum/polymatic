@@ -1,10 +1,11 @@
 {
   "name": "Polymatic",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "private": true,
   "homepage": "https://polymatic.ciberterreiro.org",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.27",
+    "@fortawesome/free-brands-svg-icons": "^5.15.1",
     "@fortawesome/free-solid-svg-icons": "^5.12.1",
     "@fortawesome/react-fontawesome": "^0.1.9",
     "@testing-library/jest-dom": "^4.2.4",
@@ -13,7 +14,6 @@
     "bootstrap": "^4.4.1",
     "euclidean-rhythms": "^2.0.1",
     "gh-pages": "^2.2.0",
-    "node-sass": "^4.13.1",
     "react": "^16.13.0",
     "react-bootstrap": "^1.0.0-beta.17",
     "react-bootstrap-range-slider": "^0.3.1",
@@ -21,6 +21,7 @@
     "react-ga": "^2.7.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
+    "sass": "^1.32.5",
     "shortid": "^2.2.15",
     "tone": "^14.7.58"
   },
@@ -29,8 +30,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build && cp CNAME build/CNAME",
-    "deploy": "gh-pages -b gh-pages -d build"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -b gh-pages -d build",
+    "staging": "npm run build && cp CI build/CNAME && gh-pages -b staging -o staging -d build"
   },
   "eslintConfig": {
     "extends": "react-app"

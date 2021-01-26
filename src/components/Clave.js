@@ -9,14 +9,19 @@ import { store } from "../store";
 
 export default function Clave({ clave }) {
   const canvasRef = useRef();
-  const [volume, setVolume] = useState(100);
+  const tempoRef = useRef();
   const {
     pattern: { sequence },
-    tempo,
     clavis,
     instrument,
+    bpm,
+    activeStep,
   } = clave;
+
   const [shift, setShift] = useState(0);
+  const [volume, setVolume] = useState(100);
+  const [tempo, setTempo] = useState(bpm);
+  const [editingTempo, setEditingTempo] = useState(false);
   const { dispatch } = useContext(store);
   const { state } = useContext(store);
 
@@ -24,7 +29,13 @@ export default function Clave({ clave }) {
     clavis.configure(canvasRef.current, sequence, tempo);
     clavis.play();
     if (state.isPlaying) clave.start();
-  }, [state.isPlaying, clave, clavis, sequence, tempo]);
+  }, [state.isPlaying, clave, clavis, sequence, tempo, bpm]);
+
+  useEffect(() => {
+    if (tempoRef.current) {
+      tempoRef.current.focus();
+    }
+  }, [editingTempo]);
 
   const handleStop = () => {
     clave.stop();
@@ -39,29 +50,68 @@ export default function Clave({ clave }) {
     dispatch({ type: "claves.remove", id: clave.id });
   };
 
-  function remap(value, low1, high1, low2, high2) {
-    return low2 + ((high2 - low2) * (value - low1)) / (high1 - low1);
-  }
-
   const handleVolume = (value) => {
-    const newVolume = remap(value, 0, 100, -80, 3);
     setVolume(value);
-    clave.setVolume(newVolume);
+    if (value === 0) {
+      clave.setVolume(-1000);
+    } else {
+      clave.setVolume(value * 0.3 - 24);
+    }
+    dispatch({ type: "claves.edit", id: clave.id, clave });
   };
 
   const handleRotate = (value) => {
     setShift(value);
     clave.shift(value);
+    dispatch({ type: "claves.edit", id: clave.id, clave });
+  };
+
+  const handleTempo = (value) => {
+    clave.setBpm(value);
+    dispatch({ type: "claves.edit", id: clave.id, clave });
+    setEditingTempo(false);
+  };
+
+  const handleEditTempo = () => {
+    setEditingTempo(true);
+    setTempo(bpm);
   };
 
   return (
     <div className="layer">
-      <canvas
-        id={shortid.generate()}
-        ref={canvasRef}
-        width={640}
-        height={425}
-      />
+      <div className="guia">
+        <canvas
+          id={shortid.generate()}
+          ref={canvasRef}
+          width={640}
+          height={425}
+        />
+        <div className="tempo">
+          <div>
+            {editingTempo ? (
+              <input
+                ref={tempoRef}
+                pattern="[0-9]*"
+                className="tempoInput"
+                onChange={(e) =>
+                  setTempo(Number(e.target.value.replace(/\D/, "")))
+                }
+                onBlur={(e) =>
+                  handleTempo(Number(e.target.value.replace(/\D/, "")))
+                }
+                type="text"
+                value={tempo}
+              />
+            ) : (
+              <p className="tempoInput" onClick={() => handleEditTempo()}>
+                {bpm}
+              </p>
+            )}
+
+            <p className="bpm">BPM</p>
+          </div>
+        </div>
+      </div>
       <div className="mt-2 volume">
         <span className="mr-2">Rotação</span>
         <RangeSlider
@@ -73,8 +123,20 @@ export default function Clave({ clave }) {
         />
       </div>
       <ul>
-        <li>padrão: {sequence.join("")}</li>
-        <li>tempo: {tempo}</li>
+        <li>
+          padrão:
+          <span className="sequence">
+            {sequence.map((step, index) => (
+              <span
+                className={index === activeStep ? "active" : ""}
+                key={index}
+              >
+                {step}
+              </span>
+            ))}
+          </span>
+        </li>
+
         <li>instrumento: {instrument}</li>
       </ul>
 

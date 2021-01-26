@@ -6,7 +6,7 @@ import * as Tone from "tone";
 class Clave {
   constructor(
     sequence,
-    tempo,
+    bpm,
     instrument,
     sample,
     polymetric = false,
@@ -15,20 +15,21 @@ class Clave {
     this.id = shortid.generate();
     this.prevSequence = prevSequence;
     this.pattern = new Pattern(sequence);
-    this.tempo = tempo;
-    this.volume = 3;
+    this.bpm = bpm;
+    this.volume = 0;
     this.polymetric = polymetric;
     this.clavis = new Clavis();
     this.size = this.pattern.sequence.length;
     this.instrument = instrument;
     this.sample = sample;
+    this.activeStep = null;
     this.context = new Tone.Context();
     this.channel = new Tone.Channel({
       volume: this.volume,
       pan: 0,
       context: this.context,
     });
-    this.context.transport.bpm.value = this.tempo;
+
     this.player = new Tone.Player({
       url: this.sample,
       context: this.context,
@@ -41,13 +42,15 @@ class Clave {
       if (newSteps !== prevSteps) {
         if (prevSteps > newSteps) {
           let ratio = prevSteps / newSteps;
-          this.tempo = (this.tempo * ratio).toFixed(2);
+          this.bpm = (this.bpm * ratio).toFixed(2);
         } else {
           let ratio = newSteps / prevSteps;
-          this.tempo = (this.tempo / ratio).toFixed(2);
+          this.bpm = (this.bpm / ratio).toFixed(2);
         }
       }
     }
+
+    this.context.transport.bpm.value = this.bpm;
 
     this.indexArray = (count) => {
       const indices = [];
@@ -59,10 +62,7 @@ class Clave {
 
     this.tick = (time, value) => {
       if (this.pattern.sequence[value] === "1") {
-        this.player
-          .sync()
-          .start(time)
-          .chain(this.channel, this.context.destination);
+        this.player.start(time).chain(this.channel, this.context.destination);
       }
       this.context.draw.schedule(() => {
         this.clavis.setCurrentStep(value);
@@ -75,8 +75,6 @@ class Clave {
       events: this.indexArray(this.size),
       subdivision: `${this.size}n`,
     }).start(0);
-    Tone.start();
-    this.context.transport.start();
   }
 
   setVolume(volume) {
@@ -93,6 +91,16 @@ class Clave {
     this.clavis.draw();
   }
 
+  setActivestep(ref) {
+    this.activeStep = ref;
+  }
+
+  setBpm(bpm) {
+    this.bpm = bpm;
+    const now = this.context.transport.now();
+    this.context.transport.bpm.setValueAtTime(this.bpm, now);
+  }
+
   remove() {
     this.clavis.pause();
     this.seq.dispose();
@@ -101,17 +109,28 @@ class Clave {
   }
 
   start() {
+    Tone.start();
+    this.context.transport.start();
     this.seq.start();
     this.clavis.play();
   }
 
-  pause() {
+  stop() {
+    this.context.transport.stop();
     this.clavis.pause();
+    this.seq.stop();
   }
 
-  stop() {
-    this.seq.stop();
-    this.clavis.pause();
+  faster() {
+    this.setBpm(this.bpm + 1);
+  }
+
+  slower() {
+    if (this.bpm >= 2) {
+      this.setBpm(this.bpm - 1);
+    } else {
+      this.setBpm(1);
+    }
   }
 }
 

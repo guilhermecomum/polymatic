@@ -41,7 +41,7 @@ function Home() {
     <div className="App">
       <Toolbar />
       <div className="wrapper">
-        {state.claves.map(clave => (
+        {state.claves.map((clave) => (
           <Layer key={clave.id} clave={clave} />
         ))}
         {state.previewVisibility && <Preview />}

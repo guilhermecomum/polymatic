@@ -13,6 +13,8 @@ import {
   faStop,
   faTimes,
   faShareAlt,
+  faBackward,
+  faForward,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Button,
@@ -68,8 +70,8 @@ function Toolbar() {
 
   const handlePreset = (value) => {
     presets[value].instruments.forEach((preset) => {
-      const { sequence, tempo, instrument } = preset;
-      const clave = new Clave(sequence, tempo, samplers.get(instrument));
+      const { sequence, tempo, sample } = preset;
+      const clave = new Clave(sequence, tempo, sample, samplers.get(sample));
       dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
     dispatch({ type: "start.all" });
@@ -109,6 +111,20 @@ function Toolbar() {
     player.start(0);
   };
 
+  const slower = () => {
+    for (const clave of claves) {
+      clave.slower();
+      dispatch({ type: "claves.edit", id: clave.id, clave });
+    }
+  };
+
+  const faster = () => {
+    for (const clave of claves) {
+      clave.faster();
+      dispatch({ type: "claves.edit", id: clave.id, clave });
+    }
+  };
+
   const start = () => {
     for (const clave of claves) {
       clave.start();
@@ -139,7 +155,7 @@ function Toolbar() {
     const newShareLink = claves.map((clave) => {
       return {
         sequence: clave.pattern.sequence.join(""),
-        tempo: clave.tempo,
+        tempo: clave.bpm,
         sample: clave.instrument,
       };
     });
@@ -163,11 +179,17 @@ function Toolbar() {
       />
       <div className="toolbar-controls">
         <ButtonGroup aria-label="Basic example">
+          <Button onClick={() => slower()}>
+            <FontAwesomeIcon icon={faBackward} />
+          </Button>
           <Button onClick={() => start()}>
             <FontAwesomeIcon icon={faPlay} />
           </Button>
           <Button onClick={() => stop()}>
             <FontAwesomeIcon icon={faStop} />
+          </Button>
+          <Button onClick={() => faster()}>
+            <FontAwesomeIcon icon={faForward} />
           </Button>
           <Button onClick={() => setModalShow(true)} disabled={!hasClaves}>
             <FontAwesomeIcon icon={faTimes} />
@@ -193,7 +215,7 @@ function Toolbar() {
           <FormControl
             placeholder="tempo"
             value={tempo}
-            onChange={(e) => setTempo(e.target.value)}
+            onChange={(e) => setTempo(Number(e.target.value))}
           />
         </InputGroup>
         <InputGroup>
