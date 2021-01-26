@@ -50,6 +50,6 @@
     ]
   },
   "devDependencies": {
-    "semantic-release": "^17.0.7"
+    "semantic-release": "^17.2.3"
   }
 }
