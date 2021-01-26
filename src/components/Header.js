@@ -26,7 +26,6 @@ function Header() {
           <FontAwesomeIcon icon={faEnvelope} className="github" size="2x" />
         </Nav.Link>
         <Nav.Link
-          href="mailto:polymatic@ciberterreiro.org"
           href="https://github.com/guilhermecomum/polymatic"
           target="_blank"
           rel="noopener noreferrer"
