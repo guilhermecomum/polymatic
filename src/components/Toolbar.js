@@ -30,7 +30,7 @@ import { store } from "../store";
 function Toolbar() {
   const history = useHistory();
   const [patternError, setPatternError] = useState(false);
-  const [instrument, setInstrument] = useState("agogo1");
+  const [instrument, setInstrument] = useState("conga1");
   const [tempo, setTempo] = useState(120);
 
   const { dispatch } = useContext(store);
@@ -54,6 +54,7 @@ function Toolbar() {
   }
 
   const handleNewClave = () => {
+    Tone.start();
     const clave = new Clave(
       previewPattern,
       tempo,
@@ -69,9 +70,10 @@ function Toolbar() {
   };
 
   const handlePreset = (value) => {
+    Tone.start();
     presets[value].instruments.forEach((preset) => {
-      const { sequence, tempo, sample } = preset;
-      const clave = new Clave(sequence, tempo, sample, samplers.get(sample));
+      const { sequence, tempo, banda } = preset;
+      const clave = new Clave(sequence, tempo, banda, samplers);
       dispatch({ type: "claves.add", id: shortid.generate(), clave });
     });
     dispatch({ type: "start.all" });
@@ -105,10 +107,13 @@ function Toolbar() {
   };
 
   const previewSample = () => {
-    const player = new Tone.Player({
-      url: samplers.get(instrument),
-    }).toDestination();
-    player.start(0);
+    Tone.start();
+    // const player = new Tone.Player({
+    //   url: samplers.get(instrument),
+    // }).toDestination();
+    //player.start(0);
+    console.log("instrument", samplers.get(instrument));
+    samplers.get(instrument).start(0);
   };
 
   const slower = () => {

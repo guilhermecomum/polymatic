@@ -3,7 +3,7 @@ import shortid from "shortid";
 const presets = {
   [shortid.generate()]: {
     name: "Toque Ignbin",
-    instruments: [{ sequence: "101101011010", tempo: 120, sample: "conga1" }]
+    instruments: [{ sequence: "101101011010", tempo: 120, sample: "conga1" }],
   },
   [shortid.generate()]: {
     name: "Son cubano",
@@ -11,22 +11,32 @@ const presets = {
       {
         sequence: "1001001000101000",
         tempo: 92,
-        sample: "claves"
-      }
-    ]
+        sample: "claves",
+      },
+    ],
   },
   [shortid.generate()]: {
     name: "Rumba",
     instruments: [
-      { sequence: "1001000100101000", tempo: 110, sample: "claves" }
-    ]
+      { sequence: "1001000100101000", tempo: 110, sample: "claves" },
+    ],
   },
   [shortid.generate()]: {
     name: "Samba",
     instruments: [
-      { sequence: "1011010101101010", tempo: 60, sample: "tamborim" }
-    ]
-  }
+      { sequence: "1011010101101010", tempo: 60, sample: "tamborim" },
+    ],
+  },
+  [shortid.generate()]: {
+    name: "John Coltrane",
+    instruments: [
+      {
+        sequence: "111",
+        tempo: 120,
+        sample: "coltrane",
+      },
+    ],
+  },
 };
 
 export default presets;

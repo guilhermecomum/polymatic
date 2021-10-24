@@ -3,6 +3,8 @@ import { HashRouter, Route, Switch } from "react-router-dom";
 import ReactGA from "react-ga";
 import About from "./pages/About";
 import Home from "./pages/Home";
+import Playground from "./pages/Playground";
+import Sandbox from "./pages/Sandbox";
 import Header from "./components/Header";
 import instruments from "./instruments";
 import "./custom.scss";
@@ -19,7 +21,7 @@ function App() {
   const { dispatch } = useContext(store);
 
   useEffect(() => {
-    const samplers = new Tone.ToneAudioBuffers({
+    const samplers = new Tone.Players({
       urls: {
         ...instruments,
       },
@@ -46,6 +48,8 @@ function App() {
         <Route exact path="/" component={Home} />
         <Route exact path="/sobre" component={About} />
         <Route exact path="/guias" component={Home} />
+        <Route exact path="/playground" component={Playground} />
+        <Route exact path="/sandbox" component={Sandbox} />
       </Switch>
     </HashRouter>
   );
