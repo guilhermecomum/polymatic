@@ -3,6 +3,7 @@ import { HashRouter, Route, Switch } from "react-router-dom";
 import ReactGA from "react-ga";
 import About from "./pages/About";
 import Home from "./pages/Home";
+import Playground from "./pages/Playground";
 import Header from "./components/Header";
 import instruments from "./instruments";
 import "./custom.scss";
@@ -29,6 +30,18 @@ function App() {
       type: "load.app",
       samplers: samplers,
     });
+    const piano = new Tone.Sampler({
+      urls: {
+        A1: "A1.mp3",
+        A2: "A2.mp3",
+      },
+      baseUrl: "https://tonejs.github.io/audio/casio/",
+      onload: () => setLoading(false),
+    }).toDestination();
+    dispatch({
+      type: "load.piano",
+      piano: piano,
+    });
   }, [dispatch]);
 
   if (loading) {
@@ -46,6 +59,7 @@ function App() {
         <Route exact path="/" component={Home} />
         <Route exact path="/sobre" component={About} />
         <Route exact path="/guias" component={Home} />
+        <Route exact path="/circle" component={Playground} />
       </Switch>
     </HashRouter>
   );
