@@ -16,6 +16,7 @@ export default function Circle({ circle }) {
     bpm,
   } = circle;
 
+  const [pattern, setPattern] = useState(sequence);
   const [shift, setShift] = useState(0);
   const [tempo, setTempo] = useState(bpm);
   const [editingTempo, setEditingTempo] = useState(false);
@@ -24,9 +25,9 @@ export default function Circle({ circle }) {
 
   useEffect(() => {
     clavis.configure(canvasRef.current, sequence, tempo);
-    clavis.play();
+    clavis.draw();
     if (state.isPlaying) circle.start();
-  }, [state.isPlaying, circle, clavis, sequence, tempo, bpm]);
+  }, [state.isPlaying, circle, clavis, sequence, tempo, bpm, pattern]);
 
   useEffect(() => {
     if (tempoRef.current) {
@@ -60,6 +61,34 @@ export default function Circle({ circle }) {
     setTempo(bpm);
   };
 
+  const handleClick = (event) => {
+    event.stopPropagation();
+    const ctx = clavis.context;
+
+    clavis.patternNotes.forEach((circ, index) => {
+      if (
+        ctx.isPointInPath(
+          circ,
+          event.nativeEvent.offsetX,
+          event.nativeEvent.offsetY
+        )
+      ) {
+        ctx.fillStyle = "green";
+        //clavis.addDot(index);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "red";
+        ctx.stroke(circ);
+        pattern[index] = pattern[index] === "1" ? "0" : "1";
+        setPattern(pattern);
+        circle.updatePattern(pattern.join(""));
+        dispatch({ type: "circle.edit", circle });
+      } else {
+        ctx.strokeStyle = "white";
+        ctx.stroke(circ);
+      }
+    });
+  };
+
   return (
     <div className="layer">
       <div className="guia">
@@ -68,6 +97,7 @@ export default function Circle({ circle }) {
           ref={canvasRef}
           width={700}
           height={700}
+          onClick={handleClick}
         />
         <div className="tempo">
           <div>

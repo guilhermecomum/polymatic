@@ -1,4 +1,4 @@
-import Clavis from "./clavis";
+import Clavis from "./circis";
 import Pattern from "./pattern";
 import shortid from "shortid";
 import * as Tone from "tone";
@@ -43,6 +43,7 @@ class Circle {
       }
       Tone.Draw.schedule(() => {
         this.clavis.setCurrentStep(value);
+        this.clavis.draw();
       }, time);
     };
 
@@ -61,6 +62,12 @@ class Circle {
     this.bpm = bpm;
     const now = Tone.Transport.now();
     Tone.Transport.bpm.setValueAtTime(this.bpm, now);
+  }
+
+  updatePattern(pattern) {
+    this.pattern = new Pattern(pattern);
+    this.size = this.pattern.sequence.length;
+    this.clavis.draw();
   }
 
   start() {
