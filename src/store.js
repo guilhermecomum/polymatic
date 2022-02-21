@@ -7,9 +7,11 @@ const initialState = {
   previewVisibility: false,
   // type: Map<String,Clave>
   // This is the list of claves shown by the main screen
+  piano: {},
   samplers: {},
   polymetric: false,
   claves: [],
+  circle: false,
   shareableLink: "",
   isPlaying: false,
   instruments: null,
@@ -25,6 +27,11 @@ const createReducer = () => {
           ...state,
           samplers: action.samplers,
           instruments: action.instruments,
+        };
+      case "load.piano":
+        return {
+          ...state,
+          piano: action.piano,
         };
       case "previewPattern.update":
         return {
@@ -72,6 +79,13 @@ const createReducer = () => {
         return {
           ...state,
           shareableLink: JSON.stringify(newShareLink),
+        };
+      case "circle.add":
+        return { ...state, circle: action.circle };
+      case "circle.edit":
+        state.circles = action.circle;
+        return {
+          ...state,
         };
       case "toggle.polymetric":
         return {
