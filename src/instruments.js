@@ -42,6 +42,9 @@ import hithat from "./samples/hithat.wav";
 import kick2 from "./samples/kick2.wav";
 import kicklow from "./samples/kicklow.wav";
 import tamborim from "./samples/tamborim.wav";
+import berimbau1 from "./samples/berimbau1.wav";
+import berimbau2 from "./samples/berimbau2.wav";
+import berimbau3 from "./samples/berimbau3.wav";
 
 const instruments = {
   agogo1,
@@ -84,7 +87,10 @@ const instruments = {
   hithat,
   kick2,
   kicklow,
-  tamborim
+  tamborim,
+  berimbau1,
+  berimbau2,
+  berimbau3,
 };
 
 export default instruments;
