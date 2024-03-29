@@ -1,22 +1,25 @@
 {
   "files": {
     "main.css": "/static/css/main.3ff22ab7.chunk.css",
-    "main.js": "/static/js/main.d628449b.chunk.js",
-    "main.js.map": "/static/js/main.d628449b.chunk.js.map",
+    "main.js": "/static/js/main.a94358a9.chunk.js",
+    "main.js.map": "/static/js/main.a94358a9.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.f0083627.js",
     "runtime-main.js.map": "/static/js/runtime-main.f0083627.js.map",
     "static/css/2.f351e075.chunk.css": "/static/css/2.f351e075.chunk.css",
-    "static/js/2.0f6805cf.chunk.js": "/static/js/2.0f6805cf.chunk.js",
-    "static/js/2.0f6805cf.chunk.js.map": "/static/js/2.0f6805cf.chunk.js.map",
+    "static/js/2.145e846a.chunk.js": "/static/js/2.145e846a.chunk.js",
+    "static/js/2.145e846a.chunk.js.map": "/static/js/2.145e846a.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.e7d4b5271e5f3cf5a5e38175d9547a00.js": "/precache-manifest.e7d4b5271e5f3cf5a5e38175d9547a00.js",
+    "precache-manifest.e1b660abd1ba5138e30646936f75ac71.js": "/precache-manifest.e1b660abd1ba5138e30646936f75ac71.js",
     "service-worker.js": "/service-worker.js",
     "static/css/2.f351e075.chunk.css.map": "/static/css/2.f351e075.chunk.css.map",
     "static/css/main.3ff22ab7.chunk.css.map": "/static/css/main.3ff22ab7.chunk.css.map",
-    "static/js/2.0f6805cf.chunk.js.LICENSE.txt": "/static/js/2.0f6805cf.chunk.js.LICENSE.txt",
+    "static/js/2.145e846a.chunk.js.LICENSE.txt": "/static/js/2.145e846a.chunk.js.LICENSE.txt",
     "static/media/agogo1.wav": "/static/media/agogo1.1065034e.wav",
     "static/media/agogo2.wav": "/static/media/agogo2.0e4e658f.wav",
     "static/media/bass.wav": "/static/media/bass.b2419d4f.wav",
+    "static/media/berimbau1.wav": "/static/media/berimbau1.92d78ab8.wav",
+    "static/media/berimbau2.wav": "/static/media/berimbau2.21b5be71.wav",
+    "static/media/berimbau3.wav": "/static/media/berimbau3.5677fbc6.wav",
     "static/media/block.wav": "/static/media/block.3753c44b.wav",
     "static/media/block1.wav": "/static/media/block1.d9f8c3a9.wav",
     "static/media/block2.wav": "/static/media/block2.7e7a9a59.wav",
@@ -57,8 +60,8 @@
   "entrypoints": [
     "static/js/runtime-main.f0083627.js",
     "static/css/2.f351e075.chunk.css",
-    "static/js/2.0f6805cf.chunk.js",
+    "static/js/2.145e846a.chunk.js",
     "static/css/main.3ff22ab7.chunk.css",
-    "static/js/main.d628449b.chunk.js"
+    "static/js/main.a94358a9.chunk.js"
   ]
 }
