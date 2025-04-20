@@ -14,8 +14,11 @@ import {
 
 import { channels } from "~/framework/channels";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { createPattern } from "~/framework/patterns";
 import { Button } from "~/components/button";
+import * as Tone from "tone";
+import { useEffect, useRef, useState } from "react";
+import { Channel } from "~/components/Channel";
+import { createPattern } from "~/framework/patterns";
 
 export const meta: MetaFunction = () => {
   return [
@@ -28,20 +31,38 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const cookieHeader = request.headers.get("Cookie");
   const cookie = (await channels.parse(cookieHeader)) || [];
 
-  return Response.json({ channels: cookie.channels || [] });
+  return { channels: (cookie.channels as Channel[]) || [] };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const cookieHeader = request.headers.get("Cookie");
   const cookie = (await channels.parse(cookieHeader)) || {};
   const formData = await request.formData();
-  const patterns = cookie.hasOwnProperty("channels") ? cookie.channels : [];
+  const patterns: Channel[] | [] = Object.hasOwn(cookie, "channels")
+    ? cookie.channels
+    : [];
 
   if (formData.get("action") === "add") {
+    const isEuclidian = new RegExp("^(\\d+),(\\d+)$");
+    const isBinary = new RegExp("^[0-1]{1,}$");
+    const pattern = formData.get("pattern") as string;
+    let necklace: (0 | 1)[];
+
+    if (isEuclidian.test(pattern)) {
+      const [pulse, steps] = pattern
+        .split(",")
+        .map((number) => parseInt(number))
+        .sort((a, b) => a - b);
+
+      necklace = createPattern(pulse, steps);
+    } else if (isBinary.test(pattern)) {
+      necklace = createPattern(pattern);
+    }
+
     cookie.channels = [
       {
         id: Date.now(),
-        pattern: formData.get("pattern"),
+        pattern: necklace.join(""),
         bpm: formData.get("tempo"),
         sample: formData.get("sample"),
         isPlaying: true,
@@ -49,11 +70,22 @@ export async function action({ request }: ActionFunctionArgs) {
       ...patterns,
     ];
   }
+
   if (formData.get("action") === "delete") {
     cookie.channels = patterns.filter((p) => p.id != formData.get("id"));
   }
 
-  return Response.json(cookie.channels, {
+  if (formData.get("action") === "edit") {
+    cookie.channels = patterns.map((p) =>
+      p.id == formData.get("id")
+        ? {
+            ...p,
+            pattern: formData.get("pattern"),
+          }
+        : p,
+    );
+  }
+  return Response.json(cookie.channels as Channel[], {
     headers: {
       "Set-Cookie": await channels.serialize(cookie),
     },
@@ -63,7 +95,33 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Index() {
   const fetcher = useFetcher();
   const { channels } = useLoaderData<typeof loader>();
-  console.log(`🐞🐞🐞 channels`, channels);
+  const [sample, setSample] = useState("/samples/kick2.wav");
+  const playerRef = useRef<Tone.Player | null>(null);
+
+  useEffect(() => {
+    // Create a Tone.Player instance
+    const player = new Tone.Player({
+      url: sample,
+    }).toDestination();
+
+    // Store the player instance in the ref's .current property
+    // This does NOT cause a re-render
+    playerRef.current = player;
+
+    // --- Cleanup Function ---
+    // This function is returned by useEffect and runs when:
+    // 1. The component unmounts
+    // 2. The `sampleUrl` dependency changes (before the effect runs again)
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.dispose();
+      }
+    };
+  }, [sample]);
+
+  const previewSample = () => {
+    playerRef.current.start(0);
+  };
 
   return (
     <div className="flex w-full flex-col">
@@ -111,12 +169,17 @@ export default function Index() {
             />
           </div>
           <div className="flex shadow-sm rounded-r-md">
-            <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
-              <PlayIcon className="h-5 w-5 " />
+            <span className="bg-red-500 hover:bg-red-700 inline-flex items-center px-2 rounded-l-md border-r-0 border-gray-300 text-white-500 text-sm">
+              <PlayIcon className="h-5 w-5" onClick={() => previewSample()} />
             </span>
-            <select name="sampler" className="text-black rounded-r-md px-2">
-              <option value="kick.wav">kick</option>
-              <option value="hithat.wav">hithat</option>
+            <select
+              name="sampler"
+              className="text-black rounded-r-md px-2"
+              value={sample}
+              onChange={(e) => setSample(e.target.value)}
+            >
+              <option value="/samples/kick2.wav">kick</option>
+              <option value="/samples/bass.wav">bass</option>
             </select>
           </div>
           <input name="action" value="add" type="hidden" />
@@ -125,55 +188,9 @@ export default function Index() {
       </div>
 
       <div className="space-y-4 mt-4 p-4">
-        {channels &&
-          channels.length > 0 &&
-          channels.map((track) => {
-            const { pattern, bpm } = track;
-            const isEuclidian = new RegExp("^(\\d+),(\\d+)$");
-            const isBinary = new RegExp("^[0-1]{1,}$");
-            let necklace;
-
-            if (isEuclidian.test(pattern)) {
-              const [pulse, steps] = pattern
-                .split(",")
-                .map((number) => parseInt(number))
-                .sort((a, b) => a - b);
-
-              necklace = createPattern(pulse, steps);
-            } else if (isBinary.test(pattern)) {
-              necklace = createPattern(pattern);
-            }
-
-            return (
-              <div key={track.id}>
-                <fetcher.Form
-                  method="post"
-                  className="flex rounded-md shadow-sm space-x-2"
-                >
-                  <>
-                    <p className="mb-4">Padrão: {necklace.join(",")}</p>
-                    <p className="mb-4">bpm: {bpm}</p>
-                    <div className="space-x-2">
-                      {necklace.map((isActive, index) => (
-                        <button
-                          key={index}
-                          className={`
-                      w-12 h-12 rounded-md transition-colors
-                      ${isActive === 1 ? "bg-blue-500" : "bg-gray-700"}
-                    `}
-                        />
-                      ))}
-                    </div>
-                    <input type="hidden" value="delete" name="action" />
-                    <input type="hidden" value={track.id} name="id" />
-                    <Button>
-                      <TrashIcon className="h-4 w-4 text-white" />
-                    </Button>
-                  </>
-                </fetcher.Form>
-              </div>
-            );
-          })}
+        {channels.map((track) => (
+          <Channel key={track.id} track={track} />
+        ))}
       </div>
     </div>
   );

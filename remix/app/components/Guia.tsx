@@ -1,5 +1,5 @@
 import { useFetcher } from "@remix-run/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback, useMemo } from "react";
 import { createPattern } from "~/framework/patterns";
 import {
   connectDots,
@@ -19,95 +19,126 @@ type Props = {
   currentStep: number;
 };
 
+// Define proper type for pattern position
+interface PatternPosition {
+  x: number;
+  y: number;
+  dot: Path2D;
+}
+
 export default function Guia({ id, pattern, currentStep }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const patternPos = [] as number[];
-  const necklace = createPattern(pattern);
   const fetcher = useFetcher();
 
-  const draw = (context: CanvasRenderingContext2D) => {
-    context.clearRect(0, 0, width, height);
-    drawOuterCircle(context);
-    let patternDots: number[] = [];
+  // Create memoized pattern to avoid recalculations
+  const necklace = useMemo(() => createPattern(pattern), [pattern]);
 
-    const startAngle = -0.5 * Math.PI;
-    const angle = (2 * Math.PI) / necklace.length;
-    const radius = theme["outer-circle-radius"];
+  // Initialize pattern positions with proper typing
+  const patternPos = useRef<PatternPosition[]>([]);
 
-    for (let i = 0; i < necklace.length; i++) {
-      let dot;
-      const a = startAngle + angle * i;
-      const [x, y] = coords(a, radius);
-      if (necklace[i] === 1) {
-        dot = drawDotOn(context, x, y);
-        patternDots.push([x, y]);
-      } else {
-        dot = drawDotOff(context, x, y);
+  // Move draw function outside render cycle with useCallback
+  const draw = useCallback(
+    (context: CanvasRenderingContext2D) => {
+      context.clearRect(0, 0, width, height);
+      drawOuterCircle(context);
+      const patternDots: Array<[number, number]> = [];
+
+      const startAngle = -0.5 * Math.PI;
+      const angle = (2 * Math.PI) / necklace.length;
+      const radius = theme["outer-circle-radius"];
+
+      // Clear existing pattern positions
+      patternPos.current = [];
+
+      for (let i = 0; i < necklace.length; i++) {
+        const a = startAngle + angle * i;
+        const [x, y] = coords(a, radius);
+        let dot: Path2D;
+
+        if (necklace[i] === 1) {
+          dot = drawDotOn(context, x, y);
+          patternDots.push([x, y]);
+        } else {
+          dot = drawDotOff(context, x, y);
+        }
+
+        patternPos.current[i] = { x, y, dot };
       }
-      patternPos[i] = { x, y, dot };
-    }
 
-    if (patternDots.length >= 1) {
-      connectDots(context, patternDots);
-    }
+      if (patternDots.length >= 1) {
+        connectDots(context, patternDots);
+      }
 
-    const beatX = patternPos[currentStep].x;
-    const beatY = patternPos[currentStep].y;
-    drawDotBeat(context, beatX, beatY);
-  };
+      const beatX = patternPos.current[currentStep].x;
+      const beatY = patternPos.current[currentStep].y;
+      drawDotBeat(context, beatX, beatY);
+    },
+    [necklace, currentStep],
+  );
 
+  // Handle canvas rendering with proper dependencies
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    if (canvas) {
-      const context = canvasRef.current.getContext("2d");
-      if (context) {
-        const render = () => {
-          draw(context);
-        };
-        render();
-      }
-    }
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    draw(context);
+
+    // No dependency on draw itself since it's wrapped in useCallback
   }, [draw]);
 
-  const handleClick = (event) => {
+  const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     event.stopPropagation();
     console.log(`🐞🐞🐞 handle Click`);
 
     const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvasRef.current.getContext("2d");
-      if (ctx) {
-        patternPos.forEach((circ, index) => {
-          if (
-            ctx.isPointInPath(
-              circ.dot,
-              event.nativeEvent.offsetX,
-              event.nativeEvent.offsetY,
-            )
-          ) {
-            const clone = [...pattern];
-            clone[index] = clone[index] === 1 ? 0 : 1;
+    if (!canvas) return;
 
-            console.log(`🐞🐞🐞 edit`, clone.join(""));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-            fetcher.submit(
-              {
-                id: id,
-                action: "edit",
-                pattern: createPattern(clone.join("")),
-              },
-              { method: "POST" },
-            );
-          }
-        });
+    // Ensure we have pattern positions
+    if (patternPos.current.length === 0) return;
+
+    // Check each dot to see if it was clicked
+    for (let index = 0; index < patternPos.current.length; index++) {
+      const circ = patternPos.current[index];
+
+      // Use isPointInPath as in original code
+      if (
+        ctx.isPointInPath(
+          circ.dot,
+          event.nativeEvent.offsetX,
+          event.nativeEvent.offsetY,
+        )
+      ) {
+        // Convert pattern string to array for manipulation
+        const patternArray = pattern.split("");
+        patternArray[index] = patternArray[index] === "1" ? "0" : "1";
+        const newPattern = patternArray.join("");
+
+        // Submit form with the updated pattern
+        fetcher.submit(
+          {
+            id: id,
+            action: "edit",
+            pattern: newPattern,
+          },
+          { method: "POST" },
+        );
+
+        // Exit after processing the first clicked dot
+        break;
       }
     }
   };
 
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="space-y-2">
       <canvas
+        key={id}
         ref={canvasRef}
         width={width}
         height={height}
