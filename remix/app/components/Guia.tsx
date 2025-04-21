@@ -91,7 +91,6 @@ export default function Guia({ id, pattern, currentStep }: Props) {
 
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     event.stopPropagation();
-    console.log(`🐞🐞🐞 handle Click`);
 
     const canvas = canvasRef.current;
     if (!canvas) return;

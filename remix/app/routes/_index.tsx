@@ -198,7 +198,7 @@ export default function Index() {
         </fetcher.Form>
       </div>
 
-      <div className="space-y-4 mt-4 p-4">
+      <div className="flex space-y-4 mt-4 p-4">
         {channels.map((track) => (
           <Channel key={track.id} track={track} />
         ))}
