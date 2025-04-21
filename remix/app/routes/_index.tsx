@@ -4,13 +4,7 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 
-import {
-  BackwardIcon,
-  ForwardIcon,
-  PlayIcon,
-  StopIcon,
-  TrashIcon,
-} from "@heroicons/react/16/solid";
+import { PlayIcon, StopIcon } from "@heroicons/react/16/solid";
 
 import { channels } from "~/framework/channels";
 import { useFetcher, useLoaderData } from "@remix-run/react";
@@ -57,6 +51,8 @@ export async function action({ request }: ActionFunctionArgs) {
       necklace = createPattern(pulse, steps);
     } else if (isBinary.test(pattern)) {
       necklace = createPattern(pattern);
+    } else {
+      throw Error("Padrão inválido!");
     }
 
     cookie.channels = [
@@ -99,6 +95,19 @@ export default function Index() {
   const playerRef = useRef<Tone.Player | null>(null);
 
   useEffect(() => {
+    document.body.addEventListener(
+      "click",
+      async () => {
+        if (Tone.getContext().state !== "running") {
+          await Tone.start();
+          console.log("AudioContext started!");
+        }
+      },
+      {
+        once: true,
+      },
+    );
+
     // Create a Tone.Player instance
     const player = new Tone.Player({
       url: sample,
@@ -120,24 +129,26 @@ export default function Index() {
   }, [sample]);
 
   const previewSample = () => {
-    playerRef.current.start(0);
+    if (playerRef.current) {
+      playerRef.current.start(0);
+    }
   };
 
   return (
     <div className="flex w-full flex-col">
       <div className="flex border-y border-white w-full p-4 space-x-2">
         <div id="general-control">
-          <Button className="rounded-l-md">
-            <BackwardIcon className="h-5 w-5" />
-          </Button>
-          <Button>
+          <Button
+            className="rounded-l-md"
+            onClick={() => Tone.getTransport().start()}
+          >
             <PlayIcon className="h-5 w-5 " />
           </Button>
-          <Button>
+          <Button
+            className="rounded-r-md"
+            onClick={() => Tone.getTransport().stop()}
+          >
             <StopIcon className="h-5 w-5" />
-          </Button>
-          <Button className="rounded-r-md">
-            <ForwardIcon className="h-5 w-5" />
           </Button>
         </div>
 
@@ -173,7 +184,7 @@ export default function Index() {
               <PlayIcon className="h-5 w-5" onClick={() => previewSample()} />
             </span>
             <select
-              name="sampler"
+              name="sample"
               className="text-black rounded-r-md px-2"
               value={sample}
               onChange={(e) => setSample(e.target.value)}
