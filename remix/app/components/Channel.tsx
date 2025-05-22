@@ -20,6 +20,8 @@ function Channel({ track }: { track: Channel }) {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const playerRef = useRef<Tone.Player | null>(null);
   const sequenceRef = useRef<Tone.Sequence | null>(null);
+  const contextRef = useRef<Tone.Context | null>(null);
+  const channelRef = useRef<Tone.Channel | null>(null);
   const necklace = createPattern(pattern);
   const size = necklace.length;
 
@@ -34,36 +36,80 @@ function Channel({ track }: { track: Channel }) {
   }, []);
 
   useEffect(() => {
+    const context = new Tone.Context();
+    contextRef.current = context;
+
+    const channel = new Tone.Channel({
+      context,
+      pan: 0,
+      volume: 0,
+    });
+    channelRef.current = channel;
+
     const player = new Tone.Player({
       url: sample,
-    }).toDestination();
+      context,
+    });
 
     playerRef.current = player;
 
-    const sequence = new Tone.Sequence(
-      (time, step) => {
-        if (necklace[step] && playerRef.current) {
-          playerRef.current.start(time);
-        }
-        Tone.getDraw().schedule(() => {
-          setCurrentStep(step);
-        }, time);
-      },
-      [...Array(size).keys()], // steps 0-15
-      `${size}n`, // sixteenth notes
-    );
+    context.transport.bpm.value = bpm;
+
+    const tick = (time: number, step: number) => {
+      if (necklace[step] && playerRef.current) {
+        playerRef.current.start(time).chain(channel, context.destination);
+      }
+
+      context.draw.schedule(() => {
+        setCurrentStep(step);
+      }, time);
+    };
+
+    const sequence = new Tone.Sequence({
+      callback: tick,
+      context,
+      events: [...Array(size).keys()],
+      subdivision: `${size}n`,
+    }).start(0);
 
     sequenceRef.current = sequence;
 
     if (isPlaying) {
+      context.transport.start();
       sequenceRef.current.start(0);
     }
 
     return () => {
-      sequence.dispose();
-      player.dispose();
+      try {
+        // Check if the sequence is actually playing before stopping it
+        if (sequenceRef.current && sequenceRef.current.state === "started") {
+          sequenceRef.current.stop();
+        }
+
+        if (sequenceRef.current) {
+          sequenceRef.current.dispose();
+        }
+
+        if (playerRef.current) {
+          // Stop only if the player is active
+          if (playerRef.current.state === "started") {
+            playerRef.current.stop();
+          }
+          playerRef.current.dispose();
+        }
+
+        if (channelRef.current) {
+          channelRef.current.dispose();
+        }
+
+        if (contextRef.current) {
+          contextRef.current.dispose();
+        }
+      } catch (error) {
+        console.error("Error during cleanup:", error);
+      }
     };
-  }, [pattern]);
+  }, [pattern, bpm, sample, isPlaying, necklace.length]);
 
   const handleDelete = () => {
     fetcher.submit(
