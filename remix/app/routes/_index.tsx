@@ -13,6 +13,7 @@ import * as Tone from "tone";
 import { useEffect, useRef, useState } from "react";
 import { Channel } from "~/components/Channel";
 import { createPattern } from "~/framework/patterns";
+import { instruments } from "~/framework/instruments";
 
 export const meta: MetaFunction = () => {
   return [
@@ -91,7 +92,9 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Index() {
   const fetcher = useFetcher();
   const { channels } = useLoaderData<typeof loader>();
-  const [sample, setSample] = useState("/samples/kick2.wav");
+  const [sample, setSample] = useState(
+    "/samples/brazilian-percussion/agogo1.wav",
+  );
   const playerRef = useRef<Tone.Player | null>(null);
 
   useEffect(() => {
@@ -189,8 +192,11 @@ export default function Index() {
               value={sample}
               onChange={(e) => setSample(e.target.value)}
             >
-              <option value="/samples/kick2.wav">kick</option>
-              <option value="/samples/bass.wav">bass</option>
+              {instruments.map((instrument) => (
+                <option key={instrument.name} value={instrument.path}>
+                  {instrument.name}
+                </option>
+              ))}
             </select>
           </div>
           <input name="action" value="add" type="hidden" />
