@@ -82,6 +82,18 @@ export async function action({ request }: ActionFunctionArgs) {
         : p,
     );
   }
+
+  if (formData.get("action") === "instrument") {
+    cookie.channels = patterns.map((p) =>
+      p.id == formData.get("id")
+        ? {
+            ...p,
+            sample: formData.get("sample"),
+          }
+        : p,
+    );
+  }
+
   if (formData.get("action") === "play") {
     if (formData.get("id")) {
       cookie.channels = patterns.map((p) =>
