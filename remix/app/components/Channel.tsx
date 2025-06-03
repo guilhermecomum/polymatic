@@ -121,6 +121,26 @@ function Channel({ track }: { track: Channel }) {
     );
   };
 
+  const handlePause = () => {
+    fetcher.submit(
+      {
+        action: "pause",
+        id,
+      },
+      { method: "POST" },
+    );
+  };
+
+  const handleResume = () => {
+    fetcher.submit(
+      {
+        action: "play",
+        id,
+      },
+      { method: "POST" },
+    );
+  };
+
   return (
     <div key={id}>
       <div className="flex flex-col rounded-md shadow-sm space-x-2">
@@ -135,9 +155,15 @@ function Channel({ track }: { track: Channel }) {
         </Button>
         <Button>
           {isPlaying ? (
-            <PauseIcon className="h-4 w-4 text-white" />
+            <PauseIcon
+              className="h-4 w-4 text-white"
+              onClick={() => handlePause()}
+            />
           ) : (
-            <PlayIcon className="h-4 w-4 text-white" />
+            <PlayIcon
+              className="h-4 w-4 text-white"
+              onClick={() => handleResume()}
+            />
           )}
         </Button>
       </div>

@@ -82,6 +82,41 @@ export async function action({ request }: ActionFunctionArgs) {
         : p,
     );
   }
+  if (formData.get("action") === "play") {
+    if (formData.get("id")) {
+      cookie.channels = patterns.map((p) =>
+        p.id == formData.get("id")
+          ? {
+              ...p,
+              isPlaying: true,
+            }
+          : p,
+      );
+    } else {
+      cookie.channels = patterns.map((p) => ({
+        ...p,
+        isPlaying: true,
+      }));
+    }
+  }
+
+  if (formData.get("action") === "pause") {
+    if (formData.get("id")) {
+      cookie.channels = patterns.map((p) =>
+        p.id == formData.get("id")
+          ? {
+              ...p,
+              isPlaying: false,
+            }
+          : p,
+      );
+    } else {
+      cookie.channels = patterns.map((p) => ({
+        ...p,
+        isPlaying: false,
+      }));
+    }
+  }
   return Response.json(cookie.channels as Channel[], {
     headers: {
       "Set-Cookie": await channels.serialize(cookie),
@@ -137,20 +172,32 @@ export default function Index() {
     }
   };
 
+  const handlePlay = () => {
+    fetcher.submit(
+      {
+        action: "play",
+      },
+      { method: "POST" },
+    );
+  };
+
+  const handlePause = () => {
+    fetcher.submit(
+      {
+        action: "pause",
+      },
+      { method: "POST" },
+    );
+  };
+
   return (
     <div className="flex w-full flex-col">
       <div className="flex border-y border-white w-full p-4 space-x-2">
         <div id="general-control">
-          <Button
-            className="rounded-l-md"
-            onClick={() => Tone.getTransport().start()}
-          >
+          <Button className="rounded-l-md" onClick={() => handlePlay()}>
             <PlayIcon className="h-5 w-5 " />
           </Button>
-          <Button
-            className="rounded-r-md"
-            onClick={() => Tone.getTransport().stop()}
-          >
+          <Button className="rounded-r-md" onClick={() => handlePause()}>
             <StopIcon className="h-5 w-5" />
           </Button>
         </div>
@@ -161,7 +208,7 @@ export default function Index() {
         >
           <div className="flex rounded-md shadow-sm">
             <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
-              Padrão
+              Guia
             </span>
             <input
               type="text"
