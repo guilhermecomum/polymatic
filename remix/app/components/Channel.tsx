@@ -5,6 +5,7 @@ import Guia from "./Guia";
 import * as Tone from "tone";
 import { useEffect, useRef, useState } from "react";
 import { createPattern } from "~/framework/patterns";
+import { instruments } from "~/framework/instruments";
 
 type Channel = {
   id: string;
@@ -121,6 +122,37 @@ function Channel({ track }: { track: Channel }) {
     );
   };
 
+  const handlePause = () => {
+    fetcher.submit(
+      {
+        action: "pause",
+        id,
+      },
+      { method: "POST" },
+    );
+  };
+
+  const handleResume = () => {
+    fetcher.submit(
+      {
+        action: "play",
+        id,
+      },
+      { method: "POST" },
+    );
+  };
+
+  const handleEdit = (e: React.FormEvent<HTMLSelectElement>, id: string) => {
+    fetcher.submit(
+      {
+        action: "instrument",
+        id,
+        sample: e.currentTarget.value,
+      },
+      { method: "POST" },
+    );
+  };
+
   return (
     <div key={id}>
       <div className="flex flex-col rounded-md shadow-sm space-x-2">
@@ -130,14 +162,32 @@ function Channel({ track }: { track: Channel }) {
         </div>
         <input type="hidden" value="delete" name="action" />
         <input type="hidden" value={track.id} name="id" />
+        <select
+          name="sample"
+          className="text-black rounded-r-md px-2"
+          value={sample}
+          onChange={(e) => handleEdit(e, track.id)}
+        >
+          {instruments.map((instrument) => (
+            <option key={instrument.name} value={instrument.path}>
+              {instrument.name}
+            </option>
+          ))}
+        </select>
         <Button onClick={() => handleDelete()}>
           <TrashIcon className="h-4 w-4 text-white" />
         </Button>
         <Button>
           {isPlaying ? (
-            <PauseIcon className="h-4 w-4 text-white" />
+            <PauseIcon
+              className="h-4 w-4 text-white"
+              onClick={() => handlePause()}
+            />
           ) : (
-            <PlayIcon className="h-4 w-4 text-white" />
+            <PlayIcon
+              className="h-4 w-4 text-white"
+              onClick={() => handleResume()}
+            />
           )}
         </Button>
       </div>
