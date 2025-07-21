@@ -70,7 +70,6 @@ function Channel({ track }: { track: Channel }) {
       callback: tick,
       context,
       events: [...Array(size).keys()],
-      subdivision: `${size}n`,
     }).start(0);
 
     sequenceRef.current = sequence;
