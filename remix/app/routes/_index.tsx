@@ -60,7 +60,6 @@ export async function action({ request }: ActionFunctionArgs) {
       {
         id: Date.now(),
         pattern: necklace.join(""),
-        bpm: formData.get("tempo"),
         sample: formData.get("sample"),
         isPlaying: true,
       },
@@ -213,18 +212,6 @@ export default function Index() {
               name="pattern"
               className="flex-1 block text-black rounded-r-md pl-2 border-gray-300 sm:text-sm"
               placeholder="10101011 ou 3,2"
-            />
-          </div>
-
-          <div className="flex rounded-md shadow-sm">
-            <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
-              Tempo
-            </span>
-            <input
-              type="text"
-              name="tempo"
-              className="flex-1 block text-black rounded-r-md pl-2 border-gray-300  sm:text-sm"
-              defaultValue={120}
             />
           </div>
           <div className="flex shadow-sm rounded-r-md">
