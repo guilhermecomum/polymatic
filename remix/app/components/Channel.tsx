@@ -157,7 +157,6 @@ function Channel({ track }: { track: Channel }) {
       <div className="flex flex-col rounded-md shadow-sm space-x-2">
         <div className="space-x-2">
           <Guia id={id} pattern={pattern} currentStep={currentStep} />
-          <p className="mb-4">bpm: {bpm}</p>
         </div>
         <input type="hidden" value="delete" name="action" />
         <input type="hidden" value={track.id} name="id" />
