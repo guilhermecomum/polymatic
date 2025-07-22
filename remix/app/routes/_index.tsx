@@ -184,23 +184,9 @@ export default function Index() {
     }
   };
 
-  const handlePlay = () => {
-    fetcher.submit(
-      {
-        action: "play",
-      },
-      { method: "POST" },
-    );
-  };
+  const handlePlay = () => Tone.getTransport().start();
 
-  const handlePause = () => {
-    fetcher.submit(
-      {
-        action: "pause",
-      },
-      { method: "POST" },
-    );
-  };
+  const handlePause = () => Tone.getTransport().stop();
 
   return (
     <div className="flex w-full flex-col">
