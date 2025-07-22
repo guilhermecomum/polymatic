@@ -10,18 +10,17 @@ import { instruments } from "~/framework/instruments";
 type Channel = {
   id: string;
   pattern: string;
-  bpm: number;
   sample: string;
-  isPlaying: boolean;
 };
 
 function Channel({ track }: { track: Channel }) {
   const fetcher = useFetcher();
-  const { pattern, bpm, id, sample, isPlaying } = track;
+  const { pattern, id, sample } = track;
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [volume, setVolume] = useState<number>(100);
   const playerRef = useRef<Tone.Player | null>(null);
   const sequenceRef = useRef<Tone.Sequence | null>(null);
-  const contextRef = useRef<Tone.Context | null>(null);
   const channelRef = useRef<Tone.Channel | null>(null);
   const necklace = createPattern(pattern);
   const size = necklace.length;
@@ -37,47 +36,33 @@ function Channel({ track }: { track: Channel }) {
   }, []);
 
   useEffect(() => {
-    const context = new Tone.Context();
-    contextRef.current = context;
-
     const channel = new Tone.Channel({
-      context,
-      pan: 0,
-      volume: 0,
-    });
+      volume: percentToDb(volume),
+    }).toDestination();
     channelRef.current = channel;
 
     const player = new Tone.Player({
       url: sample,
-      context,
-    });
+    }).connect(channel);
 
     playerRef.current = player;
 
-    context.transport.bpm.value = bpm;
-
     const tick = (time: number, step: number) => {
       if (necklace[step] && playerRef.current) {
-        playerRef.current.start(time).chain(channel, context.destination);
+        playerRef.current.start(time);
       }
 
-      context.draw.schedule(() => {
+      Tone.getDraw().schedule(() => {
         setCurrentStep(step);
       }, time);
     };
 
     const sequence = new Tone.Sequence({
       callback: tick,
-      context,
       events: [...Array(size).keys()],
     }).start(0);
 
     sequenceRef.current = sequence;
-
-    if (isPlaying) {
-      context.transport.start();
-      sequenceRef.current.start(0);
-    }
 
     return () => {
       try {
@@ -101,15 +86,11 @@ function Channel({ track }: { track: Channel }) {
         if (channelRef.current) {
           channelRef.current.dispose();
         }
-
-        if (contextRef.current) {
-          contextRef.current.dispose();
-        }
       } catch (error) {
         console.error("Error during cleanup:", error);
       }
     };
-  }, [pattern, bpm, sample, isPlaying, necklace.length]);
+  }, [pattern, sample, necklace.length]);
 
   const handleDelete = () => {
     fetcher.submit(
@@ -122,23 +103,19 @@ function Channel({ track }: { track: Channel }) {
   };
 
   const handlePause = () => {
-    fetcher.submit(
-      {
-        action: "pause",
-        id,
-      },
-      { method: "POST" },
-    );
+    setIsPlaying(false);
+    const channel = channelRef.current;
+    channel?.set({
+      mute: true,
+    });
   };
 
   const handleResume = () => {
-    fetcher.submit(
-      {
-        action: "play",
-        id,
-      },
-      { method: "POST" },
-    );
+    setIsPlaying(true);
+    const channel = channelRef.current;
+    channel?.set({
+      mute: false,
+    });
   };
 
   const handleEdit = (e: React.FormEvent<HTMLSelectElement>, id: string) => {
@@ -152,11 +129,30 @@ function Channel({ track }: { track: Channel }) {
     );
   };
 
+  function percentToDb(percent: number) {
+    if (percent <= 0) return -1000; // Silence
+    if (percent >= 100) return 0; // Maximum
+    return percent * 0.3 - 24;
+  }
+
+  const handleVolume = (value: number) => {
+    const channel = channelRef.current;
+    channel?.set({
+      volume: percentToDb(value),
+    });
+    setVolume(value);
+  };
+
   return (
     <div key={id}>
       <div className="flex flex-col rounded-md shadow-sm space-x-2">
         <div className="space-x-2">
-          <Guia id={id} pattern={pattern} currentStep={currentStep} />
+          <Guia
+            id={id}
+            pattern={pattern}
+            currentStep={currentStep}
+            isPlaying={isPlaying}
+          />
         </div>
         <input type="hidden" value="delete" name="action" />
         <input type="hidden" value={track.id} name="id" />
@@ -175,19 +171,30 @@ function Channel({ track }: { track: Channel }) {
         <Button onClick={() => handleDelete()}>
           <TrashIcon className="h-4 w-4 text-white" />
         </Button>
-        <Button>
-          {isPlaying ? (
+        {isPlaying ? (
+          <Button>
             <PauseIcon
               className="h-4 w-4 text-white"
               onClick={() => handlePause()}
             />
-          ) : (
+          </Button>
+        ) : (
+          <Button>
             <PlayIcon
               className="h-4 w-4 text-white"
               onClick={() => handleResume()}
             />
-          )}
-        </Button>
+          </Button>
+        )}
+        <input
+          type="range"
+          id="volume"
+          name="volume"
+          min="0"
+          max="100"
+          value={volume}
+          onChange={(e) => handleVolume(Number(e.target.value))}
+        />
       </div>
     </div>
   );

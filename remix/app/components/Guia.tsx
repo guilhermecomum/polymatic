@@ -17,6 +17,7 @@ type Props = {
   id: string;
   pattern: string;
   currentStep: number;
+  isPlaying: boolean;
 };
 
 // Define proper type for pattern position
@@ -26,7 +27,7 @@ interface PatternPosition {
   dot: Path2D;
 }
 
-export default function Guia({ id, pattern, currentStep }: Props) {
+export default function Guia({ id, pattern, currentStep, isPlaying }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fetcher = useFetcher();
 
@@ -84,10 +85,10 @@ export default function Guia({ id, pattern, currentStep }: Props) {
     const context = canvas.getContext("2d");
     if (!context) return;
 
-    draw(context);
+    isPlaying && draw(context);
 
     // No dependency on draw itself since it's wrapped in useCallback
-  }, [draw]);
+  }, [draw, isPlaying]);
 
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     event.stopPropagation();
