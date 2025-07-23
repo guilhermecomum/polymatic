@@ -14,9 +14,11 @@ import {
 } from "~/framework/ui";
 
 type Props = {
-  id: string;
+  id: number;
   pattern: string;
   currentStep: number;
+  isPlaying: boolean;
+  onEdit: any;
 };
 
 // Define proper type for pattern position
@@ -26,9 +28,14 @@ interface PatternPosition {
   dot: Path2D;
 }
 
-export default function Guia({ id, pattern, currentStep }: Props) {
+export default function Guia({
+  id,
+  pattern,
+  currentStep,
+  isPlaying,
+  onEdit,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fetcher = useFetcher();
 
   // Create memoized pattern to avoid recalculations
   const necklace = useMemo(() => createPattern(pattern), [pattern]);
@@ -84,10 +91,10 @@ export default function Guia({ id, pattern, currentStep }: Props) {
     const context = canvas.getContext("2d");
     if (!context) return;
 
-    draw(context);
+    isPlaying && draw(context);
 
     // No dependency on draw itself since it's wrapped in useCallback
-  }, [draw]);
+  }, [draw, isPlaying]);
 
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     event.stopPropagation();
@@ -119,15 +126,8 @@ export default function Guia({ id, pattern, currentStep }: Props) {
         const newPattern = patternArray.join("");
 
         // Submit form with the updated pattern
-        fetcher.submit(
-          {
-            id: id,
-            action: "edit",
-            pattern: newPattern,
-          },
-          { method: "POST" },
-        );
 
+        onEdit(id, newPattern);
         // Exit after processing the first clicked dot
         break;
       }

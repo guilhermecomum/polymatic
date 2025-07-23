@@ -1,13 +1,7 @@
-import {
-  ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  type MetaFunction,
-} from "@remix-run/node";
+import { type MetaFunction } from "@remix-run/node";
 
 import { PlayIcon, StopIcon } from "@heroicons/react/16/solid";
 
-import { channels } from "~/framework/channels";
-import { useFetcher, useLoaderData } from "@remix-run/react";
 import { Button } from "~/components/button";
 import * as Tone from "tone";
 import { useEffect, useRef, useState } from "react";
@@ -22,123 +16,9 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const cookieHeader = request.headers.get("Cookie");
-  const cookie = (await channels.parse(cookieHeader)) || [];
-
-  return { channels: (cookie.channels as Channel[]) || [] };
-}
-
-export async function action({ request }: ActionFunctionArgs) {
-  const cookieHeader = request.headers.get("Cookie");
-  const cookie = (await channels.parse(cookieHeader)) || {};
-  const formData = await request.formData();
-  const patterns: Channel[] | [] = Object.hasOwn(cookie, "channels")
-    ? cookie.channels
-    : [];
-
-  if (formData.get("action") === "add") {
-    const isEuclidian = new RegExp("^(\\d+),(\\d+)$");
-    const isBinary = new RegExp("^[0-1]{1,}$");
-    const pattern = formData.get("pattern") as string;
-    let necklace: (0 | 1)[];
-
-    if (isEuclidian.test(pattern)) {
-      const [pulse, steps] = pattern
-        .split(",")
-        .map((number) => parseInt(number))
-        .sort((a, b) => a - b);
-
-      necklace = createPattern(pulse, steps);
-    } else if (isBinary.test(pattern)) {
-      necklace = createPattern(pattern);
-    } else {
-      throw Error("Padrão inválido!");
-    }
-
-    cookie.channels = [
-      {
-        id: Date.now(),
-        pattern: necklace.join(""),
-        bpm: formData.get("tempo"),
-        sample: formData.get("sample"),
-        isPlaying: true,
-      },
-      ...patterns,
-    ];
-  }
-
-  if (formData.get("action") === "delete") {
-    cookie.channels = patterns.filter((p) => p.id != formData.get("id"));
-  }
-
-  if (formData.get("action") === "edit") {
-    cookie.channels = patterns.map((p) =>
-      p.id == formData.get("id")
-        ? {
-            ...p,
-            pattern: formData.get("pattern"),
-          }
-        : p,
-    );
-  }
-
-  if (formData.get("action") === "instrument") {
-    cookie.channels = patterns.map((p) =>
-      p.id == formData.get("id")
-        ? {
-            ...p,
-            sample: formData.get("sample"),
-          }
-        : p,
-    );
-  }
-
-  if (formData.get("action") === "play") {
-    if (formData.get("id")) {
-      cookie.channels = patterns.map((p) =>
-        p.id == formData.get("id")
-          ? {
-              ...p,
-              isPlaying: true,
-            }
-          : p,
-      );
-    } else {
-      cookie.channels = patterns.map((p) => ({
-        ...p,
-        isPlaying: true,
-      }));
-    }
-  }
-
-  if (formData.get("action") === "pause") {
-    if (formData.get("id")) {
-      cookie.channels = patterns.map((p) =>
-        p.id == formData.get("id")
-          ? {
-              ...p,
-              isPlaying: false,
-            }
-          : p,
-      );
-    } else {
-      cookie.channels = patterns.map((p) => ({
-        ...p,
-        isPlaying: false,
-      }));
-    }
-  }
-  return Response.json(cookie.channels as Channel[], {
-    headers: {
-      "Set-Cookie": await channels.serialize(cookie),
-    },
-  });
-}
-
 export default function Index() {
-  const fetcher = useFetcher();
-  const { channels } = useLoaderData<typeof loader>();
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [pattern, setPattern] = useState<string>("");
   const [sample, setSample] = useState(
     "/samples/brazilian-percussion/agogo1.wav",
   );
@@ -184,23 +64,65 @@ export default function Index() {
     }
   };
 
-  const handlePlay = () => {
-    fetcher.submit(
+  const handleCreate = () => {
+    const isEuclidian = new RegExp("^(\\d+),(\\d+)$");
+    const isBinary = new RegExp("^[0-1]{1,}$");
+    let necklace: (0 | 1)[];
+
+    if (isEuclidian.test(pattern)) {
+      const [pulse, steps] = pattern
+        .split(",")
+        .map((number) => parseInt(number))
+        .sort((a, b) => a - b);
+
+      necklace = createPattern(pulse, steps);
+    } else if (isBinary.test(pattern)) {
+      necklace = createPattern(pattern);
+    } else {
+      throw Error("Padrão inválido!");
+    }
+
+    setChannels([
+      ...channels,
       {
-        action: "play",
+        id: Date.now(),
+        pattern: necklace.join(""),
+        sample,
+        isPlaying: true,
       },
-      { method: "POST" },
-    );
+    ]);
   };
 
-  const handlePause = () => {
-    fetcher.submit(
-      {
-        action: "pause",
-      },
-      { method: "POST" },
+  const handleDelete = (id: number) =>
+    setChannels(channels.filter((p) => p.id != id));
+
+  const handleEditInstrument = (id: number, sample: string) =>
+    setChannels(
+      channels.map((p) =>
+        p.id == id
+          ? {
+              ...p,
+              sample,
+            }
+          : p,
+      ),
     );
-  };
+
+  const handleEditPattern = (id: number, pattern: string) =>
+    setChannels(
+      channels.map((p) =>
+        p.id == id
+          ? {
+              ...p,
+              pattern,
+            }
+          : p,
+      ),
+    );
+
+  const handlePlay = () => Tone.getTransport().start();
+
+  const handlePause = () => Tone.getTransport().stop();
 
   return (
     <div className="flex w-full flex-col">
@@ -214,10 +136,7 @@ export default function Index() {
           </Button>
         </div>
 
-        <fetcher.Form
-          method="post"
-          className="flex rounded-md shadow-sm space-x-2"
-        >
+        <div className="flex rounded-md shadow-sm space-x-2">
           <div className="flex rounded-md shadow-sm">
             <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
               Guia
@@ -227,18 +146,7 @@ export default function Index() {
               name="pattern"
               className="flex-1 block text-black rounded-r-md pl-2 border-gray-300 sm:text-sm"
               placeholder="10101011 ou 3,2"
-            />
-          </div>
-
-          <div className="flex rounded-md shadow-sm">
-            <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
-              Tempo
-            </span>
-            <input
-              type="text"
-              name="tempo"
-              className="flex-1 block text-black rounded-r-md pl-2 border-gray-300  sm:text-sm"
-              defaultValue={120}
+              onChange={(e) => setPattern(e.target.value)}
             />
           </div>
           <div className="flex shadow-sm rounded-r-md">
@@ -259,13 +167,19 @@ export default function Index() {
             </select>
           </div>
           <input name="action" value="add" type="hidden" />
-          <Button>Adicionar</Button>
-        </fetcher.Form>
+          <Button onClick={() => handleCreate()}>Adicionar</Button>
+        </div>
       </div>
 
       <div className="flex space-y-4 mt-4 p-4">
         {channels.map((track) => (
-          <Channel key={track.id} track={track} />
+          <Channel
+            key={track.id}
+            track={track}
+            onDelete={handleDelete}
+            onEditInstrument={handleEditInstrument}
+            onEditPattern={handleEditPattern}
+          />
         ))}
       </div>
     </div>
