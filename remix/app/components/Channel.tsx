@@ -8,13 +8,23 @@ import { createPattern } from "~/framework/patterns";
 import { instruments } from "~/framework/instruments";
 
 type Channel = {
-  id: string;
+  id: number;
   pattern: string;
   sample: string;
+  isPlaying: boolean;
 };
 
-function Channel({ track }: { track: Channel }) {
-  const fetcher = useFetcher();
+function Channel({
+  track,
+  onDelete,
+  onEditInstrument,
+  onEditPattern,
+}: {
+  track: Channel;
+  onDelete: any;
+  onEditInstrument: any;
+  onEditPattern: any;
+}) {
   const { pattern, id, sample } = track;
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
@@ -93,13 +103,7 @@ function Channel({ track }: { track: Channel }) {
   }, [pattern, sample, necklace.length]);
 
   const handleDelete = () => {
-    fetcher.submit(
-      {
-        action: "delete",
-        id,
-      },
-      { method: "POST" },
-    );
+    onDelete(id);
   };
 
   const handlePause = () => {
@@ -118,16 +122,8 @@ function Channel({ track }: { track: Channel }) {
     });
   };
 
-  const handleEdit = (e: React.FormEvent<HTMLSelectElement>, id: string) => {
-    fetcher.submit(
-      {
-        action: "instrument",
-        id,
-        sample: e.currentTarget.value,
-      },
-      { method: "POST" },
-    );
-  };
+  const handleEdit = (id: number, sample: string) =>
+    onEditInstrument(id, sample);
 
   function percentToDb(percent: number) {
     if (percent <= 0) return -1000; // Silence
@@ -152,6 +148,7 @@ function Channel({ track }: { track: Channel }) {
             pattern={pattern}
             currentStep={currentStep}
             isPlaying={isPlaying}
+            onEdit={onEditPattern}
           />
         </div>
         <input type="hidden" value="delete" name="action" />
@@ -160,7 +157,7 @@ function Channel({ track }: { track: Channel }) {
           name="sample"
           className="text-black rounded-r-md px-2"
           value={sample}
-          onChange={(e) => handleEdit(e, track.id)}
+          onChange={(e) => handleEdit(track.id, e.currentTarget.value)}
         >
           {instruments.map((instrument) => (
             <option key={instrument.name} value={instrument.path}>
