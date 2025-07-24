@@ -3,7 +3,7 @@ import { PauseIcon, PlayIcon, TrashIcon } from "@heroicons/react/16/solid";
 import Guia from "./Guia";
 import * as Tone from "tone";
 import { useEffect, useRef, useState } from "react";
-import { createPattern } from "~/framework/patterns";
+import { createPattern, shiftPattern } from "~/framework/patterns";
 import { instruments } from "~/framework/instruments";
 
 type Channel = {
@@ -28,6 +28,7 @@ function Channel({
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [volume, setVolume] = useState<number>(100);
+  const [shift, setShift] = useState(0);
   const playerRef = useRef<Tone.Player | null>(null);
   const sequenceRef = useRef<Tone.Sequence | null>(null);
   const channelRef = useRef<Tone.Channel | null>(null);
@@ -104,7 +105,7 @@ function Channel({
         console.error("Error during cleanup:", error);
       }
     };
-  }, [pattern, sample, necklace.length]);
+  }, [pattern, sample, necklace.length, shift]);
 
   const handleDelete = () => {
     onDelete(id);
@@ -143,6 +144,13 @@ function Channel({
     setVolume(value);
   };
 
+  const handleRotate = (value: number) => {
+    const isIncreasing = value > shift;
+    setShift(value);
+    const rotatePattern = shiftPattern(necklace, isIncreasing);
+    onEditPattern(id, rotatePattern.join(""), value);
+  };
+
   return (
     <div key={id}>
       <div className="flex flex-col rounded-md shadow-sm space-x-2">
@@ -159,13 +167,27 @@ function Channel({
           <p className="text-center">Padrão: {pattern}</p>
 
           <div className="flex space-x-2">
+            <span>Rotação:</span>
+            <input
+              type="range"
+              id="rotation"
+              name="rotation"
+              min={0}
+              max={pattern.length - 1}
+              step={1}
+              value={shift}
+              onChange={(e) => handleRotate(Number(e.target.value))}
+            />
+          </div>
+
+          <div className="flex space-x-2">
             <span>Volume:</span>
             <input
               type="range"
               id="volume"
               name="volume"
-              min="0"
-              max="100"
+              min={0}
+              max={100}
               value={volume}
               onChange={(e) => handleVolume(Number(e.target.value))}
             />
