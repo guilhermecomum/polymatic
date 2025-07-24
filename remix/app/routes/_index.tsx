@@ -124,50 +124,70 @@ export default function Index() {
 
   const handlePause = () => Tone.getTransport().stop();
 
+  const handleBPM = (bpm: number) => {
+    Tone.getTransport().bpm.value = bpm;
+  };
+
   return (
     <div className="flex w-full flex-col">
-      <div className="flex border-y border-white w-full p-4 space-x-2">
-        <div id="general-control">
-          <Button className="rounded-l-md" onClick={() => handlePlay()}>
-            <PlayIcon className="h-5 w-5 " />
-          </Button>
-          <Button className="rounded-r-md" onClick={() => handlePause()}>
-            <StopIcon className="h-5 w-5" />
-          </Button>
-        </div>
+      <div className="grid grid-flow-col gap-2 border-y border-white p-4 w-full">
+        <div className="flex space-x-2">
+          <div id="general-control">
+            <Button className="rounded-l-md" onClick={() => handlePlay()}>
+              <PlayIcon className="h-5 w-5 " />
+            </Button>
+            <Button className="rounded-r-md" onClick={() => handlePause()}>
+              <StopIcon className="h-5 w-5" />
+            </Button>
+          </div>
 
-        <div className="flex rounded-md shadow-sm space-x-2">
-          <div className="flex rounded-md shadow-sm">
-            <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
-              Guia
-            </span>
-            <input
-              type="text"
-              name="pattern"
-              className="flex-1 block text-black rounded-r-md pl-2 border-gray-300 sm:text-sm"
-              placeholder="10101011 ou 3,2"
-              onChange={(e) => setPattern(e.target.value)}
-            />
+          <div className="flex rounded-md shadow-sm space-x-2 justify-self-start">
+            <div className="flex rounded-md shadow-sm">
+              <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
+                Guia
+              </span>
+              <input
+                type="text"
+                name="pattern"
+                className="flex-1 block text-black rounded-r-md pl-2 border-gray-300 sm:text-sm"
+                placeholder="10101011 ou 3,2"
+                onChange={(e) => setPattern(e.target.value)}
+              />
+            </div>
+            <div className="flex shadow-sm rounded-r-md">
+              <span className="bg-red-500 hover:bg-red-700 inline-flex items-center px-2 rounded-l-md border-r-0 border-gray-300 text-white-500 text-sm">
+                <PlayIcon className="h-5 w-5" onClick={() => previewSample()} />
+              </span>
+              <select
+                name="sample"
+                className="text-black rounded-r-md px-2"
+                value={sample}
+                onChange={(e) => setSample(e.target.value)}
+              >
+                {instruments.map((instrument) => (
+                  <option key={instrument.name} value={instrument.path}>
+                    {instrument.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <Button className="rounded-md" onClick={() => handleCreate()}>
+              Adicionar
+            </Button>
           </div>
-          <div className="flex shadow-sm rounded-r-md">
-            <span className="bg-red-500 hover:bg-red-700 inline-flex items-center px-2 rounded-l-md border-r-0 border-gray-300 text-white-500 text-sm">
-              <PlayIcon className="h-5 w-5" onClick={() => previewSample()} />
-            </span>
-            <select
-              name="sample"
-              className="text-black rounded-r-md px-2"
-              value={sample}
-              onChange={(e) => setSample(e.target.value)}
-            >
-              {instruments.map((instrument) => (
-                <option key={instrument.name} value={instrument.path}>
-                  {instrument.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <input name="action" value="add" type="hidden" />
-          <Button onClick={() => handleCreate()}>Adicionar</Button>
+        </div>
+        <div className="flex rounded-md shadow-sm justify-self-end">
+          <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
+            BPM
+          </span>
+          <input
+            type="number"
+            name="bpm"
+            className="flex-1 block text-black rounded-r-md pl-2 border-gray-300 sm:text-sm"
+            defaultValue={120}
+            onChange={(e) => handleBPM(Number(e.target.value))}
+          />
         </div>
       </div>
 

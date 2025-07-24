@@ -1,5 +1,4 @@
 import { Button } from "~/components/button";
-import { useFetcher } from "@remix-run/react";
 import { PauseIcon, PlayIcon, TrashIcon } from "@heroicons/react/16/solid";
 import Guia from "./Guia";
 import * as Tone from "tone";
@@ -73,6 +72,11 @@ function Channel({
     }).start(0);
 
     sequenceRef.current = sequence;
+
+    if (Tone.getContext().transport.state !== "started") {
+      sequenceRef.current.start();
+      Tone.getContext().transport.start();
+    }
 
     return () => {
       try {
@@ -151,47 +155,59 @@ function Channel({
             onEdit={onEditPattern}
           />
         </div>
-        <input type="hidden" value="delete" name="action" />
-        <input type="hidden" value={track.id} name="id" />
-        <select
-          name="sample"
-          className="text-black rounded-r-md px-2"
-          value={sample}
-          onChange={(e) => handleEdit(track.id, e.currentTarget.value)}
-        >
-          {instruments.map((instrument) => (
-            <option key={instrument.name} value={instrument.path}>
-              {instrument.name}
-            </option>
-          ))}
-        </select>
-        <Button onClick={() => handleDelete()}>
-          <TrashIcon className="h-4 w-4 text-white" />
-        </Button>
-        {isPlaying ? (
-          <Button>
-            <PauseIcon
-              className="h-4 w-4 text-white"
-              onClick={() => handlePause()}
+        <div className="flex flex-col space-y-4 justify-center items-center">
+          <p className="text-center">Padrão: {pattern}</p>
+
+          <div className="flex space-x-2">
+            <span>Volume:</span>
+            <input
+              type="range"
+              id="volume"
+              name="volume"
+              min="0"
+              max="100"
+              value={volume}
+              onChange={(e) => handleVolume(Number(e.target.value))}
             />
-          </Button>
-        ) : (
-          <Button>
-            <PlayIcon
-              className="h-4 w-4 text-white"
-              onClick={() => handleResume()}
-            />
-          </Button>
-        )}
-        <input
-          type="range"
-          id="volume"
-          name="volume"
-          min="0"
-          max="100"
-          value={volume}
-          onChange={(e) => handleVolume(Number(e.target.value))}
-        />
+            <span>{volume}%</span>
+          </div>
+
+          <div className="flex space-x-2">
+            <span>Instrumento: </span>
+            <select
+              name="sample"
+              className="text-black rounded-md px-2"
+              value={sample}
+              onChange={(e) => handleEdit(track.id, e.currentTarget.value)}
+            >
+              {instruments.map((instrument) => (
+                <option key={instrument.name} value={instrument.path}>
+                  {instrument.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex justify-center">
+            {isPlaying ? (
+              <Button>
+                <PauseIcon
+                  className="h-4 w-4 text-white"
+                  onClick={() => handlePause()}
+                />
+              </Button>
+            ) : (
+              <Button>
+                <PlayIcon
+                  className="h-4 w-4 text-white"
+                  onClick={() => handleResume()}
+                />
+              </Button>
+            )}
+            <Button onClick={() => handleDelete()}>
+              <TrashIcon className="h-4 w-4 text-white" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -143,7 +143,6 @@ export default function Guia({
         height={height}
         onClick={handleClick}
       />
-      <p className="text-center">{pattern}</p>
     </div>
   );
 }
