@@ -32,8 +32,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="h-screen bg-black text-white">
-        <div className="flex text-red mb-4 p-2 space-x-4">
-          <Link className="text-red" to="/">
+        <div className="flex text-red p-4 space-x-4">
+          <Link className="text-[#cc2c11] text-3xl" to="/">
             Polymatic 7.0.0
           </Link>
         </div>

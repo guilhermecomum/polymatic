@@ -143,7 +143,7 @@ export default function Index() {
 
           <div className="flex rounded-md shadow-sm space-x-2 justify-self-start">
             <div className="flex rounded-md shadow-sm">
-              <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
+              <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-300 text-gray-500 text-sm">
                 Guia
               </span>
               <input
@@ -178,7 +178,7 @@ export default function Index() {
           </div>
         </div>
         <div className="flex rounded-md shadow-sm justify-self-end">
-          <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">
+          <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-300 text-gray-500 text-sm">
             BPM
           </span>
           <input
