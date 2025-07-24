@@ -186,7 +186,7 @@ export default function Index() {
             name="bpm"
             className="flex-1 block text-black rounded-r-md pl-2 border-gray-300 sm:text-sm"
             defaultValue={120}
-            onChange={(e) => handleBPM(e.target.value)}
+            onChange={(e) => handleBPM(Number(e.target.value))}
           />
         </div>
       </div>
