@@ -14,27 +14,15 @@ describe("createPattern", () => {
 });
 
 describe("shiftPattern", () => {
-  it("should not rotate when offset is 0", () => {
+  it("should rotate when direction is clockwise", () => {
     const pattern = createPattern("111010");
-    const [rotated] = shiftPattern(pattern, 0);
-    expect(rotated).toEqual([1, 1, 1, 0, 1, 0]);
+    const rotated = shiftPattern(pattern, true);
+    expect(rotated).toEqual([0, 1, 1, 1, 0, 1]);
   });
 
-  it("should shift pattern left by 2 positions", () => {
+  it("should rotate counterclockwise when clockwise is false", () => {
     const pattern = createPattern("111010");
-    const [rotated] = shiftPattern(pattern, 2);
-    expect(rotated).toEqual([1, 0, 1, 0, 1, 1]);
-  });
-
-  it("should handle offset larger than pattern length by using modulo", () => {
-    const pattern = createPattern("111010");
-    const [rotated] = shiftPattern(pattern, 8); // 8 % 6 = 2
-    expect(rotated).toEqual([1, 0, 1, 0, 1, 1]); // Same as shift by 2
-  });
-
-  it("should return original pattern when offset equals pattern length", () => {
-    const pattern = createPattern("111010");
-    const [rotated] = shiftPattern(pattern, 6);
-    expect(rotated).toEqual([1, 1, 1, 0, 1, 0]);
+    const rotated = shiftPattern(pattern, false);
+    expect(rotated).toEqual([1, 1, 0, 1, 0, 1]);
   });
 });

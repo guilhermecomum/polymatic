@@ -14,10 +14,10 @@ function createPattern(pulses: unknown, steps?: unknown) {
   }
 }
 
-function shiftPattern(pattern: (0 | 1)[], offset: number) {
-  const isIncreasing = 0 < offset ? true : false;
+function shiftPattern(pattern: (0 | 1)[], clockwise: boolean) {
+  const isClockwise = clockwise;
 
-  if (isIncreasing) {
+  if (isClockwise) {
     const tail = pattern.splice(pattern.length - 1, 1);
 
     for (let i = 0; i < tail.length; i++) {
@@ -30,7 +30,7 @@ function shiftPattern(pattern: (0 | 1)[], offset: number) {
     }
   }
 
-  return [pattern, offset];
+  return pattern;
 }
 
 export { createPattern, shiftPattern };
