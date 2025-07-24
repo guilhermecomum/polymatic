@@ -1,3 +1,5 @@
+import { cx } from "~/framework/utils";
+
 function Button({
   children,
   className,
@@ -5,7 +7,10 @@ function Button({
 }: JSX.IntrinsicElements["button"]) {
   return (
     <button
-      className={`bg-red-500 hover:bg-red-700 p-2 text-sm text-white ${className}`}
+      className={cx(
+        `bg-red-500 hover:bg-red-700 p-2 text-sm text-white`,
+        className,
+      )}
       {...props}
     >
       {children}
