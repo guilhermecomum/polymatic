@@ -201,7 +201,7 @@ export default function Index() {
         </div>
       </div>
 
-      <div className="flex space-y-4 mt-4 p-4">
+      <div className="flex space-x-4 items-center flex-wrap mt-4 p-4">
         {channels.map((track) => (
           <Channel
             key={track.id}
