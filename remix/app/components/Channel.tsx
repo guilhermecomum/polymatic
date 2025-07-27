@@ -1,16 +1,19 @@
 import { Button } from "~/components/button";
-import { PauseIcon, PlayIcon, TrashIcon } from "@heroicons/react/16/solid";
+import { TrashIcon } from "@heroicons/react/16/solid";
 import Guia from "./Guia";
 import * as Tone from "tone";
 import { useEffect, useRef, useState } from "react";
 import { createPattern, shiftPattern } from "~/framework/patterns";
 import { instruments } from "~/framework/instruments";
+import { cx } from "~/framework/utils";
 
 type Channel = {
   id: number;
   pattern: string;
   sample: string;
   isPlaying: boolean;
+  solo: boolean;
+  muted: boolean;
 };
 
 function Channel({
@@ -24,9 +27,10 @@ function Channel({
   onEditInstrument: any;
   onEditPattern: any;
 }) {
-  const { pattern, id, sample } = track;
+  const { pattern, id, sample, muted, solo } = track;
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [mute, setMute] = useState<boolean>(muted);
+  const [only, setOnly] = useState<boolean>(solo);
   const [volume, setVolume] = useState<number>(100);
   const [shift, setShift] = useState(0);
   const playerRef = useRef<Tone.Player | null>(null);
@@ -48,6 +52,8 @@ function Channel({
   useEffect(() => {
     const channel = new Tone.Channel({
       volume: percentToDb(volume),
+      mute: muted,
+      solo,
     }).toDestination();
     channelRef.current = channel;
 
@@ -105,30 +111,32 @@ function Channel({
         console.error("Error during cleanup:", error);
       }
     };
-  }, [pattern, sample, necklace.length, shift]);
+  }, [pattern, sample, necklace.length, shift, mute, only]);
 
   const handleDelete = () => {
     onDelete(id);
   };
 
-  const handlePause = () => {
-    setIsPlaying(false);
-    const channel = channelRef.current;
-    channel?.set({
-      mute: true,
+  const toggleMute = () => {
+    const value = !mute;
+    setMute(value);
+    channelRef.current?.set({
+      mute: value,
     });
+    onEditPattern(id, pattern, value, channelRef.current?.solo);
   };
 
-  const handleResume = () => {
-    setIsPlaying(true);
-    const channel = channelRef.current;
-    channel?.set({
-      mute: false,
+  const toggleSolo = () => {
+    const value = !only;
+    channelRef.current?.set({
+      solo: value,
     });
+    setOnly(value);
+    onEditPattern(id, pattern, channelRef.current?.muted, value);
   };
 
   const handleEdit = (id: number, sample: string) =>
-    onEditInstrument(id, sample);
+    onEditInstrument(id, sample, mute, only);
 
   function percentToDb(percent: number) {
     if (percent <= 0) return -1000; // Silence
@@ -137,8 +145,7 @@ function Channel({
   }
 
   const handleVolume = (value: number) => {
-    const channel = channelRef.current;
-    channel?.set({
+    channelRef.current?.set({
       volume: percentToDb(value),
     });
     setVolume(value);
@@ -159,13 +166,15 @@ function Channel({
             id={id}
             pattern={pattern}
             currentStep={currentStep}
-            isPlaying={isPlaying}
             onEdit={onEditPattern}
+            mute={mute}
+            only={only}
           />
         </div>
         <div className="flex flex-col space-y-4 justify-center items-center">
           <p className="text-center">Padrão: {pattern}</p>
-
+          <p>{muted && "mudo"}</p>
+          <p>{solo && "solo"}</p>
           <div className="flex space-x-2">
             <span>Rotação:</span>
             <input
@@ -210,21 +219,30 @@ function Channel({
             </select>
           </div>
           <div className="flex justify-center">
-            {isPlaying ? (
-              <Button>
-                <PauseIcon
-                  className="h-4 w-4 text-white"
-                  onClick={() => handlePause()}
+            <div className="flex flex-col items-center">
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={mute}
+                  onChange={() => toggleMute()}
                 />
-              </Button>
-            ) : (
-              <Button>
-                <PlayIcon
-                  className="h-4 w-4 text-white"
-                  onClick={() => handleResume()}
+                <span className="slider round"></span>
+              </label>
+              <span>mute</span>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={only}
+                  onChange={() => toggleSolo()}
                 />
-              </Button>
-            )}
+                <span className="slider round"></span>
+              </label>
+              <span>solo</span>
+            </div>
+
             <Button onClick={() => handleDelete()}>
               <TrashIcon className="h-4 w-4 text-white" />
             </Button>

@@ -89,6 +89,8 @@ export default function Index() {
         pattern: necklace.join(""),
         sample,
         isPlaying: true,
+        muted: false,
+        solo: false,
       },
     ]);
     const transport = Tone.getTransport();
@@ -113,13 +115,20 @@ export default function Index() {
       ),
     );
 
-  const handleEditPattern = (id: number, pattern: string) => {
+  const handleEditPattern = (
+    id: number,
+    pattern: string,
+    muted: boolean,
+    solo: boolean,
+  ) => {
     setChannels(
       channels.map((p) =>
         p.id == id
           ? {
               ...p,
               pattern,
+              muted,
+              solo,
             }
           : p,
       ),
