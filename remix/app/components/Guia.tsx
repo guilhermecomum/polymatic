@@ -1,4 +1,3 @@
-import { useFetcher } from "@remix-run/react";
 import { useEffect, useRef, useCallback, useMemo } from "react";
 import { createPattern } from "~/framework/patterns";
 import {
@@ -17,8 +16,9 @@ type Props = {
   id: number;
   pattern: string;
   currentStep: number;
-  isPlaying: boolean;
   onEdit: any;
+  mute: boolean;
+  only: boolean;
 };
 
 // Define proper type for pattern position
@@ -32,8 +32,9 @@ export default function Guia({
   id,
   pattern,
   currentStep,
-  isPlaying,
   onEdit,
+  mute,
+  only,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -91,10 +92,10 @@ export default function Guia({
     const context = canvas.getContext("2d");
     if (!context) return;
 
-    isPlaying && draw(context);
+    draw(context);
 
     // No dependency on draw itself since it's wrapped in useCallback
-  }, [draw, isPlaying]);
+  }, [draw]);
 
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     event.stopPropagation();
@@ -127,7 +128,7 @@ export default function Guia({
 
         // Submit form with the updated pattern
 
-        onEdit(id, newPattern);
+        onEdit(id, newPattern, mute, only);
         // Exit after processing the first clicked dot
         break;
       }

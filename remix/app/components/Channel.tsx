@@ -1,16 +1,16 @@
 import { Button } from "~/components/button";
-import { PauseIcon, PlayIcon, TrashIcon } from "@heroicons/react/16/solid";
+import { TrashIcon } from "@heroicons/react/16/solid";
 import Guia from "./Guia";
 import * as Tone from "tone";
 import { useEffect, useRef, useState } from "react";
 import { createPattern, shiftPattern } from "~/framework/patterns";
 import { instruments } from "~/framework/instruments";
+import { cx } from "~/framework/utils";
 
 type Channel = {
   id: number;
   pattern: string;
   sample: string;
-  isPlaying: boolean;
 };
 
 function Channel({
@@ -26,9 +26,10 @@ function Channel({
 }) {
   const { pattern, id, sample } = track;
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [volume, setVolume] = useState<number>(100);
+  const [muted, setMuted] = useState<boolean>(false);
   const [shift, setShift] = useState(0);
+
   const playerRef = useRef<Tone.Player | null>(null);
   const sequenceRef = useRef<Tone.Sequence | null>(null);
   const channelRef = useRef<Tone.Channel | null>(null);
@@ -48,6 +49,7 @@ function Channel({
   useEffect(() => {
     const channel = new Tone.Channel({
       volume: percentToDb(volume),
+      mute: muted,
     }).toDestination();
     channelRef.current = channel;
 
@@ -105,26 +107,17 @@ function Channel({
         console.error("Error during cleanup:", error);
       }
     };
-  }, [pattern, sample, necklace.length, shift]);
+  }, [pattern, sample, necklace.length, volume, muted]);
 
   const handleDelete = () => {
     onDelete(id);
   };
 
-  const handlePause = () => {
-    setIsPlaying(false);
-    const channel = channelRef.current;
-    channel?.set({
-      mute: true,
+  const toggleMute = (e) => {
+    channelRef.current?.set({
+      mute: e.target.checked,
     });
-  };
-
-  const handleResume = () => {
-    setIsPlaying(true);
-    const channel = channelRef.current;
-    channel?.set({
-      mute: false,
-    });
+    setMuted(e.target.checked);
   };
 
   const handleEdit = (id: number, sample: string) =>
@@ -137,8 +130,7 @@ function Channel({
   }
 
   const handleVolume = (value: number) => {
-    const channel = channelRef.current;
-    channel?.set({
+    channelRef.current?.set({
       volume: percentToDb(value),
     });
     setVolume(value);
@@ -148,7 +140,7 @@ function Channel({
     const isIncreasing = value > shift;
     setShift(value);
     const rotatePattern = shiftPattern(necklace, isIncreasing);
-    onEditPattern(id, rotatePattern.join(""), value);
+    onEditPattern(id, rotatePattern.join(""));
   };
 
   return (
@@ -159,13 +151,11 @@ function Channel({
             id={id}
             pattern={pattern}
             currentStep={currentStep}
-            isPlaying={isPlaying}
             onEdit={onEditPattern}
           />
         </div>
         <div className="flex flex-col space-y-4 justify-center items-center">
           <p className="text-center">Padrão: {pattern}</p>
-
           <div className="flex space-x-2">
             <span>Rotação:</span>
             <input
@@ -209,23 +199,20 @@ function Channel({
               ))}
             </select>
           </div>
-          <div className="flex justify-center">
-            {isPlaying ? (
-              <Button>
-                <PauseIcon
-                  className="h-4 w-4 text-white"
-                  onClick={() => handlePause()}
+          <div className="flex justify-between w-full px-4 items-center">
+            <div className="flex flex-col items-center">
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={muted}
+                  onChange={(e) => toggleMute(e)}
                 />
-              </Button>
-            ) : (
-              <Button>
-                <PlayIcon
-                  className="h-4 w-4 text-white"
-                  onClick={() => handleResume()}
-                />
-              </Button>
-            )}
-            <Button onClick={() => handleDelete()}>
+                <span className="slider round"></span>
+              </label>
+              <span>mute</span>
+            </div>
+
+            <Button onClick={() => handleDelete()} className="rounded">
               <TrashIcon className="h-4 w-4 text-white" />
             </Button>
           </div>

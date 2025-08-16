@@ -88,9 +88,13 @@ export default function Index() {
         id: Date.now(),
         pattern: necklace.join(""),
         sample,
-        isPlaying: true,
       },
     ]);
+    const transport = Tone.getTransport();
+    if (transport.state === "started") {
+      transport.stop();
+      transport.start();
+    }
   };
 
   const handleDelete = (id: number) =>
@@ -108,7 +112,7 @@ export default function Index() {
       ),
     );
 
-  const handleEditPattern = (id: number, pattern: string) =>
+  const handleEditPattern = (id: number, pattern: string) => {
     setChannels(
       channels.map((p) =>
         p.id == id
@@ -119,7 +123,12 @@ export default function Index() {
           : p,
       ),
     );
-
+    const transport = Tone.getTransport();
+    if (transport.state === "started") {
+      transport.stop();
+      transport.start();
+    }
+  };
   const handlePlay = () => Tone.getTransport().start();
 
   const handlePause = () => Tone.getTransport().stop();
@@ -191,7 +200,7 @@ export default function Index() {
         </div>
       </div>
 
-      <div className="flex space-y-4 mt-4 p-4">
+      <div className="flex space-x-4 items-center flex-wrap mt-4 p-4">
         {channels.map((track) => (
           <Channel
             key={track.id}
