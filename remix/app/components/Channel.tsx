@@ -11,9 +11,6 @@ type Channel = {
   id: number;
   pattern: string;
   sample: string;
-  isPlaying: boolean;
-  solo: boolean;
-  muted: boolean;
 };
 
 function Channel({
@@ -29,10 +26,9 @@ function Channel({
 }) {
   const { pattern, id, sample, muted, solo } = track;
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [mute, setMute] = useState<boolean>(muted);
-  const [only, setOnly] = useState<boolean>(solo);
   const [volume, setVolume] = useState<number>(100);
   const [shift, setShift] = useState(0);
+
   const playerRef = useRef<Tone.Player | null>(null);
   const sequenceRef = useRef<Tone.Sequence | null>(null);
   const channelRef = useRef<Tone.Channel | null>(null);
@@ -52,8 +48,6 @@ function Channel({
   useEffect(() => {
     const channel = new Tone.Channel({
       volume: percentToDb(volume),
-      mute: muted,
-      solo,
     }).toDestination();
     channelRef.current = channel;
 
@@ -111,32 +105,20 @@ function Channel({
         console.error("Error during cleanup:", error);
       }
     };
-  }, [pattern, sample, necklace.length, shift, mute, only]);
+  }, [pattern, sample, necklace.length, shift]);
 
   const handleDelete = () => {
     onDelete(id);
   };
 
   const toggleMute = () => {
-    const value = !mute;
-    setMute(value);
     channelRef.current?.set({
-      mute: value,
+      mute: !channelRef.current.muted,
     });
-    onEditPattern(id, pattern, value, channelRef.current?.solo);
-  };
-
-  const toggleSolo = () => {
-    const value = !only;
-    channelRef.current?.set({
-      solo: value,
-    });
-    setOnly(value);
-    onEditPattern(id, pattern, channelRef.current?.muted, value);
   };
 
   const handleEdit = (id: number, sample: string) =>
-    onEditInstrument(id, sample, mute, only);
+    onEditInstrument(id, sample);
 
   function percentToDb(percent: number) {
     if (percent <= 0) return -1000; // Silence
@@ -155,7 +137,7 @@ function Channel({
     const isIncreasing = value > shift;
     setShift(value);
     const rotatePattern = shiftPattern(necklace, isIncreasing);
-    onEditPattern(id, rotatePattern.join(""), value);
+    onEditPattern(id, rotatePattern.join(""));
   };
 
   return (
@@ -167,14 +149,10 @@ function Channel({
             pattern={pattern}
             currentStep={currentStep}
             onEdit={onEditPattern}
-            mute={mute}
-            only={only}
           />
         </div>
         <div className="flex flex-col space-y-4 justify-center items-center">
           <p className="text-center">Padrão: {pattern}</p>
-          <p>{muted && "mudo"}</p>
-          <p>{solo && "solo"}</p>
           <div className="flex space-x-2">
             <span>Rotação:</span>
             <input
@@ -223,24 +201,12 @@ function Channel({
               <label className="switch">
                 <input
                   type="checkbox"
-                  checked={mute}
+                  checked={channelRef.current && channelRef.current.muted}
                   onChange={() => toggleMute()}
                 />
                 <span className="slider round"></span>
               </label>
               <span>mute</span>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={only}
-                  onChange={() => toggleSolo()}
-                />
-                <span className="slider round"></span>
-              </label>
-              <span>solo</span>
             </div>
 
             <Button onClick={() => handleDelete()}>
