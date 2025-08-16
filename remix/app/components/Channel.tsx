@@ -24,9 +24,10 @@ function Channel({
   onEditInstrument: any;
   onEditPattern: any;
 }) {
-  const { pattern, id, sample, muted, solo } = track;
+  const { pattern, id, sample } = track;
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [volume, setVolume] = useState<number>(100);
+  const [muted, setMuted] = useState<boolean>(false);
   const [shift, setShift] = useState(0);
 
   const playerRef = useRef<Tone.Player | null>(null);
@@ -48,6 +49,7 @@ function Channel({
   useEffect(() => {
     const channel = new Tone.Channel({
       volume: percentToDb(volume),
+      mute: muted,
     }).toDestination();
     channelRef.current = channel;
 
@@ -105,16 +107,17 @@ function Channel({
         console.error("Error during cleanup:", error);
       }
     };
-  }, [pattern, sample, necklace.length, shift]);
+  }, [pattern, sample, necklace.length, volume, muted]);
 
   const handleDelete = () => {
     onDelete(id);
   };
 
-  const toggleMute = () => {
+  const toggleMute = (e) => {
     channelRef.current?.set({
-      mute: !channelRef.current.muted,
+      mute: e.target.checked,
     });
+    setMuted(e.target.checked);
   };
 
   const handleEdit = (id: number, sample: string) =>
@@ -196,20 +199,20 @@ function Channel({
               ))}
             </select>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-between w-full px-4 items-center">
             <div className="flex flex-col items-center">
               <label className="switch">
                 <input
                   type="checkbox"
-                  checked={channelRef.current && channelRef.current.muted}
-                  onChange={() => toggleMute()}
+                  checked={muted}
+                  onChange={(e) => toggleMute(e)}
                 />
                 <span className="slider round"></span>
               </label>
               <span>mute</span>
             </div>
 
-            <Button onClick={() => handleDelete()}>
+            <Button onClick={() => handleDelete()} className="rounded">
               <TrashIcon className="h-4 w-4 text-white" />
             </Button>
           </div>
