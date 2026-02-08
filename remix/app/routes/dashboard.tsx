@@ -57,7 +57,10 @@ export async function action({ request }: ActionFunctionArgs) {
     if (typeof folderId !== "string") {
       return json({ error: "ID da pasta é obrigatório" }, { status: 400 });
     }
-    await deleteFolder(folderId);
+    const deleted = await deleteFolder(folderId, user.id);
+    if (!deleted) {
+      return json({ error: "Pasta não encontrada" }, { status: 404 });
+    }
     return json({ success: true });
   }
 
@@ -67,7 +70,10 @@ export async function action({ request }: ActionFunctionArgs) {
     if (typeof folderId !== "string" || typeof name !== "string") {
       return json({ error: "Dados inválidos" }, { status: 400 });
     }
-    await updateFolder(folderId, name.trim());
+    const updated = await updateFolder(folderId, user.id, name.trim());
+    if (!updated) {
+      return json({ error: "Pasta não encontrada" }, { status: 404 });
+    }
     return json({ success: true });
   }
 
@@ -76,7 +82,10 @@ export async function action({ request }: ActionFunctionArgs) {
     if (typeof compositionId !== "string") {
       return json({ error: "ID da composição é obrigatório" }, { status: 400 });
     }
-    await deleteComposition(compositionId);
+    const deleted = await deleteComposition(compositionId, user.id);
+    if (!deleted) {
+      return json({ error: "Composição não encontrada" }, { status: 404 });
+    }
     return json({ success: true });
   }
 
@@ -86,9 +95,12 @@ export async function action({ request }: ActionFunctionArgs) {
     if (typeof compositionId !== "string") {
       return json({ error: "ID da composição é obrigatório" }, { status: 400 });
     }
-    await updateComposition(compositionId, {
+    const updated = await updateComposition(compositionId, user.id, {
       folderId: folderId === "" ? null : (folderId as string),
     });
+    if (!updated) {
+      return json({ error: "Composição não encontrada" }, { status: 404 });
+    }
     return json({ success: true });
   }
 
@@ -98,9 +110,12 @@ export async function action({ request }: ActionFunctionArgs) {
     if (typeof compositionId !== "string" || typeof title !== "string") {
       return json({ error: "Dados inválidos" }, { status: 400 });
     }
-    await updateComposition(compositionId, {
+    const updated = await updateComposition(compositionId, user.id, {
       title: title.trim() || null,
     });
+    if (!updated) {
+      return json({ error: "Composição não encontrada" }, { status: 404 });
+    }
     return json({ success: true });
   }
 

@@ -1,14 +1,16 @@
 import { type LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { getCompositionBySlug, encodeShareData } from "~/services/share.server";
+import { getUserId } from "~/services/session.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const { slug } = params;
 
   if (!slug) {
     return redirect("/");
   }
 
-  const composition = await getCompositionBySlug(slug);
+  const userId = await getUserId(request);
+  const composition = await getCompositionBySlug(slug, userId);
 
   if (!composition) {
     return redirect("/");

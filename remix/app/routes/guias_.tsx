@@ -9,7 +9,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (guiasParam) {
     // Parse the legacy format
-    const shareData = parseLegacyGuias(decodeURIComponent(guiasParam));
+    // URLSearchParams.get() already decodes, no need for decodeURIComponent
+    const shareData = parseLegacyGuias(guiasParam);
 
     if (shareData) {
       // Encode to new format and redirect to main page

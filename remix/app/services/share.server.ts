@@ -62,14 +62,44 @@ export function parseLegacyGuias(guiasJson: string): ShareData | null {
   }
 }
 
-// Generate short slug for compositions
+// Generate short slug for compositions using crypto-secure randomness
 export function generateSlug(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
   let slug = "";
   for (let i = 0; i < 8; i++) {
-    slug += chars.charAt(Math.floor(Math.random() * chars.length));
+    slug += chars.charAt(bytes[i] % chars.length);
   }
   return slug;
+}
+
+// Validate channels data schema
+export function validateChannels(data: unknown): data is ChannelData[] {
+  if (!Array.isArray(data)) return false;
+  return data.every(
+    (ch) =>
+      typeof ch === "object" &&
+      ch !== null &&
+      typeof ch.pattern === "string" &&
+      typeof ch.sample === "string" &&
+      /^[01]+$/.test(ch.pattern) &&
+      ch.pattern.length <= 64 &&
+      ch.sample.length <= 255 &&
+      Object.keys(ch).length === 2
+  );
+}
+
+// Validate redirectTo to prevent open redirects
+export function safeRedirectTo(redirectTo: unknown): string {
+  if (
+    typeof redirectTo !== "string" ||
+    !redirectTo.startsWith("/") ||
+    redirectTo.startsWith("//")
+  ) {
+    return "/";
+  }
+  return redirectTo;
 }
 
 // Database operations
@@ -116,7 +146,7 @@ export async function saveComposition(
   return { id, slug };
 }
 
-export async function getCompositionBySlug(slug: string) {
+export async function getCompositionBySlug(slug: string, requestUserId?: string | null) {
   const composition = await db
     .selectFrom("compositions")
     .selectAll()
@@ -124,6 +154,11 @@ export async function getCompositionBySlug(slug: string) {
     .executeTakeFirst();
 
   if (!composition) return null;
+
+  // Enforce is_public: private compositions only accessible by their owner
+  if (!composition.is_public && composition.user_id !== requestUserId) {
+    return null;
+  }
 
   // Parse channels JSON
   return {
@@ -171,6 +206,7 @@ export async function getCompositionsByFolder(folderId: string) {
 
 export async function updateComposition(
   id: string,
+  userId: string,
   data: Partial<{
     title: string | null;
     folderId: string | null;
@@ -188,15 +224,24 @@ export async function updateComposition(
     updateData.channels = JSON.stringify(data.channels);
   if (data.isPublic !== undefined) updateData.is_public = data.isPublic;
 
-  await db
+  const result = await db
     .updateTable("compositions")
     .set(updateData)
     .where("id", "=", id)
-    .execute();
+    .where("user_id", "=", userId)
+    .executeTakeFirst();
+
+  return Number(result.numUpdatedRows) > 0;
 }
 
-export async function deleteComposition(id: string) {
-  await db.deleteFrom("compositions").where("id", "=", id).execute();
+export async function deleteComposition(id: string, userId: string) {
+  const result = await db
+    .deleteFrom("compositions")
+    .where("id", "=", id)
+    .where("user_id", "=", userId)
+    .executeTakeFirst();
+
+  return Number(result.numDeletedRows) > 0;
 }
 
 // Folder operations
@@ -224,10 +269,23 @@ export async function getFoldersByUser(userId: string) {
     .execute();
 }
 
-export async function updateFolder(id: string, name: string) {
-  await db.updateTable("folders").set({ name }).where("id", "=", id).execute();
+export async function updateFolder(id: string, userId: string, name: string) {
+  const result = await db
+    .updateTable("folders")
+    .set({ name })
+    .where("id", "=", id)
+    .where("user_id", "=", userId)
+    .executeTakeFirst();
+
+  return Number(result.numUpdatedRows) > 0;
 }
 
-export async function deleteFolder(id: string) {
-  await db.deleteFrom("folders").where("id", "=", id).execute();
+export async function deleteFolder(id: string, userId: string) {
+  const result = await db
+    .deleteFrom("folders")
+    .where("id", "=", id)
+    .where("user_id", "=", userId)
+    .executeTakeFirst();
+
+  return Number(result.numDeletedRows) > 0;
 }

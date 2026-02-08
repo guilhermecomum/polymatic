@@ -2,6 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remi
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import { json, redirect } from "@remix-run/node";
 import { createUserSession, getUserId, verifyLogin } from "~/services/session.server";
+import { safeRedirectTo } from "~/services/share.server";
 import { Button } from "~/components/button";
 
 export const meta: MetaFunction = () => {
@@ -18,7 +19,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
-  const redirectTo = formData.get("redirectTo") || "/";
+  const redirectTo = safeRedirectTo(formData.get("redirectTo"));
 
   if (typeof email !== "string" || typeof password !== "string") {
     return json(
@@ -50,7 +51,7 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  return createUserSession(user.id, redirectTo as string);
+  return createUserSession(user.id, redirectTo);
 }
 
 export default function LoginPage() {

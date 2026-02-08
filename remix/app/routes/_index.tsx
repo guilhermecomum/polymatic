@@ -23,6 +23,7 @@ import {
   decodeShareData,
   encodeShareData,
   saveComposition,
+  validateChannels,
 } from "~/services/share.server";
 import { getUserId } from "~/services/session.server";
 import { ShareModal } from "~/components/ShareModal";
@@ -75,6 +76,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
     try {
       const channels = JSON.parse(channelsJson);
+      if (!validateChannels(channels)) {
+        return json({ error: "Dados de canais inválidos" }, { status: 400 });
+      }
       const result = await saveComposition(
         { channels, bpm },
         { userId, title: title || undefined, folderId: folderId || undefined }
@@ -96,6 +100,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
     try {
       const channels = JSON.parse(channelsJson);
+      if (!validateChannels(channels)) {
+        return json({ error: "Dados de canais inválidos" }, { status: 400 });
+      }
       const encoded = encodeShareData({ channels, bpm });
       const appUrl = process.env.APP_URL || "http://localhost:5173";
       const shareUrl = `${appUrl}/?data=${encoded}`;

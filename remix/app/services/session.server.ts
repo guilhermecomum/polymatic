@@ -124,17 +124,23 @@ export async function createUser(
   return { id, email, name };
 }
 
-// User lookup
+// User lookup (does NOT return password hash)
 export async function getUserByEmail(email: string) {
   return db
     .selectFrom("users")
-    .selectAll()
+    .select(["id", "email", "name"])
     .where("email", "=", email)
     .executeTakeFirst();
 }
 
 export async function verifyLogin(email: string, password: string) {
-  const user = await getUserByEmail(email);
+  // Select password only here where it's needed for verification
+  const user = await db
+    .selectFrom("users")
+    .select(["id", "email", "name", "password"])
+    .where("email", "=", email)
+    .executeTakeFirst();
+
   if (!user) return null;
 
   const isValid = await verifyPassword(password, user.password);
