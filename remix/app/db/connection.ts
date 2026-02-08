@@ -3,8 +3,8 @@ import { Pool } from "pg";
 import type { Database } from "./types";
 
 const isLocalhost =
-  env.DATABASE_URL.includes("localhost") ||
-  env.DATABASE_URL.includes("127.0.0.1");
+  process.env.DATABASE_URL.includes("localhost") ||
+  process.env.DATABASE_URL.includes("127.0.0.1");
 
 const dialect = new PostgresDialect({
   pool: new Pool({
