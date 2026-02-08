@@ -69,7 +69,7 @@ export default function App() {
     <>
       <div className="flex justify-between items-center text-red p-4">
         <Link className="text-[#cc2c11] text-3xl" to="/">
-          Polymatic 7.0.0
+          Polymatic 7.1.0
         </Link>
         <UserMenu user={user} />
       </div>
