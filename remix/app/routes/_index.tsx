@@ -1,6 +1,17 @@
-import { type MetaFunction } from "@remix-run/node";
+import {
+  type MetaFunction,
+  type LoaderFunctionArgs,
+  type ActionFunctionArgs,
+} from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData, useSearchParams, useFetcher } from "@remix-run/react";
 
-import { PlayIcon, StopIcon } from "@heroicons/react/16/solid";
+import {
+  PlayIcon,
+  StopIcon,
+  ShareIcon,
+  BookmarkIcon,
+} from "@heroicons/react/16/solid";
 
 import { Button } from "~/components/button";
 import * as Tone from "tone";
@@ -8,6 +19,13 @@ import { useEffect, useRef, useState } from "react";
 import { Channel } from "~/components/Channel";
 import { createPattern } from "~/framework/patterns";
 import { instruments } from "~/framework/instruments";
+import {
+  decodeShareData,
+  encodeShareData,
+  saveComposition,
+} from "~/services/share.server";
+import { getUserId } from "~/services/session.server";
+import { ShareModal } from "~/components/ShareModal";
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,13 +34,145 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const dataParam = url.searchParams.get("data");
+
+  let initialChannels: { pattern: string; sample: string }[] = [];
+  let initialBpm = 120;
+
+  if (dataParam) {
+    const shareData = decodeShareData(dataParam);
+    if (shareData) {
+      initialChannels = shareData.channels;
+      initialBpm = shareData.bpm;
+    }
+  }
+
+  const userId = await getUserId(request);
+
+  return json({ initialChannels, initialBpm, isLoggedIn: !!userId });
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const intent = formData.get("intent");
+
+  if (intent === "save") {
+    const userId = await getUserId(request);
+    if (!userId) {
+      return json({ error: "Você precisa estar logado para salvar" }, { status: 401 });
+    }
+
+    const channelsJson = formData.get("channels");
+    const bpm = Number(formData.get("bpm")) || 120;
+    const title = formData.get("title") as string | null;
+    const folderId = formData.get("folderId") as string | null;
+
+    if (typeof channelsJson !== "string") {
+      return json({ error: "Dados inválidos" }, { status: 400 });
+    }
+
+    try {
+      const channels = JSON.parse(channelsJson);
+      const result = await saveComposition(
+        { channels, bpm },
+        { userId, title: title || undefined, folderId: folderId || undefined }
+      );
+
+      return json({ success: true, slug: result.slug });
+    } catch {
+      return json({ error: "Erro ao salvar composição" }, { status: 500 });
+    }
+  }
+
+  if (intent === "share") {
+    const channelsJson = formData.get("channels");
+    const bpm = Number(formData.get("bpm")) || 120;
+
+    if (typeof channelsJson !== "string") {
+      return json({ error: "Dados inválidos" }, { status: 400 });
+    }
+
+    try {
+      const channels = JSON.parse(channelsJson);
+      const encoded = encodeShareData({ channels, bpm });
+      const appUrl = process.env.APP_URL || "http://localhost:5173";
+      const shareUrl = `${appUrl}/?data=${encoded}`;
+
+      return json({ success: true, shareUrl });
+    } catch {
+      return json({ error: "Erro ao gerar link" }, { status: 500 });
+    }
+  }
+
+  return json({ error: "Ação desconhecida" }, { status: 400 });
+}
+
+type ChannelType = {
+  id: number;
+  pattern: string;
+  sample: string;
+};
+
 export default function Index() {
-  const [channels, setChannels] = useState<Channel[]>([]);
+  const { initialChannels, initialBpm, isLoggedIn } =
+    useLoaderData<typeof loader>();
+  const [, setSearchParams] = useSearchParams();
+  const fetcher = useFetcher<{
+    success?: boolean;
+    shareUrl?: string;
+    slug?: string;
+    error?: string;
+  }>();
+
+  const [channels, setChannels] = useState<ChannelType[]>(() => {
+    // Initialize with channels from URL if present
+    return initialChannels.map((c, i) => ({
+      id: Date.now() + i,
+      pattern: c.pattern,
+      sample: c.sample,
+    }));
+  });
+
+  const [bpm, setBpm] = useState(initialBpm);
   const [pattern, setPattern] = useState<string>("");
   const [sample, setSample] = useState(
-    "/samples/brazilian-percussion/agogo1.wav",
+    "/samples/brazilian-percussion/agogo1.wav"
   );
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const playerRef = useRef<Tone.Player | null>(null);
+
+  // Sync loader data into state when navigating with ?data= param
+  useEffect(() => {
+    if (initialChannels.length > 0) {
+      setChannels(
+        initialChannels.map((c, i) => ({
+          id: Date.now() + i,
+          pattern: c.pattern,
+          sample: c.sample,
+        }))
+      );
+      setBpm(initialBpm);
+      setSearchParams({}, { replace: true });
+    }
+  }, [initialChannels]);
+
+  // Handle fetcher responses
+  useEffect(() => {
+    if (fetcher.data?.success) {
+      if (fetcher.data.shareUrl) {
+        setShareUrl(fetcher.data.shareUrl);
+        setIsShareModalOpen(true);
+      }
+      if (fetcher.data.slug) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      }
+    }
+  }, [fetcher.data]);
 
   useEffect(() => {
     document.body.addEventListener(
@@ -35,7 +185,7 @@ export default function Index() {
       },
       {
         once: true,
-      },
+      }
     );
 
     // Create a Tone.Player instance
@@ -57,6 +207,11 @@ export default function Index() {
       }
     };
   }, [sample]);
+
+  // Update BPM when it changes
+  useEffect(() => {
+    Tone.getTransport().bpm.value = bpm;
+  }, [bpm]);
 
   const previewSample = () => {
     if (playerRef.current) {
@@ -108,8 +263,8 @@ export default function Index() {
               ...p,
               sample,
             }
-          : p,
-      ),
+          : p
+      )
     );
 
   const handleEditPattern = (id: number, pattern: string) => {
@@ -120,8 +275,8 @@ export default function Index() {
               ...p,
               pattern,
             }
-          : p,
-      ),
+          : p
+      )
     );
     const transport = Tone.getTransport();
     if (transport.state === "started") {
@@ -133,8 +288,45 @@ export default function Index() {
 
   const handlePause = () => Tone.getTransport().stop();
 
-  const handleBPM = (bpm: number) => {
-    Tone.getTransport().bpm.value = bpm;
+  const handleBPM = (newBpm: number) => {
+    setBpm(newBpm);
+  };
+
+  const handleShare = () => {
+    const channelsData = channels.map((c) => ({
+      pattern: c.pattern,
+      sample: c.sample,
+    }));
+
+    fetcher.submit(
+      {
+        intent: "share",
+        channels: JSON.stringify(channelsData),
+        bpm: bpm.toString(),
+      },
+      { method: "post" }
+    );
+  };
+
+  const handleSave = () => {
+    if (!isLoggedIn) {
+      window.location.href = "/login?redirectTo=/";
+      return;
+    }
+
+    const channelsData = channels.map((c) => ({
+      pattern: c.pattern,
+      sample: c.sample,
+    }));
+
+    fetcher.submit(
+      {
+        intent: "save",
+        channels: JSON.stringify(channelsData),
+        bpm: bpm.toString(),
+      },
+      { method: "post" }
+    );
   };
 
   return (
@@ -186,17 +378,40 @@ export default function Index() {
             </Button>
           </div>
         </div>
-        <div className="flex rounded-md shadow-sm justify-self-end">
-          <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-300 text-gray-500 text-sm">
-            BPM
-          </span>
-          <input
-            type="number"
-            name="bpm"
-            className="flex-1 block text-black rounded-r-md pl-2 border-gray-300 sm:text-sm"
-            defaultValue={120}
-            onChange={(e) => handleBPM(Number(e.target.value))}
-          />
+        <div className="flex items-center space-x-4 justify-self-end">
+          <div className="flex rounded-md shadow-sm">
+            <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-300 text-gray-500 text-sm">
+              BPM
+            </span>
+            <input
+              type="number"
+              name="bpm"
+              className="flex-1 block text-black rounded-r-md pl-2 border-gray-300 sm:text-sm w-20"
+              value={bpm}
+              onChange={(e) => handleBPM(Number(e.target.value))}
+            />
+          </div>
+
+          {channels.length > 0 && (
+            <div className="flex space-x-2">
+              <Button
+                className="rounded-md flex items-center space-x-1"
+                onClick={handleShare}
+                disabled={fetcher.state === "submitting"}
+              >
+                <ShareIcon className="h-4 w-4" />
+                <span>Compartilhar</span>
+              </Button>
+              <Button
+                className="rounded-md flex items-center space-x-1"
+                onClick={handleSave}
+                disabled={fetcher.state === "submitting"}
+              >
+                <BookmarkIcon className="h-4 w-4" />
+                <span>{saveSuccess ? "Salvo!" : "Salvar"}</span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -211,6 +426,18 @@ export default function Index() {
           />
         ))}
       </div>
+
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        shareUrl={shareUrl}
+      />
+
+      {fetcher.data?.error && (
+        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-md">
+          {fetcher.data.error}
+        </div>
+      )}
     </div>
   );
 }
